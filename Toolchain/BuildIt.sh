@@ -10,7 +10,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo "$DIR"
 
 ARCH=${ARCH:-"i686"}
-TARGET="$ARCH-pc-serenity"
+TARGET="$ARCH-pc-gelassenheit"
 PREFIX="$DIR/Local/$ARCH"
 BUILD="$DIR/../Build/$ARCH"
 SYSROOT="$BUILD/Root"
@@ -344,7 +344,7 @@ pushd "$DIR/Build/$ARCH"
         buildstep "binutils/install" "$MAKE" install || exit 1
     popd
 
-    echo "XXX serenity libc, libm and libpthread headers"
+    echo "XXX gelassenheit libc, libm and libpthread headers"
     mkdir -p "$BUILD"
     pushd "$BUILD"
         mkdir -p Root/usr/include/
@@ -361,8 +361,8 @@ pushd "$DIR/Build/$ARCH"
         perl -pi -e 's/-no-pie/-nopie/g' "$DIR/Tarballs/gcc-$GCC_VERSION/gcc/configure"
     fi
 
-    if [ ! -f "$DIR/Tarballs/gcc-$GCC_VERSION/gcc/config/serenity-userland.h" ]; then
-        cp "$DIR/Tarballs/gcc-$GCC_VERSION/gcc/config/serenity.h" "$DIR/Tarballs/gcc-$GCC_VERSION/gcc/config/serenity-kernel.h"
+    if [ ! -f "$DIR/Tarballs/gcc-$GCC_VERSION/gcc/config/gelassenheit-userland.h" ]; then
+        cp "$DIR/Tarballs/gcc-$GCC_VERSION/gcc/config/gelassenheit.h" "$DIR/Tarballs/gcc-$GCC_VERSION/gcc/config/gelassenheit-kernel.h"
     fi
 
     rm -rf gcc

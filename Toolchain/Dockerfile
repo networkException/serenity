@@ -26,9 +26,9 @@ RUN apt-get update -y \
 RUN apt install gcc-10 g++-10; \
         update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 900 --slave /usr/bin/g++ g++ /usr/bin/g++-10
 
-RUN git clone --depth 1 https://github.com/SerenityOS/serenity.git /serenity/serenity-git
-RUN cd /serenity/serenity-git/Toolchain; \
+RUN git clone --depth 1 https://github.com/GelassenheitBS/gelassenheit.git /gelassenheit/gelassenheit-git
+RUN cd /gelassenheit/gelassenheit-git/Toolchain; \
         ./BuildIt.sh
 
-WORKDIR /serenity
-VOLUME /serenity/out
+WORKDIR /gelassenheit
+VOLUME /gelassenheit/out

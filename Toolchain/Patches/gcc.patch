@@ -16,7 +16,7 @@ index 63c1f1c8b..a82d7fd08 100755
  	     | onefs* | tirtos* | phoenix* | fuchsia* | redox* | bme* \
  	     | midnightbsd* | amdhsa* | unleashed* | emscripten* | wasi* \
 -	     | nsk* | powerunix* | genode* | zvmoe* | qnx* | emx*)
-+	     | nsk* | powerunix* | genode* | zvmoe* | qnx* | emx* | serenity*)
++	     | nsk* | powerunix* | genode* | zvmoe* | qnx* | emx* | gelassenheit*)
  		;;
  	# This one is extra strict with allowed versions
  	sco3.2v2 | sco3.2v[4-9]* | sco5v6*)
@@ -28,7 +28,7 @@ index df90720b7..a45cdd0de 100755
  
  # Check for special fix rules for particular targets
  case $machine in
-+    *-serenity* | \
++    *-gelassenheit* | \
      i?86-*-cygwin* | \
      i?86-*-mingw32* | \
      x86_64-*-mingw32* | \
@@ -53,11 +53,11 @@ index 357b0bed0..18d099584 100644
  
  # Common parts for widely ported systems.
  case ${target} in
-+*-*-serenity*)
++*-*-gelassenheit*)
 +  gas=yes
 +  gnu_ld=yes
 +  default_use_cxa_atexit=yes
-+  extra_options="${extra_options} serenity.opt"
++  extra_options="${extra_options} gelassenheit.opt"
 +  ;;
  *-*-darwin*)
    tmake_file="t-darwin "
@@ -66,26 +66,26 @@ index 357b0bed0..18d099584 100644
  esac
  
  case ${target} in
-+i[34567]86-*-serenity*)
-+    tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h glibc-stdint.h i386/i386elf.h serenity.h"
++i[34567]86-*-gelassenheit*)
++    tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h glibc-stdint.h i386/i386elf.h gelassenheit.h"
 +    ;;
-+x86_64-*-serenity*)
-+    tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h glibc-stdint.h i386/i386elf.h i386/x86-64.h serenity.h"
++x86_64-*-gelassenheit*)
++    tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h glibc-stdint.h i386/i386elf.h i386/x86-64.h gelassenheit.h"
 +    ;;
-+arm-*-serenity*)
-+    tm_file="dbxelf.h elfos.h arm/elf.h arm/aout.h glibc-stdint.h arm/serenity-elf.h ${tm_file} serenity.h"
++arm-*-gelassenheit*)
++    tm_file="dbxelf.h elfos.h arm/elf.h arm/aout.h glibc-stdint.h arm/gelassenheit-elf.h ${tm_file} gelassenheit.h"
 +    ;;
-+aarch64-*-serenity*)
-+    tm_file="${tm_file} dbxelf.h elfos.h aarch64/aarch64-elf.h glibc-stdint.h serenity.h"
++aarch64-*-gelassenheit*)
++    tm_file="${tm_file} dbxelf.h elfos.h aarch64/aarch64-elf.h glibc-stdint.h gelassenheit.h"
 +    ;;
  aarch64*-*-elf | aarch64*-*-fuchsia* | aarch64*-*-rtems*)
  	tm_file="${tm_file} dbxelf.h elfos.h newlib-stdint.h"
  	tm_file="${tm_file} aarch64/aarch64-elf.h aarch64/aarch64-errata.h aarch64/aarch64-elf-raw.h"
-diff --git a/gcc/config/arm/serenity-elf.h b/gcc/config/arm/serenity-elf.h
+diff --git a/gcc/config/arm/gelassenheit-elf.h b/gcc/config/arm/gelassenheit-elf.h
 new file mode 100644
 index 000000000..24b29c3da
 --- /dev/null
-+++ b/gcc/config/arm/serenity-elf.h
++++ b/gcc/config/arm/gelassenheit-elf.h
 @@ -0,0 +1,65 @@
 +/* Definitions of target machine for GNU compiler, NetBSD/arm ELF version.
 +   Copyright (C) 2002-2018 Free Software Foundation, Inc.
@@ -167,22 +167,22 @@ index 14a01fe71..3f8e44288 100644
  
  /* Yes, this is really supposed to work.  */
  /* This allows for a pagesize of 16384, which we have on Darwin20, but should
-diff --git a/gcc/config/serenity.h b/gcc/config/serenity.h
+diff --git a/gcc/config/gelassenheit.h b/gcc/config/gelassenheit.h
 new file mode 100644
 index 000000000..d57aacca9
 --- /dev/null
-+++ b/gcc/config/serenity.h
++++ b/gcc/config/gelassenheit.h
 @@ -0,0 +1,44 @@
 +/* Useful if you wish to make target-specific GCC changes. */
-+#undef TARGET_SERENITY
-+#define TARGET_SERENITY 1
++#undef TARGET_GELASSENHEIT
++#define TARGET_GELASSENHEIT 1
 +
 +#if defined(HAVE_LD_EH_FRAME_HDR)
 +#define LINK_EH_SPEC "%{!static|static-pie:--eh-frame-hdr} "
 +#endif
 +
 +/* Default arguments you want when running your
-+   i686-serenity-gcc/x86_64-serenity-gcc toolchain */
++   i686-gelassenheit-gcc/x86_64-gelassenheit-gcc toolchain */
 +#undef LIB_SPEC
 +#define LIB_SPEC "%{pthread:-lpthread} -lc" /* link against C standard library */
 +
@@ -213,17 +213,17 @@ index 000000000..d57aacca9
 +  do {                                \
 +    builtin_define ("__gelassenheit__");      \
 +    builtin_define ("__unix__");      \
-+    builtin_assert ("system=serenity");   \
++    builtin_assert ("system=gelassenheit");   \
 +    builtin_assert ("system=unix");   \
 +    builtin_assert ("system=posix");   \
 +  } while(0);
-diff --git a/gcc/config/serenity.opt b/gcc/config/serenity.opt
+diff --git a/gcc/config/gelassenheit.opt b/gcc/config/gelassenheit.opt
 new file mode 100644
 index 000000000..6ce2af2d7
 --- /dev/null
-+++ b/gcc/config/serenity.opt
++++ b/gcc/config/gelassenheit.opt
 @@ -0,0 +1,32 @@
-+; SerenityOS options.
++; GelassenheitBS options.
 +
 +; Copyright (C) 2021 Gunnar Beutner <gunnar@beutner.name>
 +;
@@ -263,7 +263,7 @@ index 9b28369e3..6821ed4ba 100755
    *-linux-musl*)
      gcc_cv_target_dl_iterate_phdr=yes
      ;;
-+  *-serenity*)
++  *-gelassenheit*)
 +    gcc_cv_target_dl_iterate_phdr=yes
 +    ;;
  esac
@@ -277,15 +277,15 @@ index 50f000622..fa30ef089 100644
  	tmake_file="$tmake_file nvptx/t-nvptx"
  	extra_parts="crt0.o"
  	;;
-+i[34567]86-*-serenity*)
++i[34567]86-*-gelassenheit*)
 +	extra_parts="$extra_parts crti.o crtbegin.o crtbeginS.o crtend.o crtendS.o crtn.o"
 +	tmake_file="$tmake_file i386/t-crtstuff t-crtstuff-pic t-libgcc-pic t-slibgcc t-eh-dw2-dip"
 +	;;
-+x86_64-*-serenity*)
++x86_64-*-gelassenheit*)
 +	extra_parts="$extra_parts crti.o crtbegin.o crtbeginS.o crtend.o crtendS.o crtn.o"
 +	tmake_file="$tmake_file i386/t-crtstuff t-crtstuff-pic t-libgcc-pic t-slibgcc t-eh-dw2-dip"
 +	;;
-+arm-*-serenity*)
++arm-*-gelassenheit*)
 +	tmake_file="${tmake_file} t-fixedpoint-gnu-prefix t-crtfm"
 +	tmake_file="$tmake_file arm/t-arm arm/t-elf t-softfp-sfdf t-softfp-excl arm/t-softfp t-softfp"
 +	tmake_file="${tmake_file} arm/t-bpabi t-eh-dw2-dip"
@@ -293,7 +293,7 @@ index 50f000622..fa30ef089 100644
 +	unwind_header=config/arm/unwind-arm.h
 +	extra_parts="$extra_parts crti.o crtn.o"
 +	;;
-+aarch64-*-serenity*)
++aarch64-*-gelassenheit*)
 +	extra_parts="$extra_parts crti.o crtbegin.o crtend.o crtn.o"
 +	extra_parts="$extra_parts crtfastmath.o"
 +	tmake_file="$tmake_file ${cpu_type}/t-aarch64"
@@ -368,7 +368,7 @@ index 326a279c5..6b76901dc 100755
  # Base decisions on target environment.
  case "${host}" in
 +
-+  *-serenity*)
++  *-gelassenheit*)
 +
 +  # All these tests are for C++; save the language and the compiler flags.
 +  # The CXXFLAGS thing is suspicious, but based on similar bits previously
@@ -6358,7 +6358,7 @@ index ff44d5ae0..2ca1a4262 100644
  AC_DEFUN([GLIBCXX_CROSSCONFIG],[
  # Base decisions on target environment.
  case "${host}" in
-+  *-serenity*)
++  *-gelassenheit*)
 +    GLIBCXX_CHECK_COMPILER_FEATURES
 +    GLIBCXX_CHECK_LINKER_FEATURES
 +    GLIBCXX_CHECK_MATH_SUPPORT

@@ -5,21 +5,21 @@ diff -ur gdb-10.2-orig/bfd/config.bfd gdb-10.2/bfd/config.bfd
  
  case "${targ}" in
  # START OF targmatch.h
-+  i[3-7]86-*-serenity*)
++  i[3-7]86-*-gelassenheit*)
 +    targ_defvec=i386_elf32_vec
 +    targ_selvecs=
 +    ;;
-+  arm-*-serenity*)
++  arm-*-gelassenheit*)
 +    targ_defvec=arm_elf32_le_vec
 +    targ_selvecs=
 +    ;;
  #ifdef BFD64
-+  x86_64-*-serenity*)
++  x86_64-*-gelassenheit*)
 +    targ_defvec=x86_64_elf64_vec
 +    targ_selvecs=i386_elf32_vec
 +    want64=true
 +    ;;
-+  aarch64-*-serenity*)
++  aarch64-*-gelassenheit*)
 +    targ_defvec=aarch64_elf64_le_vec
 +    targ_selvecs=
 +    want64=true
@@ -34,7 +34,7 @@ diff -ur gdb-10.2-orig/config.sub gdb-10.2/config.sub
  	# Each alternative MUST end in a * to match a version number.
  	# sysv* is not here because it comes later, after sysvr4.
  	gnu* | bsd* | mach* | minix* | genix* | ultrix* | irix* \
-+	     | serenity* \
++	     | gelassenheit* \
  	     | *vms* | esix* | aix* | cnk* | sunos | sunos[34]*\
  	     | hpux* | unos* | osf* | luna* | dgux* | auroraux* | solaris* \
  	     | sym* | kopensolaris* | plan9* \

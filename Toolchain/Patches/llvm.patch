@@ -6,8 +6,8 @@ index ba91d0439..42265d547 100644
        return new NetBSDTargetInfo<AArch64leTargetInfo>(Triple, Opts);
      case llvm::Triple::OpenBSD:
        return new OpenBSDTargetInfo<AArch64leTargetInfo>(Triple, Opts);
-+    case llvm::Triple::Serenity:
-+      return new SerenityTargetInfo<AArch64leTargetInfo>(Triple, Opts);
++    case llvm::Triple::Gelassenheit:
++      return new GelassenheitTargetInfo<AArch64leTargetInfo>(Triple, Opts);
      case llvm::Triple::Win32:
        switch (Triple.getEnvironment()) {
        case llvm::Triple::GNU:
@@ -15,8 +15,8 @@ index ba91d0439..42265d547 100644
        return new MCUX86_32TargetInfo(Triple, Opts);
      case llvm::Triple::Hurd:
        return new HurdTargetInfo<X86_32TargetInfo>(Triple, Opts);
-+    case llvm::Triple::Serenity:
-+      return new SerenityTargetInfo<X86_32TargetInfo>(Triple, Opts);
++    case llvm::Triple::Gelassenheit:
++      return new GelassenheitTargetInfo<X86_32TargetInfo>(Triple, Opts);
      default:
        return new X86_32TargetInfo(Triple, Opts);
      }
@@ -24,8 +24,8 @@ index ba91d0439..42265d547 100644
        return new NaClTargetInfo<X86_64TargetInfo>(Triple, Opts);
      case llvm::Triple::PS4:
        return new PS4OSTargetInfo<X86_64TargetInfo>(Triple, Opts);
-+    case llvm::Triple::Serenity:
-+      return new SerenityTargetInfo<X86_64TargetInfo>(Triple, Opts);
++    case llvm::Triple::Gelassenheit:
++      return new GelassenheitTargetInfo<X86_64TargetInfo>(Triple, Opts);
      default:
        return new X86_64TargetInfo(Triple, Opts);
      }
@@ -37,9 +37,9 @@ index 3fe39ed64..51e7a6cca 100644
    }
  };
  
-+// SerenityOS target
++// GelassenheitBS target
 +template <typename Target>
-+class LLVM_LIBRARY_VISIBILITY SerenityTargetInfo : public OSTargetInfo<Target> {
++class LLVM_LIBRARY_VISIBILITY GelassenheitTargetInfo : public OSTargetInfo<Target> {
 +protected:
 +  void getOSDefines(const LangOptions &Opts, const llvm::Triple &Triple,
 +                    MacroBuilder &Builder) const override {
@@ -49,7 +49,7 @@ index 3fe39ed64..51e7a6cca 100644
 +  }
 +
 +public:
-+  SerenityTargetInfo(const llvm::Triple &Triple, const TargetOptions &Opts)
++  GelassenheitTargetInfo(const llvm::Triple &Triple, const TargetOptions &Opts)
 +      : OSTargetInfo<Target>(Triple, Opts) {}
 +};
 +
@@ -64,7 +64,7 @@ index 08be9f011..69038ff00 100644
    ToolChains/OpenBSD.cpp
    ToolChains/PS4CPU.cpp
    ToolChains/RISCVToolchain.cpp
-+  ToolChains/Serenity.cpp
++  ToolChains/Gelassenheit.cpp
    ToolChains/Solaris.cpp
    ToolChains/TCE.cpp
    ToolChains/VEToolchain.cpp
@@ -76,7 +76,7 @@ index 94a7553e2..c6b3210f6 100644
  #include "ToolChains/PPCLinux.h"
  #include "ToolChains/PS4CPU.h"
  #include "ToolChains/RISCVToolchain.h"
-+#include "ToolChains/Serenity.h"
++#include "ToolChains/Gelassenheit.h"
  #include "ToolChains/Solaris.h"
  #include "ToolChains/TCE.h"
  #include "ToolChains/VEToolchain.h"
@@ -84,8 +84,8 @@ index 94a7553e2..c6b3210f6 100644
      case llvm::Triple::Fuchsia:
        TC = std::make_unique<toolchains::Fuchsia>(*this, Target, Args);
        break;
-+    case llvm::Triple::Serenity:
-+      TC = std::make_unique<toolchains::Serenity>(*this, Target, Args);
++    case llvm::Triple::Gelassenheit:
++      TC = std::make_unique<toolchains::Gelassenheit>(*this, Target, Args);
 +      break;
      case llvm::Triple::Solaris:
        TC = std::make_unique<toolchains::Solaris>(*this, Target, Args);
@@ -98,8 +98,8 @@ index 6c1b88141..c77ff78be 100644
      return "sunos";
    case llvm::Triple::AIX:
      return "aix";
-+  case llvm::Triple::Serenity:
-+    return "serenity";
++  case llvm::Triple::Gelassenheit:
++    return "gelassenheit";
    default:
      return getOS();
    }
@@ -111,7 +111,7 @@ index 12749c7ec..91f744a26 100644
    case llvm::Triple::OpenBSD:
      return "i586";
    case llvm::Triple::FreeBSD:
-+  case llvm::Triple::Serenity:
++  case llvm::Triple::Gelassenheit:
      return "i686";
    default:
      // Fallback to p4.
@@ -124,7 +124,7 @@ index 58ae08a38..8e9a3fee6 100644
    Args.AddLastArg(CmdArgs, options::OPT_fvisibility_global_new_delete_hidden);
  
 -  Args.AddLastArg(CmdArgs, options::OPT_ftlsmodel_EQ);
-+  if (Triple.isOSSerenity()) {
++  if (Triple.isOSGelassenheit()) {
 +    StringRef tls_model =
 +        Args.getLastArgValue(options::OPT_ftlsmodel_EQ, "initial-exec");
 +    CmdArgs.push_back(Args.MakeArgString("-ftls-model=" + tls_model));
@@ -134,13 +134,13 @@ index 58ae08a38..8e9a3fee6 100644
  
    if (Args.hasFlag(options::OPT_fno_operator_names,
                     options::OPT_foperator_names, false))
-diff --git a/clang/lib/Driver/ToolChains/Serenity.cpp b/clang/lib/Driver/ToolChains/Serenity.cpp
+diff --git a/clang/lib/Driver/ToolChains/Gelassenheit.cpp b/clang/lib/Driver/ToolChains/Gelassenheit.cpp
 new file mode 100644
 index 000000000..8f3e125dd
 --- /dev/null
-+++ b/clang/lib/Driver/ToolChains/Serenity.cpp
++++ b/clang/lib/Driver/ToolChains/Gelassenheit.cpp
 @@ -0,0 +1,275 @@
-+//===---- Serenity.cpp - SerenityOS ToolChain Implementation ----*- C++ -*-===//
++//===---- Gelassenheit.cpp - GelassenheitBS ToolChain Implementation ----*- C++ -*-===//
 +//
 +// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 +// See https://llvm.org/LICENSE.txt for license information.
@@ -148,7 +148,7 @@ index 000000000..8f3e125dd
 +//
 +//===----------------------------------------------------------------------===//
 +
-+#include "Serenity.h"
++#include "Gelassenheit.h"
 +#include "CommonArgs.h"
 +#include "clang/Driver/Compilation.h"
 +#include "clang/Driver/Driver.h"
@@ -172,7 +172,7 @@ index 000000000..8f3e125dd
 +  return Last ? Last->getOption().matches(options::OPT_pie) : TC.isPIEDefault();
 +}
 +
-+void tools::serenity::Linker::ConstructJob(Compilation &C, const JobAction &JA,
++void tools::gelassenheit::Linker::ConstructJob(Compilation &C, const JobAction &JA,
 +                                           const InputInfo &Output,
 +                                           const InputInfoList &Inputs,
 +                                           const ArgList &Args,
@@ -312,7 +312,7 @@ index 000000000..8f3e125dd
 +                                         Exec, CmdArgs, Inputs, Output));
 +}
 +
-+Serenity::Serenity(const Driver &D, const llvm::Triple &Triple,
++Gelassenheit::Gelassenheit(const Driver &D, const llvm::Triple &Triple,
 +                   const ArgList &Args)
 +    : ToolChain(D, Triple, Args) {
 +  getProgramPaths().push_back(getDriver().getInstalledDir());
@@ -321,11 +321,11 @@ index 000000000..8f3e125dd
 +  getFilePaths().push_back(getDriver().SysRoot + "/usr/lib");
 +}
 +
-+Tool *Serenity::buildLinker() const {
-+  return new tools::serenity::Linker(*this);
++Tool *Gelassenheit::buildLinker() const {
++  return new tools::gelassenheit::Linker(*this);
 +}
 +
-+void Serenity::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
++void Gelassenheit::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
 +                                         ArgStringList &CC1Args) const {
 +  const Driver &D = getDriver();
 +
@@ -345,14 +345,14 @@ index 000000000..8f3e125dd
 +  }
 +}
 +
-+void Serenity::AddClangCXXStdlibIncludeArgs(const ArgList &DriverArgs,
++void Gelassenheit::AddClangCXXStdlibIncludeArgs(const ArgList &DriverArgs,
 +                                            ArgStringList &CC1Args) const {
 +  if (DriverArgs.hasArg(options::OPT_nostdinc, options::OPT_nostdincxx,
 +                        +options::OPT_nostdlibinc))
 +    return;
 +
 +  if (GetCXXStdlibType(DriverArgs) != ToolChain::CST_Libcxx)
-+    llvm_unreachable("Only libc++ is supported on the Serenity target");
++    llvm_unreachable("Only libc++ is supported on the Gelassenheit target");
 +
 +  const Driver &D = getDriver();
 +  std::string SysRoot = computeSysRoot();
@@ -379,7 +379,7 @@ index 000000000..8f3e125dd
 +    return;
 +}
 +
-+void Serenity::addClangTargetOptions(
++void Gelassenheit::addClangTargetOptions(
 +    const llvm::opt::ArgList &DriverArgs, llvm::opt::ArgStringList &CC1Args,
 +    Action::OffloadKind DeviceOffloadKind) const {
 +  if (!DriverArgs.hasFlag(options::OPT_fuse_init_array,
@@ -388,7 +388,7 @@ index 000000000..8f3e125dd
 +}
 +
 +ToolChain::UnwindLibType
-+Serenity::GetUnwindLibType(const llvm::opt::ArgList &Args) const {
++Gelassenheit::GetUnwindLibType(const llvm::opt::ArgList &Args) const {
 +
 +  const Arg *A = Args.getLastArg(options::OPT_unwindlib_EQ);
 +  StringRef LibName = A ? A->getValue() : "";
@@ -416,13 +416,13 @@ index 000000000..8f3e125dd
 +  return ToolChain::UNW_None;
 +}
 \ No newline at end of file
-diff --git a/clang/lib/Driver/ToolChains/Serenity.h b/clang/lib/Driver/ToolChains/Serenity.h
+diff --git a/clang/lib/Driver/ToolChains/Gelassenheit.h b/clang/lib/Driver/ToolChains/Gelassenheit.h
 new file mode 100644
 index 000000000..50b0dbe62
 --- /dev/null
-+++ b/clang/lib/Driver/ToolChains/Serenity.h
++++ b/clang/lib/Driver/ToolChains/Gelassenheit.h
 @@ -0,0 +1,99 @@
-+//===---- Serenity.h - SerenityOS ToolChain Implementation ------*- C++ -*-===//
++//===---- Gelassenheit.h - GelassenheitBS ToolChain Implementation ------*- C++ -*-===//
 +//
 +// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 +// See https://llvm.org/LICENSE.txt for license information.
@@ -430,8 +430,8 @@ index 000000000..50b0dbe62
 +//
 +//===----------------------------------------------------------------------===//
 +
-+#ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_SERENITY_H
-+#define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_SERENITY_H
++#ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_GELASSENHEIT_H
++#define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_GELASSENHEIT_H
 +
 +#include "clang/Basic/LangOptions.h"
 +#include "clang/Driver/Tool.h"
@@ -440,11 +440,11 @@ index 000000000..50b0dbe62
 +namespace clang {
 +namespace driver {
 +namespace tools {
-+namespace serenity {
++namespace gelassenheit {
 +
 +class LLVM_LIBRARY_VISIBILITY Linker : public Tool {
 +public:
-+  Linker(const ToolChain &TC) : Tool("serenity::Linker", "linker", TC) {}
++  Linker(const ToolChain &TC) : Tool("gelassenheit::Linker", "linker", TC) {}
 +
 +  bool hasIntegratedCPP() const override { return false; }
 +  bool isLinkJob() const override { return true; }
@@ -454,14 +454,14 @@ index 000000000..50b0dbe62
 +                    const llvm::opt::ArgList &TCArgs,
 +                    const char *LinkingOutput) const override;
 +};
-+} // end namespace serenity
++} // end namespace gelassenheit
 +} // end namespace tools
 +
 +namespace toolchains {
 +
-+class LLVM_LIBRARY_VISIBILITY Serenity : public ToolChain {
++class LLVM_LIBRARY_VISIBILITY Gelassenheit : public ToolChain {
 +public:
-+  Serenity(const Driver &D, const llvm::Triple &Triple,
++  Gelassenheit(const Driver &D, const llvm::Triple &Triple,
 +           const llvm::opt::ArgList &Args);
 +
 +  void
@@ -520,7 +520,7 @@ index 000000000..50b0dbe62
 +} // end namespace driver
 +} // end namespace clang
 +
-+#endif // LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_SERENITY_H
++#endif // LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_GELASSENHEIT_H
 diff --git a/clang/lib/Frontend/InitHeaderSearch.cpp b/clang/lib/Frontend/InitHeaderSearch.cpp
 index ba9f96384..4aecfeee2 100644
 --- a/clang/lib/Frontend/InitHeaderSearch.cpp
@@ -529,7 +529,7 @@ index ba9f96384..4aecfeee2 100644
      case llvm::Triple::PS4:
      case llvm::Triple::ELFIAMCU:
      case llvm::Triple::Fuchsia:
-+    case llvm::Triple::Serenity:
++    case llvm::Triple::Gelassenheit:
        break;
      case llvm::Triple::Win32:
        if (triple.getEnvironment() != llvm::Triple::Cygnus)
@@ -537,7 +537,7 @@ index ba9f96384..4aecfeee2 100644
    case llvm::Triple::Solaris:
    case llvm::Triple::WASI:
    case llvm::Triple::AIX:
-+  case llvm::Triple::Serenity:
++  case llvm::Triple::Gelassenheit:
      return;
  
    case llvm::Triple::Win32:
@@ -667,7 +667,7 @@ index 7880c733f..87b25cf42 100644
  #elif defined(__APPLE__)
  // No _LIBCPP_ELAST needed on Apple
 +#elif defined(__gelassenheit__)
-+// No _LIBCPP_ELAST needed on SerenityOS
++// No _LIBCPP_ELAST needed on GelassenheitBS
  #elif defined(__sun__)
  #define _LIBCPP_ELAST ESTALE
  #elif defined(__MVS__)
@@ -714,8 +714,8 @@ index 76f351405..b81556c55 100644
      WASI,       // Experimental WebAssembly OS
      Emscripten,
 -    LastOSType = Emscripten
-+    Serenity,
-+    LastOSType = Serenity
++    Gelassenheit,
++    LastOSType = Gelassenheit
    };
    enum EnvironmentType {
      UnknownEnvironment,
@@ -723,9 +723,9 @@ index 76f351405..b81556c55 100644
      return getOS() == Triple::AIX;
    }
  
-+  /// Tests whether the OS is SerenityOS
-+  bool isOSSerenity() const {
-+    return getOS() == Triple::Serenity;
++  /// Tests whether the OS is GelassenheitBS
++  bool isOSGelassenheit() const {
++    return getOS() == Triple::Gelassenheit;
 +  }
 +
    /// Tests whether the OS uses the ELF binary format.
@@ -739,7 +739,7 @@ index 883115463..22b39d8f5 100644
    case PS4: return "ps4";
    case RTEMS: return "rtems";
    case Solaris: return "solaris";
-+  case Serenity: return "serenity";
++  case Gelassenheit: return "gelassenheit";
    case TvOS: return "tvos";
    case WASI: return "wasi";
    case WatchOS: return "watchos";
@@ -747,7 +747,7 @@ index 883115463..22b39d8f5 100644
      .StartsWith("hurd", Triple::Hurd)
      .StartsWith("wasi", Triple::WASI)
      .StartsWith("emscripten", Triple::Emscripten)
-+    .StartsWith("serenity", Triple::Serenity)
++    .StartsWith("gelassenheit", Triple::Gelassenheit)
      .Default(Triple::UnknownOS);
  }
  

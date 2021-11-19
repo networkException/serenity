@@ -1,16 +1,16 @@
-list(APPEND CMAKE_MODULE_PATH "@SERENITY_SOURCE_DIR@/Toolchain/CMake")
+list(APPEND CMAKE_MODULE_PATH "@GELASSENHEIT_SOURCE_DIR@/Toolchain/CMake")
 
-set(CMAKE_SYSTEM_NAME SerenityOS)
-set(CMAKE_SYSTEM_PROCESSOR "@SERENITY_ARCH@")
+set(CMAKE_SYSTEM_NAME GelassenheitBS)
+set(CMAKE_SYSTEM_PROCESSOR "@GELASSENHEIT_ARCH@")
 
-set(SERENITYOS 1)
-set(triple @SERENITY_ARCH@-pc-serenity)
-set(TOOLCHAIN_ROOT @SERENITY_SOURCE_DIR@/Toolchain/Local/clang/)
+set(GELASSENHEITBS 1)
+set(triple @GELASSENHEIT_ARCH@-pc-gelassenheit)
+set(TOOLCHAIN_ROOT @GELASSENHEIT_SOURCE_DIR@/Toolchain/Local/clang/)
 set(TOOLCHAIN_PATH ${TOOLCHAIN_ROOT}/bin)
 
 # where to read from/write to
-set(CMAKE_SYSROOT @SERENITY_BUILD_DIR@/Root)
-set(CMAKE_STAGING_PREFIX @SERENITY_BUILD_DIR@/Root/usr/local)
+set(CMAKE_SYSROOT @GELASSENHEIT_BUILD_DIR@/Root)
+set(CMAKE_STAGING_PREFIX @GELASSENHEIT_BUILD_DIR@/Root/usr/local)
 set(CMAKE_INSTALL_PREFIX /usr/local)
 set(CMAKE_INSTALL_DATAROOTDIR share)
 
@@ -24,7 +24,7 @@ set(CMAKE_LINKER ${TOOLCHAIN_PATH}/ld.lld)
 set(CMAKE_RANLIB ${TOOLCHAIN_PATH}/llvm-ranlib)
 set(CMAKE_STRIP ${TOOLCHAIN_PATH}/llvm-strip)
 set(CMAKE_AR ${TOOLCHAIN_PATH}/llvm-ar)
-set(SERENITY_CXXFILT ${TOOLCHAIN_PATH}/llvm-cxxfilt)
+set(GELASSENHEIT_CXXFILT ${TOOLCHAIN_PATH}/llvm-cxxfilt)
 # FIXME: Persuade LLVM maintainers to add `--update-section` to llvm-objcopy, as it's required for the kernel symbol map.
 set(CMAKE_OBJCOPY ${TOOLCHAIN_PATH}/gnu-objcopy)
 

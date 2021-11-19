@@ -21,11 +21,11 @@ set(LLVM_INSTALL_BINUTILS_SYMLINKS OFF CACHE BOOL "")
 set(CLANG_ENABLE_CLANGD OFF CACHE BOOL "")
 
 set(compiler_flags "-nostdlib -nostdlib++")
-foreach(target i686-pc-serenity;x86_64-pc-serenity;aarch64-pc-serenity)
+foreach(target i686-pc-gelassenheit;x86_64-pc-gelassenheit;aarch64-pc-gelassenheit)
     list(APPEND targets "${target}")
 
     set(RUNTIMES_${target}_CMAKE_BUILD_TYPE Release CACHE STRING "")
-    set(RUNTIMES_${target}_CMAKE_SYSROOT ${SERENITY_${target}_SYSROOT} CACHE PATH "")
+    set(RUNTIMES_${target}_CMAKE_SYSROOT ${GELASSENHEIT_${target}_SYSROOT} CACHE PATH "")
     set(RUNTIMES_${target}_CMAKE_C_FLAGS ${compiler_flags} CACHE STRING "")
     set(RUNTIMES_${target}_CMAKE_CXX_FLAGS ${compiler_flags} CACHE STRING "")
     set(RUNTIMES_${target}_COMPILER_RT_BUILD_CRT ON CACHE BOOL "")
@@ -37,7 +37,7 @@ foreach(target i686-pc-serenity;x86_64-pc-serenity;aarch64-pc-serenity)
     set(RUNTIMES_${target}_COMPILER_RT_BUILD_ORC OFF CACHE BOOL "")
 
     set(BUILTINS_${target}_CMAKE_BUILD_TYPE Release CACHE STRING "")
-    set(BUILTINS_${target}_CMAKE_SYSROOT ${SERENITY_${target}_SYSROOT} CACHE PATH "")
+    set(BUILTINS_${target}_CMAKE_SYSROOT ${GELASSENHEIT_${target}_SYSROOT} CACHE PATH "")
     set(BUILTINS_${target}_COMPILER_RT_EXCLUDE_ATOMIC_BUILTIN OFF CACHE BOOL "")
 endforeach()
 

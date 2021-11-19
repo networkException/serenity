@@ -281,9 +281,9 @@ pushd "$DIR/Build/clang"
     pushd llvm
         buildstep "llvm/configure" cmake "$DIR/Tarballs/$LLVM_NAME/llvm" \
             -G Ninja \
-            -DSERENITY_i686-pc-serenity_SYSROOT="$BUILD/i686clang/Root" \
-            -DSERENITY_x86_64-pc-serenity_SYSROOT="$BUILD/x86_64clang/Root" \
-            -DSERENITY_aarch64-pc-serenity_SYSROOT="$BUILD/aarch64clang/Root" \
+            -DGELASSENHEIT_i686-pc-gelassenheit_SYSROOT="$BUILD/i686clang/Root" \
+            -DGELASSENHEIT_x86_64-pc-gelassenheit_SYSROOT="$BUILD/x86_64clang/Root" \
+            -DGELASSENHEIT_aarch64-pc-gelassenheit_SYSROOT="$BUILD/aarch64clang/Root" \
             -DCMAKE_INSTALL_PREFIX="$PREFIX" \
             -C "$DIR/CMake/LLVMConfig.cmake" \
             ${dev:+"-DLLVM_CCACHE_BUILD=ON"} \
@@ -298,7 +298,7 @@ pushd "$DIR/Build/clang"
     mkdir -p binutils
     pushd binutils
         buildstep "binutils/configure" "$DIR/Tarballs/$BINUTILS_NAME/configure" --prefix="$PREFIX" \
-            --enable-targets="$(echo "$ARCHS" | sed -E "s@(\S)(\s|$)@\1-pc-serenity,@g")" \
+            --enable-targets="$(echo "$ARCHS" | sed -E "s@(\S)(\s|$)@\1-pc-gelassenheit,@g")" \
             --program-prefix="gnu-" \
             --disable-nls \
             --disable-gas \
@@ -315,9 +315,9 @@ pushd "$DIR/Build/clang"
         pushd runtimes/"$arch"
             buildstep "runtimes/$arch/configure" cmake "$DIR/Tarballs/$LLVM_NAME/runtimes" \
                 -G Ninja \
-                -DSERENITY_TOOLCHAIN_ARCH="$arch" \
-                -DSERENITY_TOOLCHAIN_ROOT="$PREFIX" \
-                -DSERENITY_BUILD_DIR="$BUILD/${arch}clang/" \
+                -DGELASSENHEIT_TOOLCHAIN_ARCH="$arch" \
+                -DGELASSENHEIT_TOOLCHAIN_ROOT="$PREFIX" \
+                -DGELASSENHEIT_BUILD_DIR="$BUILD/${arch}clang/" \
                 -DCMAKE_INSTALL_PREFIX="$PREFIX" \
                 -C "$DIR/CMake/LLVMRuntimesConfig.cmake"
 

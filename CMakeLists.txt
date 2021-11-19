@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/Meta/CMake")
 
-project(SerenityOS C CXX ASM)
+project(GelassenheitBS C CXX ASM)
 
 if(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "")
   message(FATAL_ERROR
@@ -11,8 +11,8 @@ if(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "")
     "and that's all there is.")
 endif()
 
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "SerenityOS")
-    message(FATAL_ERROR "System name is not SerenityOS, this is unsupported.\n"
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "GelassenheitBS")
+    message(FATAL_ERROR "System name is not GelassenheitBS, this is unsupported.\n"
             "Please re-read the BuildInstructions documentation, and use the superbuild configuration\n")
 endif()
 
@@ -139,7 +139,7 @@ set(CMAKE_SKIP_RPATH TRUE)
 add_compile_options(-Wall)
 add_compile_options(-Wextra)
 
-if (NOT CMAKE_HOST_SYSTEM_NAME MATCHES SerenityOS)
+if (NOT CMAKE_HOST_SYSTEM_NAME MATCHES GelassenheitBS)
     # FIXME: Something makes this go crazy and flag unused variables that aren't flagged as such when building with the toolchain.
     #        Disable -Werror for now.
     add_compile_options(-Werror)

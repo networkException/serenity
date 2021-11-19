@@ -44,7 +44,7 @@ if(NOT SERENITY_TOOLCHAIN STREQUAL "GNU")
 endif()
 set(SERENITY_BUILD_DIR "${PROJECT_BINARY_DIR}/../${SERENITY_ARCH}${SERENITY_BUILD_DIR_SUFFIX}")
 
-if (CMAKE_HOST_SYSTEM_NAME MATCHES "SerenityOS")
+if (CMAKE_HOST_SYSTEM_NAME MATCHES "GelassenheitBS")
     message(STATUS "Good job on building cmake!")
 else()
     configure_file("${SERENITY_SOURCE_DIR}/Toolchain/CMake/${SERENITY_TOOLCHAIN}Toolchain.txt.in" "${SERENITY_BUILD_DIR}/CMakeToolchain.txt" @ONLY)

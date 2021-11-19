@@ -7,23 +7,23 @@ index 30087e3b..8b192b2e 100644
  case "${targ}" in
  # START OF targmatch.h
 +
-+  i[3-7]86-*-serenity*)
++  i[3-7]86-*-gelassenheit*)
 +    targ_defvec=i386_elf32_vec
 +    targ_selvecs=
 +    ;;
  #ifdef BFD64
-+  x86_64-*-serenity*)
++  x86_64-*-gelassenheit*)
 +    targ_defvec=x86_64_elf64_vec
 +    targ_selvecs=i386_elf32_vec
 +    want64=true
 +    ;;
 +
-+  arm-*-serenity*)
++  arm-*-gelassenheit*)
 +    targ_defvec=arm_elf32_le_vec
 +    targ_selvecs=
 +    targ64_selvecs=
 +    ;;
-+  aarch64-*-serenity*)
++  aarch64-*-gelassenheit*)
 +    targ_defvec=aarch64_elf64_le_vec
 +    targ_selvecs=
 +    want64=true
@@ -40,7 +40,7 @@ index 7384e919..aa02c3f6 100755
  	# The portable systems comes first.
  	# Each alternative MUST end in a * to match a version number.
  	gnu* | android* | bsd* | mach* | minix* | genix* | ultrix* | irix* \
-+	     | serenity* \
++	     | gelassenheit* \
  	     | *vms* | esix* | aix* | cnk* | sunos | sunos[34]* \
  	     | hpux* | unos* | osf* | luna* | dgux* | auroraux* | solaris* \
  	     | sym* |  plan9* | psp* | sim* | xray* | os68k* | v88r* \
@@ -52,9 +52,9 @@ index 338892ad..3c03ee8b 100644
  generic_target=${cpu_type}-$vendor-$os
  # Note: This table is alpha-sorted, please try to keep it that way.
  case ${generic_target} in
-+  i386-*-serenity*)                     fmt=elf;;
-+  arm-*-serenity*)                      fmt=elf;;
-+  aarch64-*-serenity*)                  fmt=elf;;
++  i386-*-gelassenheit*)                     fmt=elf;;
++  arm-*-gelassenheit*)                      fmt=elf;;
++  aarch64-*-gelassenheit*)                  fmt=elf;;
    aarch64*-*-elf*)			fmt=elf;;
    aarch64*-*-fuchsia*)			fmt=elf;;
    aarch64*-*-genode*)			fmt=elf;;
@@ -66,7 +66,7 @@ index f8e99325..bc55fd2b 100644
  	earmelf_nbsd.c \
  	earmelf_phoenix.c \
  	earmelf_vxworks.c \
-+	earmelf_serenity.c \
++	earmelf_gelassenheit.c \
  	earmelfb.c \
  	earmelfb_fbsd.c \
  	earmelfb_fuchsia.c \
@@ -78,7 +78,7 @@ index ef2e99e0..657d24a2 100644
  	earmelf_nbsd.c \
  	earmelf_phoenix.c \
  	earmelf_vxworks.c \
-+	earmelf_serenity.c \
++	earmelf_gelassenheit.c \
  	earmelfb.c \
  	earmelfb_fbsd.c \
  	earmelfb_fuchsia.c \
@@ -86,7 +86,7 @@ index ef2e99e0..657d24a2 100644
  	eelf_i386_vxworks.c \
  	eelf_iamcu.c \
  	eelf_s390.c \
-+	eelf_i386_serenity.c \
++	eelf_i386_gelassenheit.c \
  	eh8300elf.c \
  	eh8300elf_linux.c \
  	eh8300helf.c \
@@ -94,7 +94,7 @@ index ef2e99e0..657d24a2 100644
  	eelf_x86_64_cloudabi.c \
  	eelf_x86_64_fbsd.c \
  	eelf_x86_64_sol2.c \
-+	eelf_x86_64_serenity.c \
++	eelf_x86_64_gelassenheit.c \
  	ehppa64linux.c \
  	ei386pep.c \
  	emmo.c
@@ -106,31 +106,31 @@ index 6205d7c9..00d97c37 100644
  # Please try to keep this table more or less in alphabetic order - it
  # makes it much easier to lookup a specific archictecture.
  case "${targ}" in
-+i[3-7]86-*-serenity*)
-+			targ_emul=elf_i386_serenity
++i[3-7]86-*-gelassenheit*)
++			targ_emul=elf_i386_gelassenheit
 +			targ_extra_emuls=elf_i386
-+			targ64_extra_emuls="elf_x86_64_serenity elf_x86_64"
++			targ64_extra_emuls="elf_x86_64_gelassenheit elf_x86_64"
 +			;;
-+x86_64-*-serenity*)
-+			targ_emul=elf_x86_64_serenity
-+			targ_extra_emuls="elf_i386_serenity elf_x86_64 elf_i386"
++x86_64-*-gelassenheit*)
++			targ_emul=elf_x86_64_gelassenheit
++			targ_extra_emuls="elf_i386_gelassenheit elf_x86_64 elf_i386"
 +			;;
-+arm-*-serenity*)
-+			targ_emul=armelf_serenity
-+			targ_extra_emuls="armelf_serenity armelf"
++arm-*-gelassenheit*)
++			targ_emul=armelf_gelassenheit
++			targ_extra_emuls="armelf_gelassenheit armelf"
 +			;;
-+aarch64-*-serenity*)
++aarch64-*-gelassenheit*)
 +			targ_emul=aarch64elf
 +			targ_extra_emuls=
 +			;;
  aarch64_be-*-elf)	targ_emul=aarch64elfb
  			targ_extra_emuls="aarch64elf aarch64elf32 aarch64elf32b armelfb armelf"
  			;;
-diff --git a/ld/emulparams/armelf_serenity.sh b/ld/emulparams/armelf_serenity.sh
+diff --git a/ld/emulparams/armelf_gelassenheit.sh b/ld/emulparams/armelf_gelassenheit.sh
 new file mode 100644
 index 00000000..517cd626
 --- /dev/null
-+++ b/ld/emulparams/armelf_serenity.sh
++++ b/ld/emulparams/armelf_gelassenheit.sh
 @@ -0,0 +1,7 @@
 +. ${srcdir}/emulparams/armelf.sh
 +MAXPAGESIZE="CONSTANT (MAXPAGESIZE)"
@@ -139,27 +139,27 @@ index 00000000..517cd626
 +
 +unset STACK_ADDR
 +unset EMBEDDED
-diff --git a/ld/emulparams/elf_aarch64_serenity.sh b/ld/emulparams/elf_aarch64_serenity.sh
+diff --git a/ld/emulparams/elf_aarch64_gelassenheit.sh b/ld/emulparams/elf_aarch64_gelassenheit.sh
 new file mode 100644
 index 00000000..45a05bf4
 --- /dev/null
-+++ b/ld/emulparams/elf_aarch64_serenity.sh
++++ b/ld/emulparams/elf_aarch64_gelassenheit.sh
 @@ -0,0 +1 @@
 +. ${srcdir}/emulparams/elf_aarch64.sh
-diff --git a/ld/emulparams/elf_i386_serenity.sh b/ld/emulparams/elf_i386_serenity.sh
+diff --git a/ld/emulparams/elf_i386_gelassenheit.sh b/ld/emulparams/elf_i386_gelassenheit.sh
 new file mode 100644
 index 00000000..342d5298
 --- /dev/null
-+++ b/ld/emulparams/elf_i386_serenity.sh
++++ b/ld/emulparams/elf_i386_gelassenheit.sh
 @@ -0,0 +1,3 @@
 +. ${srcdir}/emulparams/elf_i386.sh
 +GENERATE_SHLIB_SCRIPT=yes
 +GENERATE_PIE_SCRIPT=yes
-diff --git a/ld/emulparams/elf_x86_64_serenity.sh b/ld/emulparams/elf_x86_64_serenity.sh
+diff --git a/ld/emulparams/elf_x86_64_gelassenheit.sh b/ld/emulparams/elf_x86_64_gelassenheit.sh
 new file mode 100644
 index 00000000..a2af90a6
 --- /dev/null
-+++ b/ld/emulparams/elf_x86_64_serenity.sh
++++ b/ld/emulparams/elf_x86_64_gelassenheit.sh
 @@ -0,0 +1 @@
 +. ${srcdir}/emulparams/elf_x86_64.sh
 diff --git a/libiberty/rust-demangle.c b/libiberty/rust-demangle.c
