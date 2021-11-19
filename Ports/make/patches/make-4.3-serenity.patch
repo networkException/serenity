@@ -17,7 +17,7 @@ diff -ru make-4.3-clean/lib/getdtablesize.c make-4.3/lib/getdtablesize.c
  /* Specification.  */
  #include <unistd.h>
  
-+#ifdef __serenity__
++#ifdef __gelassenheit__
 +# include <sys/select.h>
 +#endif
 +
@@ -28,7 +28,7 @@ diff -ru make-4.3-clean/lib/getdtablesize.c make-4.3/lib/getdtablesize.c
  int
  getdtablesize (void)
  {
-+#ifdef __serenity__
++#ifdef __gelassenheit__
 +  return FD_SETSIZE;
 +#else
    struct rlimit lim;
@@ -49,7 +49,7 @@ diff -ru make-4.3-clean/lib/getprogname.c make-4.3/lib/getprogname.c
  # include <sys/procfs.h>
  #endif
  
-+#ifdef __serenity__
++#ifdef __gelassenheit__
 +# include <unistd.h>
 +#endif
 +
@@ -60,7 +60,7 @@ diff -ru make-4.3-clean/lib/getprogname.c make-4.3/lib/getprogname.c
          }
      }
    return NULL;
-+# elif defined __serenity__
++# elif defined __gelassenheit__
 +  char* buffer = malloc(1024);
 +  if (get_process_name(buffer, 1024) < 0)
 +      return NULL;
@@ -77,7 +77,7 @@ diff -ru make-4.3-clean/src/arscan.c make-4.3/src/arscan.c
  
  #ifndef WINDOWS32
 -# if !defined (__ANDROID__) && !defined (__BEOS__)
-+# if !defined (__ANDROID__) && !defined (__BEOS__) && !defined(__serenity__)
++# if !defined (__ANDROID__) && !defined (__BEOS__) && !defined(__gelassenheit__)
  #  include <ar.h>
  # else
     /* These platforms don't have <ar.h> but have archives in the same format

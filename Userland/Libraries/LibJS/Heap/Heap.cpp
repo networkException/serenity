@@ -19,20 +19,20 @@
 #include <LibJS/Runtime/WeakContainer.h>
 #include <setjmp.h>
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
 #    include <serenity.h>
 #endif
 
 namespace JS {
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
 static int gc_perf_string_id;
 #endif
 
 Heap::Heap(VM& vm)
     : m_vm(vm)
 {
-#ifdef __serenity__
+#ifdef __gelassenheit__
     auto gc_signpost_string = "Garbage collection"sv;
     gc_perf_string_id = perf_register_string(gc_signpost_string.characters_without_null_termination(), gc_signpost_string.length());
 #endif
@@ -86,7 +86,7 @@ void Heap::collect_garbage(CollectionType collection_type, bool print_report)
     VERIFY(!m_collecting_garbage);
     TemporaryChange change(m_collecting_garbage, true);
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
     static size_t global_gc_counter = 0;
     perf_event(PERF_EVENT_SIGNPOST, gc_perf_string_id, global_gc_counter++);
 #endif

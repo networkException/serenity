@@ -17,7 +17,7 @@ index a24b773..cbf137b 100644
  
  /* Some platforms do not have siginfo on their signal handlers.  */
 -#if defined(SA_SIGINFO) && !defined(__BEOS__)
-+#if defined(SA_SIGINFO) && !defined(__BEOS__) && !defined(__serenity__)
++#if defined(SA_SIGINFO) && !defined(__BEOS__) && !defined(__gelassenheit__)
  #  define KWSYSPE_USE_SIGINFO 1
  #endif
  
@@ -30,7 +30,7 @@ index 1384dbe..18f03fb 100644
  
  // ****************************************************************************
 -#if !defined(_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
-+#if !defined(_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__) && !defined(__serenity__)
++#if !defined(_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__) && !defined(__gelassenheit__)
  void StacktraceSignalHandler(int sigNo, siginfo_t* sigInfo,
                               void* /*sigContext*/)
  {
@@ -39,7 +39,7 @@ index 1384dbe..18f03fb 100644
  void SystemInformationImplementation::SetStackTraceOnError(int enable)
  {
 -#if !defined(_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
-+#if !defined(_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__) && !defined(__serenity__)
++#if !defined(_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__) && !defined(__gelassenheit__)
    static int saOrigValid = 0;
    static struct sigaction saABRTOrig;
    static struct sigaction saSEGVOrig;

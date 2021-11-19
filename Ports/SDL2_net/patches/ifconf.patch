@@ -5,7 +5,7 @@ diff -Naur SDL2_net-2.0.1/SDLnet.c SDL2_net-2.0.1.serenity/SDLnet.c
      return inet_ntoa(in);
  }
  
-+#ifdef __serenity__
++#ifdef __gelassenheit__
 +#undef SIOCGIFCONF
 +#endif
 +

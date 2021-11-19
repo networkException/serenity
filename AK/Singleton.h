@@ -14,7 +14,7 @@
 #    include <Kernel/Arch/ScopedCritical.h>
 #endif
 
-#ifndef __serenity__
+#ifndef __gelassenheit__
 #    include <new>
 #endif
 

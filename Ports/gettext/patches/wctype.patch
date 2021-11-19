@@ -5,7 +5,7 @@ diff -Naur gettext-0.21/gettext-tools/gnulib-lib/fnmatch.c gettext-0.21.serenity
  # define CHAR_CLASS_MAX_LENGTH 256
  #endif
  
-+#ifdef __serenity__
++#ifdef __gelassenheit__
 +wctype_t wctype(const char*)
 +{
 +    asm("int3");

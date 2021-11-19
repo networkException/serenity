@@ -6,7 +6,7 @@
 
 #pragma once
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
 #    ifdef KERNEL
 #        include <Kernel/kstdio.h>
 #    else

@@ -43,7 +43,7 @@ index 3fe39ed64..51e7a6cca 100644
 +protected:
 +  void getOSDefines(const LangOptions &Opts, const llvm::Triple &Triple,
 +                    MacroBuilder &Builder) const override {
-+    Builder.defineMacro("__serenity__");
++    Builder.defineMacro("__gelassenheit__");
 +    DefineStd(Builder, "unix", Opts);
 +    Builder.defineMacro("__ELF__");
 +  }
@@ -562,7 +562,7 @@ index 97e33f315..179bd2a67 100644
        defined(__sun__) || \
        defined(__MVS__) || \
        defined(_AIX) || \
-+      defined(__serenity__) || \
++      defined(__gelassenheit__) || \
        (defined(__MINGW32__) && __has_include(<pthread.h>))
  #    define _LIBCPP_HAS_THREAD_API_PTHREAD
  #  elif defined(__Fuchsia__)
@@ -575,7 +575,7 @@ index ad742997d..c75dcb458 100644
  # include <xlocale.h>
  # include <__support/solaris/xlocale.h>
 -#elif defined(_NEWLIB_VERSION)
-+#elif defined(_NEWLIB_VERSION) || defined(__serenity__)
++#elif defined(_NEWLIB_VERSION) || defined(__gelassenheit__)
  # include <__support/newlib/xlocale.h>
  #elif defined(__OpenBSD__)
  # include <__support/openbsd/xlocale.h>
@@ -584,7 +584,7 @@ index ad742997d..c75dcb458 100644
      static const mask blank  = _ISBLANK;
      static const mask __regex_word = 0x80;
 -#elif defined(_NEWLIB_VERSION)
-+#elif defined(_NEWLIB_VERSION) || defined(__serenity__)
++#elif defined(_NEWLIB_VERSION) || defined(__gelassenheit__)
      // Same type as Newlib's _ctype_ array in newlib/libc/include/ctype.h.
      typedef char mask;
      static const mask space  = _S;
@@ -597,7 +597,7 @@ index b75f9263a..f5ffb9003 100644
  #define _LIBCPP_SUPPORT_NEWLIB_XLOCALE_H
  
 -#if defined(_NEWLIB_VERSION)
-+#if defined(_NEWLIB_VERSION) || defined(__serenity__)
++#if defined(_NEWLIB_VERSION) || defined(__gelassenheit__)
  
  #include <cstdlib>
  #include <clocale>
@@ -606,7 +606,7 @@ index b75f9263a..f5ffb9003 100644
  #endif
  
 -#endif // _NEWLIB_VERSION
-+#endif // _NEWLIB_VERSION || __serenity__
++#endif // _NEWLIB_VERSION || __gelassenheit__
  
  #endif
 diff --git a/libcxx/include/initializer_list b/libcxx/include/initializer_list
@@ -617,7 +617,7 @@ index ea1f23467..45631ac2f 100644
  */
  
  #include <__config>
-+#if !defined(__serenity__) || !defined(KERNEL)
++#if !defined(__gelassenheit__) || !defined(KERNEL)
  #include <cstddef>
 +#endif
  
@@ -632,7 +632,7 @@ index 8e584005d..f29f3453e 100644
  #if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
  // Most unix variants have catopen.  These are the specific ones that don't.
 -#  if !defined(__BIONIC__) && !defined(_NEWLIB_VERSION)
-+#  if !defined(__BIONIC__) && !defined(_NEWLIB_VERSION) && !defined(__serenity__)
++#  if !defined(__BIONIC__) && !defined(_NEWLIB_VERSION) && !defined(__gelassenheit__)
  #    define _LIBCPP_HAS_CATOPEN 1
  #    include <nl_types.h>
  #  endif
@@ -645,7 +645,7 @@ index aefc08c16..7ee71d16b 100644
  inline _LIBCPP_INLINE_VISIBILITY
  void* __libcpp_aligned_alloc(std::size_t __alignment, std::size_t __size) {
 -#if defined(_LIBCPP_MSVCRT_LIKE)
-+#if defined(_LIBCPP_MSVCRT_LIKE) || (defined(__serenity__) && !defined(KERNEL))
++#if defined(_LIBCPP_MSVCRT_LIKE) || (defined(__gelassenheit__) && !defined(KERNEL))
    return ::_aligned_malloc(__size, __alignment);
  #else
    void* __result = nullptr;
@@ -654,7 +654,7 @@ index aefc08c16..7ee71d16b 100644
  inline _LIBCPP_INLINE_VISIBILITY
  void __libcpp_aligned_free(void* __ptr) {
 -#if defined(_LIBCPP_MSVCRT_LIKE)
-+#if defined(_LIBCPP_MSVCRT_LIKE) || (defined(__serenity__) && !defined(KERNEL))
++#if defined(_LIBCPP_MSVCRT_LIKE) || (defined(__gelassenheit__) && !defined(KERNEL))
    ::_aligned_free(__ptr);
  #else
    ::free(__ptr);
@@ -666,7 +666,7 @@ index 7880c733f..87b25cf42 100644
  #define _LIBCPP_ELAST 4095
  #elif defined(__APPLE__)
  // No _LIBCPP_ELAST needed on Apple
-+#elif defined(__serenity__)
++#elif defined(__gelassenheit__)
 +// No _LIBCPP_ELAST needed on SerenityOS
  #elif defined(__sun__)
  #define _LIBCPP_ELAST ESTALE
@@ -679,7 +679,7 @@ index d5ab8fb3b..5039c1987 100644
      return __pctype_func();
  #elif defined(__EMSCRIPTEN__)
      return *__ctype_b_loc();
-+#elif defined(__serenity__)
++#elif defined(__gelassenheit__)
 +    return _ctype_;
  #elif defined(_NEWLIB_VERSION)
      // Newlib has a 257-entry table in ctype_.c, where (char)0 starts at [1].

@@ -5,7 +5,7 @@ diff -Naur openssh-portable-9ca7e9c861775dd6c6312bc8aaab687403d24676/monitor_fdp
  int
  mm_send_fd(int sock, int fd)
  {
-+#ifndef __serenity__
++#ifndef __gelassenheit__
  #if defined(HAVE_SENDMSG) && (defined(HAVE_ACCRIGHTS_IN_MSGHDR) || defined(HAVE_CONTROL_IN_MSGHDR))
  	struct msghdr msg;
  #ifndef HAVE_ACCRIGHTS_IN_MSGHDR
@@ -21,7 +21,7 @@ diff -Naur openssh-portable-9ca7e9c861775dd6c6312bc8aaab687403d24676/monitor_fdp
  int
  mm_receive_fd(int sock)
  {
-+#ifndef __serenity__
++#ifndef __gelassenheit__
  #if defined(HAVE_RECVMSG) && (defined(HAVE_ACCRIGHTS_IN_MSGHDR) || defined(HAVE_CONTROL_IN_MSGHDR))
  	struct msghdr msg;
  #ifndef HAVE_ACCRIGHTS_IN_MSGHDR

@@ -16,7 +16,7 @@ index 2958fb5..ef49806 100644
  #include "gconstructor.h"
  #include "gmem.h"       /* for g_mem_gc_friendly */
  
-+#ifdef __serenity__
++#ifdef __gelassenheit__
 +#include <strings.h>
 +#endif
  #include <string.h>
@@ -30,7 +30,7 @@ index b6ff60f..670d1aa 100644
  #include <stdio.h>
  #include <stdlib.h>
  #include <locale.h>
-+#ifdef __serenity__
++#ifdef __gelassenheit__
 +#include <strings.h>
 +#endif
  #include <string.h>

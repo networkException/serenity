@@ -4,7 +4,7 @@
          }
      }
    return NULL;
-+# elif defined __serenity__
++# elif defined __gelassenheit__
 +  return "?";
  # else
  #  error "getprogname module not ported to this OS"

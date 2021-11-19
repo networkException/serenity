@@ -26,7 +26,7 @@ inline void kfree_sized(void* ptr, size_t)
 }
 #endif
 
-#ifndef __serenity__
+#ifndef __gelassenheit__
 #    include <AK/Types.h>
 
 #    ifndef AK_OS_MACOS

@@ -5,7 +5,7 @@ diff -Naur gettext-0.21/gettext-tools/gnulib-lib/fnmatch_loop.c gettext-0.21.ser
  
  /* Match STRING against the file name pattern PATTERN, returning zero if
     it matches, nonzero if not.  */
-+#ifdef __serenity__
++#ifdef __gelassenheit__
 +# define FNM_EXTMATCH 9000
 +#endif
 +

@@ -9,7 +9,7 @@
 #include <errno.h>
 #include <spawn.h>
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
 #    include <serenity.h>
 #endif
 
@@ -26,7 +26,7 @@ pid_t Process::spawn(StringView path)
     if ((errno = posix_spawn(&pid, path_string.characters(), nullptr, nullptr, const_cast<char**>(argv), environ))) {
         perror("Process::spawn posix_spawn");
     } else {
-#ifdef __serenity__
+#ifdef __gelassenheit__
         if (disown(pid) < 0)
             perror("Process::spawn disown");
 #endif

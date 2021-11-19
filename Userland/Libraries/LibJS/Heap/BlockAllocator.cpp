@@ -25,7 +25,7 @@ BlockAllocator::~BlockAllocator()
 {
     for (auto* block : m_blocks) {
         ASAN_UNPOISON_MEMORY_REGION(block, HeapBlock::block_size);
-#ifdef __serenity__
+#ifdef __gelassenheit__
         if (munmap(block, HeapBlock::block_size) < 0) {
             perror("munmap");
             VERIFY_NOT_REACHED();
@@ -43,7 +43,7 @@ void* BlockAllocator::allocate_block([[maybe_unused]] char const* name)
         size_t random_index = get_random_uniform(m_blocks.size());
         auto* block = m_blocks.unstable_take(random_index);
         ASAN_UNPOISON_MEMORY_REGION(block, HeapBlock::block_size);
-#ifdef __serenity__
+#ifdef __gelassenheit__
         if (set_mmap_name(block, HeapBlock::block_size, name) < 0) {
             perror("set_mmap_name");
             VERIFY_NOT_REACHED();
@@ -52,7 +52,7 @@ void* BlockAllocator::allocate_block([[maybe_unused]] char const* name)
         return block;
     }
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
     auto* block = (HeapBlock*)serenity_mmap(nullptr, HeapBlock::block_size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_RANDOMIZED | MAP_PRIVATE, 0, 0, HeapBlock::block_size, name);
     VERIFY(block != MAP_FAILED);
 #else
@@ -66,7 +66,7 @@ void BlockAllocator::deallocate_block(void* block)
 {
     VERIFY(block);
     if (m_blocks.size() >= max_cached_blocks) {
-#ifdef __serenity__
+#ifdef __gelassenheit__
         if (munmap(block, HeapBlock::block_size) < 0) {
             perror("munmap");
             VERIFY_NOT_REACHED();

@@ -5,7 +5,7 @@
  #endif
  
 -#if defined TCC_IS_NATIVE && !defined CONFIG_TCCBOOT
-+#if defined TCC_IS_NATIVE && !defined CONFIG_TCCBOOT && !defined __serenity__
++#if defined TCC_IS_NATIVE && !defined CONFIG_TCCBOOT && !defined __gelassenheit__
  # define CONFIG_TCC_BACKTRACE
  # if (defined TCC_TARGET_I386 || defined TCC_TARGET_X86_64) \
    && !defined TCC_UCLIBC && !defined TCC_MUSL

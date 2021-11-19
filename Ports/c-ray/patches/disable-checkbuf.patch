@@ -5,7 +5,7 @@
  //Wait for 2 secs and abort if nothing is coming in from stdin
  void checkBuf() {
 -#ifndef WINDOWS
-+#if !defined(WINDOWS) && !defined(__serenity__)
++#if !defined(WINDOWS) && !defined(__gelassenheit__)
  	fd_set set;
  	struct timeval timeout;
  	int rv;

@@ -51,7 +51,7 @@ These extensions can be used as-is, but you need to point them to the custom Ser
     ],
     "defines": [
         "DEBUG",
-        "__serenity__",
+        "__gelassenheit__",
     ],
     "compilerPath": "${workspaceFolder}/Toolchain/Local/i686/bin/i686-pc-serenity-g++",
     "cStandard": "c17",

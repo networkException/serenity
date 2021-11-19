@@ -267,7 +267,7 @@ int main(int argc, char** argv)
 #endif
 
     bool print_progress =
-#ifdef __serenity__
+#ifdef __gelassenheit__
         true; // Use OSC 9 to print progress
 #else
         false;

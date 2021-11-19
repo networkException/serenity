@@ -5,7 +5,7 @@ diff -Naur gettext-0.21/gettext-runtime/gnulib-lib/getprogname.c gettext-0.21.se
          }
      }
    return NULL;
-+# elif defined(__serenity__)
++# elif defined(__gelassenheit__)
 +  return NULL;
  # else
  #  error "getprogname module not ported to this OS"
@@ -17,7 +17,7 @@ diff -Naur gettext-0.21/gettext-tools/gnulib-lib/getprogname.c gettext-0.21.sere
          }
      }
    return NULL;
-+# elif defined(__serenity__)
++# elif defined(__gelassenheit__)
 +  return NULL;
  # else
  #  error "getprogname module not ported to this OS"
@@ -29,7 +29,7 @@ diff -Naur gettext-0.21/gettext-tools/libgettextpo/getprogname.c gettext-0.21.se
          }
      }
    return NULL;
-+# elif defined(__serenity__)
++# elif defined(__gelassenheit__)
 +  return NULL;
  # else
  #  error "getprogname module not ported to this OS"
@@ -41,7 +41,7 @@ diff -Naur gettext-0.21/libtextstyle/lib/getprogname.c gettext-0.21.serenity/lib
          }
      }
    return NULL;
-+# elif defined(__serenity__)
++# elif defined(__gelassenheit__)
 +  return NULL;
  # else
  #  error "getprogname module not ported to this OS"

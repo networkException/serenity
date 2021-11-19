@@ -5,7 +5,7 @@ diff -Naur NetHack-NetHack-3.6.6_Released/include/unixconf.h NetHack-NetHack-3.6
   * Comment out the USE_FCNTL if for some reason you have a strange
   * OS/filesystem combination for which fcntl(2) does not work. */
  #ifdef POSIX_TYPES
-+#ifndef __serenity__
++#ifndef __gelassenheit__
  #define USE_FCNTL
  #endif
 +#endif

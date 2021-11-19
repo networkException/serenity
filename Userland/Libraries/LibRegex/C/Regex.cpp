@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
 #    include <regex.h>
 #else
 #    include <LibC/regex.h>

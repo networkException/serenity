@@ -8,7 +8,7 @@ index 093a1720..8b0a0c5d 100644
  #include "includes.h"
  
 -#if !defined(HAVE_INET_ATON)
-+#if !defined(__serenity__)
++#if !defined(__gelassenheit__)
  
  #include <sys/types.h>
  #include <sys/param.h>
@@ -203,7 +203,7 @@ index e5fd6f5b..cb9e1aa0 100644
  #endif
  
 -#ifndef HAVE_INET_ATON
-+#if !defined(HAVE_INET_ATON) && !defined(__serenity__)
++#if !defined(HAVE_INET_ATON) && !defined(__gelassenheit__)
  int inet_aton(const char *cp, struct in_addr *addr);
  #endif
  

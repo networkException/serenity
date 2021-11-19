@@ -18,7 +18,7 @@ index 769b578..625d8cc 100644
  #include <fnmatch.h>
  #include <assert.h>
  
-+#ifdef __serenity__
++#ifdef __gelassenheit__
 +#include <arpa/inet.h>  /* for ntohl/ntohs */
 +#include <netinet/in.h>
 +#else

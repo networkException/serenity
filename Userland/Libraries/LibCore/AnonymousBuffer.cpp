@@ -10,7 +10,7 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 
-#if defined(__serenity__)
+#if defined(__gelassenheit__)
 #    include <serenity.h>
 #endif
 
@@ -29,7 +29,7 @@ namespace Core {
 ErrorOr<AnonymousBuffer> AnonymousBuffer::create_with_size(size_t size)
 {
     int fd = -1;
-#if defined(__serenity__)
+#if defined(__gelassenheit__)
     fd = anon_create(round_up_to_power_of_two(size, PAGE_SIZE), O_CLOEXEC);
     if (fd < 0)
         return Error::from_errno(errno);

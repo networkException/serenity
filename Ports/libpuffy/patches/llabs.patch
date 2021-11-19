@@ -5,7 +5,7 @@ diff -Naur libpuffy-1.0/fmt_scaled.c libpuffy-1.0.serenity/fmt_scaled.c
  	return -1;
  }
  
-+#ifndef __serenity__
++#ifndef __gelassenheit__
  static long long
  llabs(long long j)
  {

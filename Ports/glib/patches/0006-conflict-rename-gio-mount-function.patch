@@ -17,7 +17,7 @@ index c624268..24723c5 100644
  
  
  static void
-+#ifdef __serenity__
++#ifdef __gelassenheit__
 +gio_mount (GFile *file)
 +#elif
  mount (GFile *file)

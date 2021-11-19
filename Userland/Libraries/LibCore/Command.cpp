@@ -16,7 +16,7 @@
 namespace Core {
 
 // Only supported in serenity mode because we use `posix_spawn_file_actions_addchdir`
-#ifdef __serenity__
+#ifdef __gelassenheit__
 
 String command(const String& command_string, Optional<LexicalPath> chdir)
 {

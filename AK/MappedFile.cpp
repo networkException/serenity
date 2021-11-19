@@ -43,7 +43,7 @@ ErrorOr<NonnullRefPtr<MappedFile>> MappedFile::map_from_fd_and_close(int fd, [[m
     if (ptr == MAP_FAILED)
         return Error::from_errno(errno);
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
     if (set_mmap_name(ptr, size, path.characters()) < 0) {
         perror("set_mmap_name");
     }

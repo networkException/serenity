@@ -18,7 +18,7 @@ index ada32f8..7a0a0c2 100644
      {
        guint32 addr4 = g_ntohl (address->priv->addr.ipv4.s_addr);
 -
-+#ifndef __serenity__
++#ifndef __gelassenheit__
        return IN_MULTICAST (addr4);
 +#else
 +      return 0;

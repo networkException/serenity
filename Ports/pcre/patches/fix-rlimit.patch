@@ -6,7 +6,7 @@ diff -Naur pcre-8.44/pcretest.c pcre-8.44.serenity/pcretest.c
          *endptr == 0))
      {
 -#if defined(_WIN32) || defined(WIN32) || defined(__minix) || defined(NATIVE_ZOS) || defined(__VMS)
-+#if defined(_WIN32) || defined(WIN32) || defined(__minix) || defined(NATIVE_ZOS) || defined(__VMS) || defined(__serenity__)
++#if defined(_WIN32) || defined(WIN32) || defined(__minix) || defined(NATIVE_ZOS) || defined(__VMS) || defined(__gelassenheit__)
      printf("PCRE: -S not supported on this OS\n");
      exit(1);
  #else

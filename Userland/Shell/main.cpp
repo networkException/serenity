@@ -41,7 +41,7 @@ int main(int argc, char** argv)
         s_shell->editor()->save_history(s_shell->get_history_path());
     });
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
     if (pledge("stdio rpath wpath cpath proc exec tty sigaction unix fattr", nullptr) < 0) {
         perror("pledge");
         return 1;
@@ -60,7 +60,7 @@ int main(int argc, char** argv)
 
         s_shell->setup_signals();
 
-#ifndef __serenity__
+#ifndef __gelassenheit__
         sigset_t blocked;
         sigemptyset(&blocked);
         sigaddset(&blocked, SIGTTOU);

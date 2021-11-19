@@ -484,7 +484,7 @@ Bitmap::~Bitmap()
 void Bitmap::set_mmap_name([[maybe_unused]] String const& name)
 {
     VERIFY(m_needs_munmap);
-#ifdef __serenity__
+#ifdef __gelassenheit__
     ::set_mmap_name(m_data, size_in_bytes(), name.characters());
 #endif
 }
@@ -502,7 +502,7 @@ void Bitmap::set_volatile()
 {
     if (m_volatile)
         return;
-#ifdef __serenity__
+#ifdef __gelassenheit__
     int rc = madvise(m_data, size_in_bytes(), MADV_SET_VOLATILE);
     if (rc < 0) {
         perror("madvise(MADV_SET_VOLATILE)");
@@ -519,7 +519,7 @@ void Bitmap::set_volatile()
         return true;
     }
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
     int rc = madvise(m_data, size_in_bytes(), MADV_SET_NONVOLATILE);
     if (rc < 0) {
         if (errno == ENOMEM) {
@@ -552,7 +552,7 @@ ErrorOr<BackingStore> Bitmap::allocate_backing_store(BitmapFormat format, IntSiz
     auto const data_size_in_bytes = size_in_bytes(pitch, size.height() * scale_factor);
 
     int map_flags = MAP_ANONYMOUS | MAP_PRIVATE;
-#ifdef __serenity__
+#ifdef __gelassenheit__
     map_flags |= MAP_PURGEABLE;
     void* data = mmap_with_name(nullptr, data_size_in_bytes, PROT_READ | PROT_WRITE, map_flags, 0, 0, String::formatted("GraphicsBitmap [{}]", size).characters());
 #else

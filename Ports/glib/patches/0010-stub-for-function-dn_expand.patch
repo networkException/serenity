@@ -17,7 +17,7 @@ index 64c3b2e..ef709e0 100644
  
  /* From bionic/libc/private/resolv_private.h */
  int dn_expand(const u_char *, const u_char *, const u_char *, char *, int);
-+#ifdef __serenity__
++#ifdef __gelassenheit__
 +int dn_expand(const u_char *, const u_char *, const u_char *, char *, int)
 +{
 +  return 0;

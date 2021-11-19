@@ -5,7 +5,7 @@
  #    include <unistd.h>  /* declares _POSIX_VERSION */
  #    if defined(_POSIX_VERSION)  /* POSIX compliant */
 -#      define PLATFORM_POSIX_VERSION _POSIX_VERSION
-+#      if defined(__serenity__)
++#      if defined(__gelassenheit__)
 +#        define PLATFORM_POSIX_VERSION 1
 +#      else
 +#        define PLATFORM_POSIX_VERSION _POSIX_VERSION

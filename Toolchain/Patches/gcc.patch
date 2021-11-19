@@ -211,7 +211,7 @@ index 000000000..d57aacca9
 +#undef TARGET_OS_CPP_BUILTINS
 +#define TARGET_OS_CPP_BUILTINS()      \
 +  do {                                \
-+    builtin_define ("__serenity__");      \
++    builtin_define ("__gelassenheit__");      \
 +    builtin_define ("__unix__");      \
 +    builtin_assert ("system=serenity");   \
 +    builtin_assert ("system=unix");   \
@@ -335,7 +335,7 @@ index 5095b6830..d19942eee 100644
  
 +#if !defined(inhibit_libc) && defined(HAVE_LD_EH_FRAME_HDR) \
 +    && defined(TARGET_DL_ITERATE_PHDR) \
-+    && defined(__serenity__)
++    && defined(__gelassenheit__)
 +# define USE_PT_GNU_EH_FRAME
 +#endif
 +

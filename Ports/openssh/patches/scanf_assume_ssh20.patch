@@ -25,7 +25,7 @@ index 09c7258e..4c670986 100644
  		goto out;
  	}
  
-+#ifndef __serenity__
++#ifndef __gelassenheit__
  	/*
  	 * Check that the versions match.  In future this might accept
  	 * several versions and set appropriate flags to handle them.

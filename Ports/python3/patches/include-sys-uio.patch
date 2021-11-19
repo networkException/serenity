@@ -5,7 +5,7 @@
  #endif
  
 -#if defined(__OpenBSD__)
-+#if defined(__OpenBSD__) || defined(__serenity__)
++#if defined(__OpenBSD__) || defined(__gelassenheit__)
  # include <sys/uio.h>
  #endif
  

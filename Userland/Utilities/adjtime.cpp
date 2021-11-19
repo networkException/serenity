@@ -11,7 +11,7 @@
 
 int main(int argc, char** argv)
 {
-#ifdef __serenity__
+#ifdef __gelassenheit__
     if (pledge("stdio settime", nullptr) < 0) {
         perror("pledge");
         return 1;
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
         }
     }
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
     if (pledge("stdio", nullptr) < 0) {
         perror("pledge");
         return 1;

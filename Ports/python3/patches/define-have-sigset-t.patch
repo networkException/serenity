@@ -6,7 +6,7 @@
  #if defined(PYPTHREAD_SIGMASK) || defined(HAVE_SIGWAIT) || \
 -        defined(HAVE_SIGWAITINFO) || defined(HAVE_SIGTIMEDWAIT)
 +        defined(HAVE_SIGWAITINFO) || defined(HAVE_SIGTIMEDWAIT) || \
-+        defined(__serenity__)
++        defined(__gelassenheit__)
  # define HAVE_SIGSET_T
  #endif
  

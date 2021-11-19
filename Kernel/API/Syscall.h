@@ -10,7 +10,7 @@
 #include <AK/Types.h>
 #include <AK/Userspace.h>
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
 #    include <LibC/fd_set.h>
 #endif
 
@@ -221,7 +221,7 @@ constexpr StringView to_string(Function function)
     return "Unknown"sv;
 }
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
 struct StringArgument {
     const char* characters;
     size_t length { 0 };

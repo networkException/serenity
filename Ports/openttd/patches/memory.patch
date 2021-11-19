@@ -5,7 +5,7 @@ diff -Naur openttd-1.11.0/src/spritecache.cpp openttd-1.11.0.serenity/src/sprite
  	/* Remember 'target_size' from the previous allocation attempt, so we do not try to reach the target_size multiple times in case of failure. */
  	static uint last_alloc_attempt = 0;
  
-+#ifndef __serenity__
++#ifndef __gelassenheit__
  	if (_spritecache_ptr == nullptr || (_allocated_sprite_cache_size != target_size && target_size != last_alloc_attempt)) {
  		delete[] reinterpret_cast<byte *>(_spritecache_ptr);
  

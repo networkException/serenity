@@ -17,7 +17,7 @@ diff -Naur openttd-1.11.0/src/network/core/host.cpp openttd-1.11.0.serenity/src/
  
  static void NetworkFindBroadcastIPsInternal(NetworkAddressList *broadcast) // !GETIFADDRS implementation
  {
-+#ifndef __serenity__
++#ifndef __gelassenheit__
  	SOCKET sock = socket(AF_INET, SOCK_DGRAM, 0);
  	if (sock == INVALID_SOCKET) return;
  
@@ -44,7 +44,7 @@ diff -Naur openttd-1.11.0/src/network/core/os_abstraction.h openttd-1.11.0.seren
  /* According to glibc/NEWS, <ifaddrs.h> appeared in glibc-2.3. */
  #	if !defined(__sgi__) && !defined(SUNOS) && !defined(__INNOTEK_LIBC__) \
 -	   && !(defined(__GLIBC__) && (__GLIBC__ <= 2) && (__GLIBC_MINOR__ <= 2)) && !defined(__dietlibc__) && !defined(HPUX)
-+	   && !(defined(__GLIBC__) && (__GLIBC__ <= 2) && (__GLIBC_MINOR__ <= 2)) && !defined(__dietlibc__) && !defined(HPUX) && !defined(__serenity__)
++	   && !(defined(__GLIBC__) && (__GLIBC__ <= 2) && (__GLIBC_MINOR__ <= 2)) && !defined(__dietlibc__) && !defined(HPUX) && !defined(__gelassenheit__)
  /* If for any reason ifaddrs.h does not exist on your system, comment out
   *   the following two lines and an alternative way will be used to fetch
   *   the list of IPs from the system. */
@@ -55,7 +55,7 @@ diff -Naur openttd-1.11.0/src/os/unix/unix.cpp openttd-1.11.0.serenity/src/os/un
  #	define HAS_SYSCTL
  #endif
  
-+#ifndef __serenity__
++#ifndef __gelassenheit__
  #ifdef HAS_STATVFS
  #include <sys/statvfs.h>
  #endif
@@ -68,7 +68,7 @@ diff -Naur openttd-1.11.0/src/os/unix/unix.cpp openttd-1.11.0.serenity/src/os/un
  	if (statfs(path, &s) != 0) return false;
  	free = (uint64)s.f_bsize * s.f_bavail;
 -#elif defined(HAS_STATVFS)
-+#elif defined(HAS_STATVFS) && !defined(__serenity__)
++#elif defined(HAS_STATVFS) && !defined(__gelassenheit__)
  	struct statvfs s;
  
  	if (statvfs(path, &s) != 0) return false;
@@ -80,7 +80,7 @@ diff -Naur openttd-1.11.0/src/stdafx.h openttd-1.11.0.serenity/src/stdafx.h
  #endif
  
 -#if defined(__HAIKU__) || defined(__CYGWIN__)
-+#if defined(__HAIKU__) || defined(__CYGWIN__) || defined(__serenity__)
++#if defined(__HAIKU__) || defined(__CYGWIN__) || defined(__gelassenheit__)
  #	include <strings.h> /* strncasecmp */
  #endif
  
@@ -89,7 +89,7 @@ diff -Naur openttd-1.11.0/src/stdafx.h openttd-1.11.0.serenity/src/stdafx.h
  #endif
  
 -#if defined(SUNOS) || defined(HPUX) || defined(__CYGWIN__)
-+#if defined(SUNOS) || defined(HPUX) || defined(__CYGWIN__) || defined(__serenity__)
++#if defined(SUNOS) || defined(HPUX) || defined(__CYGWIN__) || defined(__gelassenheit__)
  #	include <alloca.h>
  #endif
  
@@ -98,7 +98,7 @@ diff -Naur openttd-1.11.0/src/stdafx.h openttd-1.11.0.serenity/src/stdafx.h
  
  /* This is already defined in unix, but not in QNX Neutrino (6.x) or Cygwin. */
 -#if (!defined(UNIX) && !defined(__HAIKU__)) || defined(__QNXNTO__) || defined(__CYGWIN__)
-+#if (!defined(UNIX) && !defined(__HAIKU__)) || defined(__QNXNTO__) || defined(__CYGWIN__) || defined(__serenity__)
++#if (!defined(UNIX) && !defined(__HAIKU__)) || defined(__QNXNTO__) || defined(__CYGWIN__) || defined(__gelassenheit__)
  	typedef unsigned int uint;
  #endif
  

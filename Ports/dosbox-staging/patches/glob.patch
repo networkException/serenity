@@ -5,7 +5,7 @@ diff -Naur dosbox-staging-0.76.0/src/misc/fs_utils_posix.cpp dosbox-staging-0.76
  
  #include <cerrno>
  #include <cctype>
-+#ifndef __serenity__
++#ifndef __gelassenheit__
  #include <glob.h>
 +#endif
  #include <sys/stat.h>
@@ -18,7 +18,7 @@ diff -Naur dosbox-staging-0.76.0/src/misc/fs_utils_posix.cpp dosbox-staging-0.76
  	// glob(3) sorts by default, so if more than one path will match
  	// the pattern, return the first one (in alphabetic order) that matches.
  	const std::string pattern = translate_to_glob_pattern(path);
-+#ifndef __serenity__
++#ifndef __gelassenheit__
  	glob_t pglob;
  	const int err = glob(pattern.c_str(), GLOB_TILDE, nullptr, &pglob);
  	if (err == GLOB_NOMATCH) {

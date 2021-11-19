@@ -6,7 +6,7 @@
 
 #pragma once
 
-#ifndef __serenity__
+#ifndef __gelassenheit__
 #    include <LibC/elf.h>
 #else
 #    include <elf.h>

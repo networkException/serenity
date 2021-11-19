@@ -19,7 +19,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
 #    include <serenity.h>
 #endif
 

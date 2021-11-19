@@ -5,7 +5,7 @@
   * don't have to do anything
   */
 -#ifdef _MSC_VER
-+#if defined(_MSC_VER) || defined(__serenity__)
++#if defined(_MSC_VER) || defined(__gelassenheit__)
  int cray_vasprintf(char **strp, const char *format, va_list ap) {
  	int len = vscprintf(format, ap);
  	if (len == -1)

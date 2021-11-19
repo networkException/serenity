@@ -22,7 +22,7 @@ VM& Console::vm()
 
 Value Console::debug()
 {
-#ifdef __serenity__
+#ifdef __gelassenheit__
     dbgln("\033[32;1m(js debug)\033[0m {}", vm().join_arguments());
 #endif
     if (m_client)
@@ -32,7 +32,7 @@ Value Console::debug()
 
 Value Console::error()
 {
-#ifdef __serenity__
+#ifdef __gelassenheit__
     dbgln("\033[32;1m(js error)\033[0m {}", vm().join_arguments());
 #endif
     if (m_client)
@@ -42,7 +42,7 @@ Value Console::error()
 
 Value Console::info()
 {
-#ifdef __serenity__
+#ifdef __gelassenheit__
     dbgln("\033[32;1m(js info)\033[0m {}", vm().join_arguments());
 #endif
     if (m_client)
@@ -52,7 +52,7 @@ Value Console::info()
 
 Value Console::log()
 {
-#ifdef __serenity__
+#ifdef __gelassenheit__
     dbgln("\033[32;1m(js log)\033[0m {}", vm().join_arguments());
 #endif
     if (m_client)
@@ -62,7 +62,7 @@ Value Console::log()
 
 Value Console::warn()
 {
-#ifdef __serenity__
+#ifdef __gelassenheit__
     dbgln("\033[32;1m(js warn)\033[0m {}", vm().join_arguments());
 #endif
     if (m_client)

@@ -15,7 +15,7 @@ index f64c01c..96f6417 100644
        case AF_UNIX:
          return UV_NAMED_PIPE;
        case AF_INET:
-+#ifndef __serenity__
++#ifndef __gelassenheit__
        case AF_INET6:
 +#endif
          return UV_TCP;
@@ -25,7 +25,7 @@ index f64c01c..96f6417 100644
    if (type == SOCK_DGRAM &&
 -      (ss.ss_family == AF_INET || ss.ss_family == AF_INET6))
 +      (ss.ss_family == AF_INET
-+#ifndef __serenity__
++#ifndef __gelassenheit__
 +       || ss.ss_family == AF_INET6
 +#endif
 +    ))

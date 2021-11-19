@@ -167,7 +167,7 @@ diff -Naur gcc-11.2.0/gcc/config/serenity.h gcc-11.2.0.serenity/gcc/config/seren
 +#undef TARGET_OS_CPP_BUILTINS
 +#define TARGET_OS_CPP_BUILTINS()      \
 +  do {                                \
-+    builtin_define ("__serenity__");      \
++    builtin_define ("__gelassenheit__");      \
 +    builtin_define ("__unix__");      \
 +    builtin_assert ("system=serenity");   \
 +    builtin_assert ("system=unix");   \
@@ -307,7 +307,7 @@ diff -Naur gcc-11.2.0/libgcc/unwind-dw2-fde-dip.c gcc-11.2.0.serenity/libgcc/unw
  
  #if !defined(inhibit_libc) && defined(HAVE_LD_EH_FRAME_HDR) \
      && defined(TARGET_DL_ITERATE_PHDR) \
-+    && defined(__serenity__)
++    && defined(__gelassenheit__)
 +# define USE_PT_GNU_EH_FRAME
 +#endif
 +

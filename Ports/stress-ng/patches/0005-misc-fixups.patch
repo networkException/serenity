@@ -579,7 +579,7 @@ diff -Naur stress-ng-0.11.23/core-net.c stress-ng-0.11.23.serenity/core-net.c
  		break;
  	}
  #endif
-+#ifndef __serenity__
++#ifndef __gelassenheit__
  #if defined(AF_INET6)
  	case AF_INET6: {
  		static struct sockaddr_in6 addr;
@@ -595,7 +595,7 @@ diff -Naur stress-ng-0.11.23/core-net.c stress-ng-0.11.23.serenity/core-net.c
  		break;
  	}
  #endif
-+#ifndef __serenity__
++#ifndef __gelassenheit__
  #if defined(AF_INET6)
  	case AF_INET6: {
  		struct sockaddr_in6 *addr = (struct sockaddr_in6 *)sockaddr;

@@ -39,7 +39,7 @@ void ConnectionBase::post_message(MessageBuffer buffer)
     uint32_t message_size = buffer.data.size();
     buffer.data.prepend(reinterpret_cast<const u8*>(&message_size), sizeof(message_size));
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
     for (auto& fd : buffer.fds) {
         auto rc = sendfd(m_socket->fd(), fd->value());
         if (rc < 0) {

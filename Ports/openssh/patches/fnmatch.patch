@@ -5,7 +5,7 @@ diff -Naur openssh-portable-9ca7e9c861775dd6c6312bc8aaab687403d24676/openbsd-com
  
  /* OPENBSD ORIGINAL: include/fnmatch.h */
  
-+#ifdef __serenity__
++#ifdef __gelassenheit__
 +#define	FNM_NOMATCH	1	/* Match failed. */
 +
 +#define	FNM_NOESCAPE	0x01	/* Disable backslash escaping. */

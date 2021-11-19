@@ -5,7 +5,7 @@ diff -Naur nano-5.8/lib/fnmatch_loop.c nano-5.8.serenity/lib/fnmatch_loop.c
  # include <stdint.h>
  #endif
  
-+#ifdef __serenity__
++#ifdef __gelassenheit__
 +# define FNM_EXTMATCH 9000
 +#endif
 +

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
 #    include <serenity.h>
 #endif
 #include <AK/LexicalPath.h>
@@ -240,7 +240,7 @@ String File::absolute_path(String const& path)
     return LexicalPath::canonicalized_path(full_path.string());
 }
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
 
 String File::read_link(String const& link_path)
 {

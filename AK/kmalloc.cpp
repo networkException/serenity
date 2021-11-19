@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-#if defined(__serenity__) && !defined(KERNEL)
+#if defined(__gelassenheit__) && !defined(KERNEL)
 
 #    include <AK/Assertions.h>
 #    include <AK/kmalloc.h>

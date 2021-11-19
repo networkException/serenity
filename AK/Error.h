@@ -10,7 +10,7 @@
 #include <AK/StringView.h>
 #include <AK/Try.h>
 
-#if defined(__serenity__) && defined(KERNEL)
+#if defined(__gelassenheit__) && defined(KERNEL)
 #    include <LibC/errno_numbers.h>
 #else
 #    include <errno.h>
@@ -63,7 +63,7 @@ public:
     {
     }
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
     ErrorOr(ErrnoCode code)
         : m_error(Error::from_errno(code))
     {
@@ -106,7 +106,7 @@ public:
     {
     }
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
     ErrorOr(ErrnoCode code)
         : m_error(Error::from_errno(code))
     {

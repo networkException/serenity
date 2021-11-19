@@ -330,7 +330,7 @@ void GlobalObject::set_associated_realm(Badge<Realm>, Realm& realm)
 
 JS_DEFINE_NATIVE_FUNCTION(GlobalObject::gc)
 {
-#ifdef __serenity__
+#ifdef __gelassenheit__
     dbgln("Forced garbage collection requested!");
 #endif
     vm.heap().collect_garbage();

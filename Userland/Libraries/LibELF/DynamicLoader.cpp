@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#ifndef __serenity__
+#ifndef __gelassenheit__
 static void* mmap_with_name(void* addr, size_t length, int prot, int flags, int fd, off_t offset, const char*)
 {
     return mmap(addr, length, prot, flags, fd, offset);
@@ -218,7 +218,7 @@ Result<NonnullRefPtr<DynamicObject>, DlErrorMessage> DynamicLoader::load_stage_3
             return DlErrorMessage { String::formatted("mprotect .relro: PROT_READ: {}", strerror(errno)) };
         }
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
         if (set_mmap_name(m_relro_segment_address.as_ptr(), m_relro_segment_size, String::formatted("{}: .relro", m_filename).characters()) < 0) {
             return DlErrorMessage { String::formatted("set_mmap_name .relro: {}", strerror(errno)) };
         }

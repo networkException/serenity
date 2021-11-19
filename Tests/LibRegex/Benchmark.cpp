@@ -14,7 +14,7 @@
 #    define BENCHMARK_LOOP_ITERATIONS 100000
 
 //#    define REGEX_BENCHMARK_OUR
-#    ifndef __serenity__
+#    ifndef __gelassenheit__
 //#        define REGEX_BENCHMARK_OTHER
 #    endif
 

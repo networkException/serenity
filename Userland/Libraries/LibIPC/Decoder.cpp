@@ -162,7 +162,7 @@ bool Decoder::decode(Dictionary& dictionary)
 
 bool Decoder::decode([[maybe_unused]] File& file)
 {
-#ifdef __serenity__
+#ifdef __gelassenheit__
     int fd = recvfd(m_sockfd, O_CLOEXEC);
     if (fd < 0) {
         dbgln("recvfd: {}", strerror(errno));

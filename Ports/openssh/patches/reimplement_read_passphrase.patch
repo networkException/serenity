@@ -7,7 +7,7 @@ index 974d67f0..3496eebe 100644
  #include "ssh.h"
  #include "uidswap.h"
  
-+#ifdef __serenity__
++#ifdef __gelassenheit__
 +#include <termios.h>
 +#endif
 +

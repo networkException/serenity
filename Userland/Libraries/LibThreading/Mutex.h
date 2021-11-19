@@ -21,7 +21,7 @@ class Mutex {
 public:
     Mutex()
     {
-#ifndef __serenity__
+#ifndef __gelassenheit__
         pthread_mutexattr_t attr;
         pthread_mutexattr_init(&attr);
         pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -34,7 +34,7 @@ public:
     void unlock();
 
 private:
-#ifdef __serenity__
+#ifdef __gelassenheit__
     pthread_mutex_t m_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
 #else
     pthread_mutex_t m_mutex;

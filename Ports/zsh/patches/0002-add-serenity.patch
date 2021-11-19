@@ -5,7 +5,7 @@
  #ifdef HAVE_SYS_RESOURCE_H
  # include <sys/resource.h>
 -# if defined(__hpux) && !defined(RLIMIT_CPU)
-+# if (defined(__hpux) && !defined(RLIMIT_CPU)) || defined(__serenity__)
++# if (defined(__hpux) && !defined(RLIMIT_CPU)) || defined(__gelassenheit__)
  /* HPUX does have the BSD rlimits in the kernel.  Officially they are *
   * unsupported but quite a few of them like RLIMIT_CORE seem to work. *
   * All the following are in the <sys/resource.h> but made visible     *

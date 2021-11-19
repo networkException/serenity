@@ -48,7 +48,7 @@ bool format_file(StringView path, bool inplace)
 
 int main(int argc, char** argv)
 {
-#ifdef __serenity__
+#ifdef __gelassenheit__
     if (pledge("stdio rpath wpath cpath", nullptr) < 0) {
         perror("pledge");
         return 1;
@@ -64,7 +64,7 @@ int main(int argc, char** argv)
     args_parser.add_positional_argument(files, "File(s) to process", "path", Core::ArgsParser::Required::No);
     args_parser.parse(argc, argv);
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
     if (!inplace) {
         if (pledge("stdio rpath", nullptr) < 0) {
             perror("pledge");

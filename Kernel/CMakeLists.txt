@@ -406,7 +406,7 @@ else() # Assume Clang
     add_compile_options(-Waddress-of-packed-member)
     add_compile_options(-faligned-allocation)
 
-    # We need this in order to pick up the #define __serenity__, otherwise we end up including unistd.h into the linker script
+    # We need this in order to pick up the #define __gelassenheit__, otherwise we end up including unistd.h into the linker script
     set(TARGET_STRING "--target=${CMAKE_CXX_COMPILER_TARGET}")
     
     add_link_options(LINKER:--build-id=none)

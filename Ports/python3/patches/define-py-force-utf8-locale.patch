@@ -5,7 +5,7 @@
  #endif
  
 -#if defined(__ANDROID__) || defined(__VXWORKS__)
-+#if defined(__ANDROID__) || defined(__VXWORKS__) || defined(__serenity__)
++#if defined(__ANDROID__) || defined(__VXWORKS__) || defined(__gelassenheit__)
     // Use UTF-8 as the locale encoding, ignore the LC_CTYPE locale.
     // See _Py_GetLocaleEncoding(), PyUnicode_DecodeLocale()
     // and PyUnicode_EncodeLocale().

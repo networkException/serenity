@@ -16,7 +16,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#ifdef __serenity__
+#ifdef __gelassenheit__
 #    include <LibCompress/Deflate.h>
 #    include <serenity.h>
 #endif
