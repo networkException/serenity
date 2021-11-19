@@ -1,3 +1,13 @@
+# GelassenheitBS
+
+Dies ist die eingedeutschte Version von [SerenityOS](https://github.com/SerenityOS/serenity/tree/d0c29c9735a4e15bdb4ccae02111a253da8b6042).
+
+Ein paar Benutzer finden es lustig, Alles ins Deutsche zu übersetzen, darum machen wir das hier einfach mal.
+
+Neue Funktionen, Fähigkeiten, und Fehlerbehebungen bitte in [SerenityOS](https://github.com/SerenityOS/serenity) implementieren. Dieses Depot wird für immer auf dem funktionalen Stand von d0c29c9735a4e15bdb4ccae02111a253da8b6042 bleiben.
+
+Mithilfe ist gern gesehen. Bitte versuche dafür zu sorgen, dass alle Zwischenzustände Sinn ergeben, und nach Möglichkeit auch bauen.
+
 # SerenityOS
 
 Graphical Unix-like operating system for x86 computers.
