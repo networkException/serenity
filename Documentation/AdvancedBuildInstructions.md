@@ -25,7 +25,7 @@ This will configure your keymap to German (`de`) instead of US English. See [`Ba
 
 ## Ninja build targets
 
-The `Meta/serenity.sh` script provides an abstraction over the build targets which are made available by CMake. The
+The `Meta/gelassenheit.sh` script provides an abstraction over the build targets which are made available by CMake. The
 following build targets cannot be accessed through the script and have to be used directly by changing the current
 directory to `Build/i686` and then running `ninja <target>`:
 
@@ -91,7 +91,7 @@ The "SuperBuild" pattern helps to separate the host build of core Serenity libra
 entire operating system environment. The SuperBuild allows clear separation of the host and target builds in the project's CMakeLists
 and unifies the approach taken towards different compiler toolchains and architectures.
 
-The recommended way to build and run the system, `./Meta/serenity.sh run`, invokes the SuperBuild equivalently to the commands below:
+The recommended way to build and run the system, `./Meta/gelassenheit.sh run`, invokes the SuperBuild equivalently to the commands below:
 
 ```console
 $ cmake -GNinja -S Meta/CMake/Superbuild -B Build/superbuild-i686 -DSERENITY_ARCH=i686 -DSERENITY_TOOLCHAIN=GNU
@@ -192,7 +192,7 @@ useful for stopping us from relying on compiler-specific behavior, and the built
 bugs.  Code compiled with both of these toolchains works identically in most cases, with the limitation that ports
 can't be built with Clang yet.
 
-Note that `Meta/serenity.sh` is not yet supported, so the appropriate `ninja` targets (`install`, `image` and `run`)
+Note that `Meta/gelassenheit.sh` is not yet supported, so the appropriate `ninja` targets (`install`, `image` and `run`)
 need to be invoked manually.
 
 To build the Clang-based toolchain, run `BuildClang.sh` from the `Toolchain` directory. The script defaults to building

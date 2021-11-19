@@ -1,4 +1,4 @@
-#compdef serenity serenity.sh
+#compdef serenity gelassenheit.sh
 
 _serenity() {
     local args

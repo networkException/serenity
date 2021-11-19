@@ -76,7 +76,7 @@ sh="Build/lagom/shell"
 
 if [[ ! -x $sh ]]; then
   echo "Building the Serenity shell, please wait..."
-  Meta/serenity.sh build lagom shell_lagom
+  Meta/gelassenheit.sh build lagom shell_lagom
 fi
 
 echo "Instantiating template \"$TEMPLATE\" at \"$DESTINATION\"..."

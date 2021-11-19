@@ -34,7 +34,7 @@ will need to install the tools as well as the system emulators for i386 and x86_
 
 ![QEMU Components](QEMU_Components.png)
 
-Run `Meta/serenity.sh run` to build and run SerenityOS as usual.
+Run `Meta/gelassenheit.sh run` to build and run SerenityOS as usual.
 
 ### Hardware acceleration
 
@@ -50,4 +50,4 @@ following command in an elevated PowerShell session: \
 
 You may have to reboot after enabling the WHPX feature.
 
-Afterwards you can start the VM with `Meta/serenity.sh run` as usual.
+Afterwards you can start the VM with `Meta/gelassenheit.sh run` as usual.

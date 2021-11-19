@@ -19,13 +19,13 @@ After opening the `serenity` repository in CLion as a new project, the "`Open Pr
 ```
 
 > CLion will complain that the toolchain file doesn't exist yet, if you haven't `cmake` for the SuperBuild step before. The SuperBuild configure step creates the Toolchain file.
-> To re-create the file after blasting your build directory, run `cmake -GNinja -S Meta/CMake/Superbuild -B Build/superbuild-i686` from the top level in a terminal, or simply run `./Meta/serenity.sh run`
+> To re-create the file after blasting your build directory, run `cmake -GNinja -S Meta/CMake/Superbuild -B Build/superbuild-i686` from the top level in a terminal, or simply run `./Meta/gelassenheit.sh run`
 
 `Build Directory`: `Build/i686`
 
 > _If you have not built the Toolchain at this point, please do so: `./Toolchain/BuildIt.sh`_
 
-> _If you have not built host tools from Lagom at this point, please do so: `./Meta/serenity.sh build` or `ninja -C Build/superbuild-i686` after running `cmake -GNinja -S Meta/CMake/Superbuild -B Build/superbuild-i686`_
+> _If you have not built host tools from Lagom at this point, please do so: `./Meta/gelassenheit.sh build` or `ninja -C Build/superbuild-i686` after running `cmake -GNinja -S Meta/CMake/Superbuild -B Build/superbuild-i686`_
 
 If you already have the project open, you can go to `File -> Settings -> Build, Execution, Deployment -> CMake` to find these options.
 

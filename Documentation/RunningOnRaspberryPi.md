@@ -19,7 +19,7 @@ Please follow [build instructions](BuildInstructions.md) to download and build S
 Use following the command to build the toolchain for Aarch64:
 
 ```console
-Meta/serenity.sh rebuild-toolchain aarch64
+Meta/gelassenheit.sh rebuild-toolchain aarch64
 ```
 
 ### Step 3: Build and run in emulator
@@ -27,7 +27,7 @@ Meta/serenity.sh rebuild-toolchain aarch64
 Use the following command to build and run the Aarch64 kernel:
 
 ```console
-Meta/serenity.sh run aarch64
+Meta/gelassenheit.sh run aarch64
 ```
 
 It should build Serenity and open a QEMU window, similar to the x86 version. You should see some messages in the terminal.
@@ -35,7 +35,7 @@ It should build Serenity and open a QEMU window, similar to the x86 version. You
 You can also run it under gdb with:
 
 ```console
-Meta/serenity.sh gdb aarch64
+Meta/gelassenheit.sh gdb aarch64
 ```
 
 ## Running on real hardware using an SD Card

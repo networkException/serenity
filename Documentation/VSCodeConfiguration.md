@@ -152,7 +152,7 @@ Note: The Assertion und KUBSan Problem matchers will only run after you have clo
             ],
             "args": [
                 "-c",
-                "\"Meta/serenity.sh build lagom\""
+                "\"Meta/gelassenheit.sh build lagom\""
             ],
             "presentation": {
                 "echo": true,
@@ -170,7 +170,7 @@ Note: The Assertion und KUBSan Problem matchers will only run after you have clo
             "command": "bash",
                 "args": [
                     "-c",
-                    "Meta/serenity.sh build ${input:arch} ${input:compiler}"
+                    "Meta/gelassenheit.sh build ${input:arch} ${input:compiler}"
                 ],
                 "options": {
                     "env": {
@@ -210,7 +210,7 @@ Note: The Assertion und KUBSan Problem matchers will only run after you have clo
             "command": "bash",
                 "args": [
                     "-c",
-                    "Meta/serenity.sh run ${input:arch} ${input:compiler}"
+                    "Meta/gelassenheit.sh run ${input:arch} ${input:compiler}"
                 ],
                 "options": {
                     "env": {
