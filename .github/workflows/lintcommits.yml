@@ -7,7 +7,7 @@ on: [pull_request_target]
 jobs:
   lint_commits:
     runs-on: ubuntu-20.04
-    if: always() && github.repository == 'SerenityOS/serenity'
+    if: always() && github.repository == 'SerenityOS/Gelassenheit'
 
     steps:
       - name: Lint PR commits
@@ -76,4 +76,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.BUGGIEBOT }}
         with:
-          msg: "One or more of the commits in this PR do not match the [code submission policy](https://github.com/SerenityOS/serenity/blob/master/CONTRIBUTING.md#code-submission-policy), please check the `lint_commits` CI job for more details."
+          msg: "One or more of the commits in this PR do not match the [code submission policy](https://github.com/GelassenheitBS/Gelassenheit/blob/master/CONTRIBUTING.md#code-submission-policy), please check the `lint_commits` CI job for more details."

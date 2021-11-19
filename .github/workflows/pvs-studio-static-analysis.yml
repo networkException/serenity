@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PVS_STUDIO_ANALYSIS_ARCH: i686
-    if: always() && github.repository == 'SerenityOS/serenity' && github.ref == 'refs/heads/master'
+    if: always() && github.repository == 'GelassenheitBS/Gelassenheit' && github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v2
 
@@ -79,10 +79,10 @@ jobs:
       - name: Build generated sources so they are available for analysis.
         working-directory: ${{ github.workspace }}
         # Note: The superbuild will create the Build/arch directory when doing the
-        #       configure step for the serenity ExternalProject, as that's the configured
+        #       configure step for the Gelassenheit ExternalProject, as that's the configured
         #       binary directory for that project.
         run: |
-          ninja -C Build/superbuild serenity-configure
+          ninja -C Build/superbuild Gelassenheit-configure
           cmake -B Build/${{ env.PVS_STUDIO_ANALYSIS_ARCH }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
           ninja -C Build/${{ env.PVS_STUDIO_ANALYSIS_ARCH }} all_generated
 

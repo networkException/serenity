@@ -4,8 +4,8 @@ on: [push, pull_request]
 
 env:
   # Don't mix these up!
-  # runner.workspace = /home/runner/work/serenity
-  # github.workspace = /home/runner/work/serenity/serenity
+  # runner.workspace = /home/runner/work/Gelassenheit
+  # github.workspace = /home/runner/work/Gelassenheit/Gelassenheit
   SERENITY_SOURCE_DIR: ${{ github.workspace }}
 
 concurrency:
@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build_and_test_serenity:
+  build_and_test_Gelassenheit:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -164,7 +164,7 @@ jobs:
 
       # === ACTUALLY BUILD ===
 
-      - name: Build Serenity and Tests
+      - name: Build GelassenheitBS and Tests
         working-directory: ${{ github.workspace }}/Build/superbuild
         run: cmake --build .
       - name: Show ccache stats after build
@@ -173,7 +173,7 @@ jobs:
         working-directory: ${{ github.workspace }}/Meta
         run: ./check-symbols.sh
 
-      - name: Create Serenity Rootfs
+      - name: Create GelassenheitBS Rootfs
         if: ${{ matrix.debug-options == 'NORMAL_DEBUG'}}
         working-directory: ${{ github.workspace }}/Build/${{ matrix.arch }}
         run: ninja install && ninja image
@@ -203,7 +203,7 @@ jobs:
         timeout-minutes: 60
 
       - name: Print Target Logs
-        # Extremely useful if Serenity hangs trying to run one of the tests
+        # Extremely useful if GelassenheitBS hangs trying to run one of the tests
         if: ${{ !cancelled() && matrix.debug-options == 'NORMAL_DEBUG'}}
         working-directory: ${{ github.workspace }}/Build/${{ matrix.arch }}
         run: '[ ! -e debug.log ] || cat debug.log'

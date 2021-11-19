@@ -8,7 +8,7 @@ jobs:
   build:
     name: Static Analysis
     runs-on: ubuntu-latest
-    if: always() && github.repository == 'SerenityOS/serenity' && github.ref == 'refs/heads/master'
+    if: always() && github.repository == 'GelassenheitBS/Gelassenheit' && github.ref == 'refs/heads/master'
     env:
       # Latest scanner version is tracked on: https://sonarcloud.io/documentation/analysis/scan/sonarscanner/
       SONAR_SCANNER_VERSION: 4.6.2.2472
@@ -38,9 +38,9 @@ jobs:
       - name: Configure sonar-scanner
         run: |
           echo "$HOME/.sonar/sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux/bin" >> $GITHUB_PATH
-          echo "sonar.projectKey=SerenityOS_serenity" >> ${{ github.workspace }}/sonar-project.properties
+          echo "sonar.projectKey=GelassenheitBS_Gelassenheit" >> ${{ github.workspace }}/sonar-project.properties
           echo "sonar.projectVersion=${{ github.sha }}" >> ${{ github.workspace }}/sonar-project.properties
-          echo "sonar.organization=serenityos" >> ${{ github.workspace }}/sonar-project.properties
+          echo "sonar.organization=GelassenheitBS" >> ${{ github.workspace }}/sonar-project.properties
           echo "sonar.cfamily.compile-commands=${{ github.workspace }}/Build/${{ env.SONAR_ANALYSIS_ARCH }}/compile_commands.json" >> ${{ github.workspace }}/sonar-project.properties
           echo "sonar.cfamily.threads=2" >> ${{ github.workspace }}/sonar-project.properties
           echo "sonar.cfamily.cache.enabled=false" >> ${{ github.workspace }}/sonar-project.properties
@@ -116,10 +116,10 @@ jobs:
       - name: Build generated sources so they are available for analysis.
         working-directory: ${{ github.workspace }}
         # Note: The superbuild will create the Build/arch directory when doing the
-        #       configure step for the serenity ExternalProject, as that's the configured
+        #       configure step for the Gelassenheit ExternalProject, as that's the configured
         #       binary directory for that project.
         run: |
-          ninja -C Build/superbuild serenity-configure
+          ninja -C Build/superbuild Gelassenheit-configure
           cmake -B Build/${{ env.SONAR_ANALYSIS_ARCH }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
           ninja -C Build/${{ env.SONAR_ANALYSIS_ARCH }} all_generated
 
