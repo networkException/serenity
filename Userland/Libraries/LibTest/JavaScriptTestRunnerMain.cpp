@@ -143,9 +143,9 @@ int main(int argc, char** argv)
 #ifdef __gelassenheit__
         test_root = LexicalPath::join("/home/anon", String::formatted("{}-tests", program_name.split_view('-').last())).string();
 #else
-        char* serenity_source_dir = getenv("SERENITY_SOURCE_DIR");
+        char* serenity_source_dir = getenv("GELASSENHEIT_SOURCE_DIR");
         if (!serenity_source_dir) {
-            warnln("No test root given, {} requires the SERENITY_SOURCE_DIR environment variable to be set", g_program_name);
+            warnln("No test root given, {} requires the GELASSENHEIT_SOURCE_DIR environment variable to be set", g_program_name);
             return 1;
         }
         test_root = String::formatted("{}/{}", serenity_source_dir, g_test_root_fragment);
@@ -161,9 +161,9 @@ int main(int argc, char** argv)
 #ifdef __gelassenheit__
         common_path = "/home/anon/js-tests/test-common.js";
 #else
-        char* serenity_source_dir = getenv("SERENITY_SOURCE_DIR");
+        char* serenity_source_dir = getenv("GELASSENHEIT_SOURCE_DIR");
         if (!serenity_source_dir) {
-            warnln("No test root given, {} requires the SERENITY_SOURCE_DIR environment variable to be set", g_program_name);
+            warnln("No test root given, {} requires the GELASSENHEIT_SOURCE_DIR environment variable to be set", g_program_name);
             return 1;
         }
         common_path = String::formatted("{}/Userland/Libraries/LibJS/Tests/test-common.js", serenity_source_dir);

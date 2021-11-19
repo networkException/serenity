@@ -11,8 +11,8 @@ launcher_category=Games
 launcher_command=/usr/local/bin/dosbox
 icon_file=contrib/icons/dosbox-staging.ico
 
-export CFLAGS="-I${SERENITY_INSTALL_ROOT}/usr/local/include/SDL2"
-export CPPFLAGS="-I${SERENITY_INSTALL_ROOT}/usr/local/include/SDL2"
+export CFLAGS="-I${GELASSENHEIT_INSTALL_ROOT}/usr/local/include/SDL2"
+export CPPFLAGS="-I${GELASSENHEIT_INSTALL_ROOT}/usr/local/include/SDL2"
 
 pre_configure() {
     run ./autogen.sh

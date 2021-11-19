@@ -32,7 +32,7 @@ else
 fi
 }
 
-DISK_SIZE=$(($(disk_usage "$SERENITY_SOURCE_DIR/Base") + $(disk_usage Root) + 300))
+DISK_SIZE=$(($(disk_usage "$GELASSENHEIT_SOURCE_DIR/Base") + $(disk_usage Root) + 300))
 
 echo "setting up disk image..."
 dd if=/dev/zero of=extlinux_disk_image bs=1M count="${DISK_SIZE:-800}" status=none || die "couldn't create disk image"
@@ -84,7 +84,7 @@ script_path=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 "$script_path/build-root-filesystem.sh"
 
 if [ -z "$1" ]; then
-    extlinux_cfg="$SERENITY_SOURCE_DIR"/Meta/extlinux.conf
+    extlinux_cfg="$GELASSENHEIT_SOURCE_DIR"/Meta/extlinux.conf
 else
     extlinux_cfg=$1
 fi

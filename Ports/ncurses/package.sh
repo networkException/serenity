@@ -22,16 +22,16 @@ pre_configure() {
 post_install() {
     # Compatibility symlinks for merged libraries.
     for lib in tinfo tic curses; do
-        ln -svf libncursesw.so "${SERENITY_INSTALL_ROOT}/usr/local/lib/lib${lib}w.so"
+        ln -svf libncursesw.so "${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/lib${lib}w.so"
     done
 
     # Compatibility symlinks for non-w libraries.
     for lib in form menu ncurses ncurses++ panel tinfo tic curses; do
-        ln -svf lib${lib}w.so "${SERENITY_INSTALL_ROOT}/usr/local/lib/lib${lib}.so"
+        ln -svf lib${lib}w.so "${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/lib${lib}.so"
     done
 
     # Compatibility symlink for the include folder.
     # Target folder has to be removed, otherwise we will get `/usr/local/include/ncurses/ncursesw`.
-    rm -rf "${SERENITY_INSTALL_ROOT}/usr/local/include/ncurses"
-    ln -svf ncursesw "${SERENITY_INSTALL_ROOT}/usr/local/include/ncurses"
+    rm -rf "${GELASSENHEIT_INSTALL_ROOT}/usr/local/include/ncurses"
+    ln -svf ncursesw "${GELASSENHEIT_INSTALL_ROOT}/usr/local/include/ncurses"
 }

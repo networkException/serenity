@@ -80,42 +80,42 @@ function(serenity_bin target_name)
 endfunction()
 
 function(serenity_test test_src sub_dir)
-    cmake_parse_arguments(PARSE_ARGV 2 SERENITY_TEST "MAIN_ALREADY_DEFINED" "CUSTOM_MAIN" "LIBS")
+    cmake_parse_arguments(PARSE_ARGV 2 GELASSENHEIT_TEST "MAIN_ALREADY_DEFINED" "CUSTOM_MAIN" "LIBS")
     set(TEST_SOURCES ${test_src})
-    if ("${SERENITY_TEST_CUSTOM_MAIN}" STREQUAL "")
-        set(SERENITY_TEST_CUSTOM_MAIN "$<TARGET_OBJECTS:LibTestMain>")
+    if ("${GELASSENHEIT_TEST_CUSTOM_MAIN}" STREQUAL "")
+        set(GELASSENHEIT_TEST_CUSTOM_MAIN "$<TARGET_OBJECTS:LibTestMain>")
     endif()
-    if (NOT ${SERENITY_TEST_MAIN_ALREADY_DEFINED})
-        list(PREPEND TEST_SOURCES "${SERENITY_TEST_CUSTOM_MAIN}")
+    if (NOT ${GELASSENHEIT_TEST_MAIN_ALREADY_DEFINED})
+        list(PREPEND TEST_SOURCES "${GELASSENHEIT_TEST_CUSTOM_MAIN}")
     endif()
     get_filename_component(test_name ${test_src} NAME_WE)
     add_executable(${test_name} ${TEST_SOURCES})
     add_dependencies(ComponentTests ${test_name})
     set_target_properties(${test_name} PROPERTIES EXCLUDE_FROM_ALL TRUE)
     target_link_libraries(${test_name} LibTest LibCore)
-    foreach(lib ${SERENITY_TEST_LIBS})
+    foreach(lib ${GELASSENHEIT_TEST_LIBS})
         target_link_libraries(${test_name} ${lib})
     endforeach()
     install(TARGETS ${test_name} RUNTIME DESTINATION usr/Tests/${sub_dir} OPTIONAL)
 endfunction()
 
 function(serenity_testjs_test test_src sub_dir)
-    cmake_parse_arguments(PARSE_ARGV 2 SERENITY_TEST "" "CUSTOM_MAIN" "LIBS")
-    if ("${SERENITY_TEST_CUSTOM_MAIN}" STREQUAL "")
-        set(SERENITY_TEST_CUSTOM_MAIN "$<TARGET_OBJECTS:JavaScriptTestRunnerMain>")
+    cmake_parse_arguments(PARSE_ARGV 2 GELASSENHEIT_TEST "" "CUSTOM_MAIN" "LIBS")
+    if ("${GELASSENHEIT_TEST_CUSTOM_MAIN}" STREQUAL "")
+        set(GELASSENHEIT_TEST_CUSTOM_MAIN "$<TARGET_OBJECTS:JavaScriptTestRunnerMain>")
     endif()
-    list(APPEND SERENITY_TEST_LIBS LibJS LibCore)
+    list(APPEND GELASSENHEIT_TEST_LIBS LibJS LibCore)
     serenity_test(${test_src} ${sub_dir}
-        CUSTOM_MAIN "${SERENITY_TEST_CUSTOM_MAIN}"
-        LIBS ${SERENITY_TEST_LIBS})
+        CUSTOM_MAIN "${GELASSENHEIT_TEST_CUSTOM_MAIN}"
+        LIBS ${GELASSENHEIT_TEST_LIBS})
 endfunction()
 
 function(serenity_app target_name)
-    cmake_parse_arguments(PARSE_ARGV 1 SERENITY_APP "" "ICON" "")
+    cmake_parse_arguments(PARSE_ARGV 1 GELASSENHEIT_APP "" "ICON" "")
 
     serenity_bin("${target_name}")
-    set(small_icon "${SerenityOS_SOURCE_DIR}/Base/res/icons/16x16/${SERENITY_APP_ICON}.png")
-    set(medium_icon "${SerenityOS_SOURCE_DIR}/Base/res/icons/32x32/${SERENITY_APP_ICON}.png")
+    set(small_icon "${GelassenheitBS_SOURCE_DIR}/Base/res/icons/16x16/${GELASSENHEIT_APP_ICON}.png")
+    set(medium_icon "${GelassenheitBS_SOURCE_DIR}/Base/res/icons/32x32/${GELASSENHEIT_APP_ICON}.png")
 
     if (EXISTS "${small_icon}")
         embed_resource("${target_name}" serenity_icon_s "${small_icon}")
@@ -130,7 +130,7 @@ function(serenity_app target_name)
         list(APPEND allowed_missing_medium_icons "audio-volume-high")
         list(APPEND allowed_missing_medium_icons "edit-copy")
 
-        if (NOT ${SERENITY_APP_ICON} IN_LIST allowed_missing_medium_icons)
+        if (NOT ${GELASSENHEIT_APP_ICON} IN_LIST allowed_missing_medium_icons)
             message(FATAL_ERROR "Missing medium app icon: ${medium_icon}")
         endif()
     endif()
@@ -143,8 +143,8 @@ function(embed_resource target section file)
     file(SIZE "${input_file}" file_size)
     add_custom_command(
         OUTPUT "${asm_file}"
-        COMMAND "${SerenityOS_SOURCE_DIR}/Meta/generate-embedded-resource-assembly.sh" "${asm_file}" "${section}" "${input_file}" "${file_size}"
-        DEPENDS "${input_file}" "${SerenityOS_SOURCE_DIR}/Meta/generate-embedded-resource-assembly.sh"
+        COMMAND "${GelassenheitBS_SOURCE_DIR}/Meta/generate-embedded-resource-assembly.sh" "${asm_file}" "${section}" "${input_file}" "${file_size}"
+        DEPENDS "${input_file}" "${GelassenheitBS_SOURCE_DIR}/Meta/generate-embedded-resource-assembly.sh"
         COMMENT "Generating ${asm_file}"
     )
     target_sources("${target}" PRIVATE "${asm_file}")

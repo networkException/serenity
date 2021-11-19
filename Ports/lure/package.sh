@@ -17,7 +17,7 @@ build() {
 }
 
 install() {
-    target_dir="${SERENITY_INSTALL_ROOT}${resource_path}"
+    target_dir="${GELASSENHEIT_INSTALL_ROOT}${resource_path}"
     run_nocd mkdir -p ${target_dir}
     run_nocd chmod 644 ${workdir}/*
     run_nocd cp ${workdir}/* ${target_dir}

@@ -20,11 +20,11 @@ endif()
 cmake_policy(SET CMP0058 NEW)
 
 get_filename_component(
-    SERENITY_PROJECT_ROOT "${PROJECT_SOURCE_DIR}/../.."
+    GELASSENHEIT_PROJECT_ROOT "${PROJECT_SOURCE_DIR}/../.."
     ABSOLUTE CACHE
 )
 
-list(APPEND CMAKE_MODULE_PATH "${SERENITY_PROJECT_ROOT}/Meta/CMake")
+list(APPEND CMAKE_MODULE_PATH "${GELASSENHEIT_PROJECT_ROOT}/Meta/CMake")
 
 if(NOT COMMAND serenity_option)
     macro(serenity_option)
@@ -151,7 +151,7 @@ set(Lagom_INSTALL_CMAKEDIR "${CMAKE_INSTALL_DATADIR}/${package}"
 mark_as_advanced(Lagom_INSTALL_CMAKEDIR)
 
 install(
-    FILES "${SERENITY_PROJECT_ROOT}/Meta/CMake/lagom-install-config.cmake"
+    FILES "${GELASSENHEIT_PROJECT_ROOT}/Meta/CMake/lagom-install-config.cmake"
     DESTINATION "${Lagom_INSTALL_CMAKEDIR}"
     RENAME "${package}Config.cmake"
     COMPONENT Lagom_Development
@@ -196,7 +196,7 @@ function(lagom_lib library fs_name)
             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     )
     install(
-        DIRECTORY "${SERENITY_PROJECT_ROOT}/Userland/Libraries/Lib${library}"
+        DIRECTORY "${GELASSENHEIT_PROJECT_ROOT}/Userland/Libraries/Lib${library}"
         COMPONENT Lagom_Development
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         FILES_MATCHING PATTERN "*.h"
@@ -229,7 +229,7 @@ endif()
 
 # Manually install AK headers
 install(
-    DIRECTORY "${SERENITY_PROJECT_ROOT}/AK"
+    DIRECTORY "${GELASSENHEIT_PROJECT_ROOT}/AK"
     COMPONENT Lagom_Development
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     FILES_MATCHING PATTERN "*.h"
@@ -476,7 +476,7 @@ if (BUILD_LAGOM)
         add_library(
             LagomTestMain
             OBJECT
-            "${SERENITY_PROJECT_ROOT}/Userland/Libraries/LibTest/TestMain.cpp"
+            "${GELASSENHEIT_PROJECT_ROOT}/Userland/Libraries/LibTest/TestMain.cpp"
         )
 
         # LibTest tests from Tests/
@@ -542,7 +542,7 @@ if (BUILD_LAGOM)
             NAME JS
             COMMAND test-js_lagom --show-progress=false
         )
-        set_tests_properties(JS PROPERTIES ENVIRONMENT SERENITY_SOURCE_DIR=${SERENITY_PROJECT_ROOT})
+        set_tests_properties(JS PROPERTIES ENVIRONMENT GELASSENHEIT_SOURCE_DIR=${GELASSENHEIT_PROJECT_ROOT})
 
         # test-invalid-unicode-js
         lagom_test(../../Tests/LibJS/test-invalid-unicode-js.cpp LIBS LagomJS)
@@ -566,7 +566,7 @@ if (BUILD_LAGOM)
             COMMAND test-wasm_lagom --show-progress=false
         )
         set_tests_properties(WasmParser PROPERTIES
-            ENVIRONMENT SERENITY_SOURCE_DIR=${SERENITY_PROJECT_ROOT}
+            ENVIRONMENT GELASSENHEIT_SOURCE_DIR=${GELASSENHEIT_PROJECT_ROOT}
             SKIP_RETURN_CODE 1)
 
         # Tests that are not LibTest based
@@ -587,7 +587,7 @@ if (BUILD_LAGOM)
             add_test(
                 NAME "Shell-${TEST_NAME}"
                 COMMAND shell_lagom --skip-shellrc "${TEST_PATH}"
-                WORKING_DIRECTORY ${SERENITY_PROJECT_ROOT}/Userland/Shell/Tests
+                WORKING_DIRECTORY ${GELASSENHEIT_PROJECT_ROOT}/Userland/Shell/Tests
             )
             set_tests_properties("Shell-${TEST_NAME}" PROPERTIES
                 TIMEOUT 10

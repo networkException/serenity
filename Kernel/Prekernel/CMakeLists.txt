@@ -2,7 +2,7 @@ set(SOURCES
     UBSanitizer.cpp
     ../MiniStdLib.cpp
 )
-if ("${SERENITY_ARCH}" STREQUAL "aarch64")
+if ("${GELASSENHEIT_ARCH}" STREQUAL "aarch64")
     set(SOURCES
         ${SOURCES}
         Arch/aarch64/Aarch64_asm_utils.S
@@ -30,9 +30,9 @@ else()
 endif()
 
 
-if ("${SERENITY_ARCH}" STREQUAL "i686")
+if ("${GELASSENHEIT_ARCH}" STREQUAL "i686")
     set(PREKERNEL_TARGET Prekernel32)
-elseif ("${SERENITY_ARCH}" STREQUAL "x86_64")
+elseif ("${GELASSENHEIT_ARCH}" STREQUAL "x86_64")
     set(PREKERNEL_TARGET Prekernel64)
 else()
     set(PREKERNEL_TARGET Prekernel)
@@ -43,7 +43,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
 add_executable(${PREKERNEL_TARGET} ${SOURCES})
 target_compile_options(${PREKERNEL_TARGET} PRIVATE -no-pie -fno-pic -fno-threadsafe-statics)
 
-if ("${SERENITY_ARCH}" STREQUAL "aarch64")
+if ("${GELASSENHEIT_ARCH}" STREQUAL "aarch64")
     set(PREKERNEL_LINKER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/Arch/aarch64/linker.ld")
 else()
     set(PREKERNEL_LINKER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/Arch/x86/linker.ld")
@@ -57,7 +57,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang$")
     target_link_libraries(${PREKERNEL_TARGET} PRIVATE clang_rt.builtins)
 endif()
 
-if ("${SERENITY_ARCH}" STREQUAL "i686" OR "${SERENITY_ARCH}" STREQUAL "x86_64")
+if ("${GELASSENHEIT_ARCH}" STREQUAL "i686" OR "${GELASSENHEIT_ARCH}" STREQUAL "x86_64")
     add_custom_command(
         TARGET ${PREKERNEL_TARGET} POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} -O elf32-i386 ${CMAKE_CURRENT_BINARY_DIR}/${PREKERNEL_TARGET} ${CMAKE_CURRENT_BINARY_DIR}/Prekernel
@@ -65,7 +65,7 @@ if ("${SERENITY_ARCH}" STREQUAL "i686" OR "${SERENITY_ARCH}" STREQUAL "x86_64")
     )
 endif()
 
-if ("${SERENITY_ARCH}" STREQUAL "aarch64")
+if ("${GELASSENHEIT_ARCH}" STREQUAL "aarch64")
     embed_resource(Prekernel serenity_boot_logo "Arch/aarch64/SerenityLogoRGB.ppm")
 
     add_custom_command(

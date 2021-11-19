@@ -7,6 +7,6 @@ files="https://www.freedesktop.org/software/fontconfig/release/fontconfig-${vers
 auth_type="sha256"
 configopts=("--prefix=/usr/local" "--enable-libxml2" "LDFLAGS=-ldl -lxml2")
 
-export CFLAGS="-I${SERENITY_INSTALL_ROOT}/usr/local/include/libxml2"
-export LIBXML2_CFLAGS="-I${SERENITY_INSTALL_ROOT}/usr/local/include/libxml2/"
+export CFLAGS="-I${GELASSENHEIT_INSTALL_ROOT}/usr/local/include/libxml2"
+export LIBXML2_CFLAGS="-I${GELASSENHEIT_INSTALL_ROOT}/usr/local/include/libxml2/"
 export LIBXML2_LIBS="-lxml2"

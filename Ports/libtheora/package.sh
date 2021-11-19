@@ -9,12 +9,12 @@ configopts=("--disable-examples")
 
 build_shared() {
     local name=$1
-    ${CC} -shared -o ${SERENITY_INSTALL_ROOT}/usr/local/lib/${name}.so -Wl,-soname,${name}.so -Wl,--whole-archive ${SERENITY_INSTALL_ROOT}/usr/local/lib/${name}.a -Wl,--no-whole-archive
-    rm -f ${SERENITY_INSTALL_ROOT}/usr/local/lib/${name}.la
+    ${CC} -shared -o ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/${name}.so -Wl,-soname,${name}.so -Wl,--whole-archive ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/${name}.a -Wl,--no-whole-archive
+    rm -f ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/${name}.la
 }
 
 install() {
-    run make DESTDIR=${SERENITY_INSTALL_ROOT} "${installopts[@]}" install
+    run make DESTDIR=${GELASSENHEIT_INSTALL_ROOT} "${installopts[@]}" install
     build_shared libtheora
     build_shared libtheoradec
     build_shared libtheoraenc

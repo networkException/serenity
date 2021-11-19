@@ -6,12 +6,12 @@ auth_type=sha256
 depends=()
 workdir=glm
 useconfigure=true
-configopts=("-DCMAKE_TOOLCHAIN_FILE=${SERENITY_BUILD_DIR}/CMakeToolchain.txt")
+configopts=("-DCMAKE_TOOLCHAIN_FILE=${GELASSENHEIT_BUILD_DIR}/CMakeToolchain.txt")
 
 configure() {
     run cmake "${configopts[@]}"
 }
 
 install() {
-    run cp -R glm "${SERENITY_BUILD_DIR}/Root/usr/local/include/"
+    run cp -R glm "${GELASSENHEIT_BUILD_DIR}/Root/usr/local/include/"
 }

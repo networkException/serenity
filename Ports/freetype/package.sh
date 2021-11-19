@@ -7,7 +7,7 @@ auth_type=sha256
 configopts=("--with-brotli=no" "--with-bzip2=no" "--with-zlib=no" "--with-harfbuzz=no" "--with-png=no")
 
 install() {
-    run make DESTDIR=${SERENITY_INSTALL_ROOT} "${installopts[@]}" install
-    ${CC} -shared -o ${SERENITY_INSTALL_ROOT}/usr/local/lib/libfreetype.so -Wl,-soname,libfreetype.so -Wl,--whole-archive ${SERENITY_INSTALL_ROOT}/usr/local/lib/libfreetype.a -Wl,--no-whole-archive
-    rm -f ${SERENITY_INSTALL_ROOT}/usr/local/lib/libfreetype.la
+    run make DESTDIR=${GELASSENHEIT_INSTALL_ROOT} "${installopts[@]}" install
+    ${CC} -shared -o ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libfreetype.so -Wl,-soname,libfreetype.so -Wl,--whole-archive ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libfreetype.a -Wl,--no-whole-archive
+    rm -f ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libfreetype.la
 }

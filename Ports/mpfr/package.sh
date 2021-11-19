@@ -2,7 +2,7 @@
 port=mpfr
 version=4.1.0
 useconfigure=true
-configopts=("--target=${SERENITY_ARCH}-pc-serenity" "--with-sysroot=/")
+configopts=("--target=${GELASSENHEIT_ARCH}-pc-serenity" "--with-sysroot=/")
 files="https://ftpmirror.gnu.org/gnu/mpfr/mpfr-${version}.tar.xz mpfr-${version}.tar.xz
 https://ftpmirror.gnu.org/gnu/mpfr/mpfr-${version}.tar.xz.sig mpfr-${version}.tar.xz.sig
 https://ftpmirror.gnu.org/gnu/gnu-keyring.gpg gnu-keyring.gpg"

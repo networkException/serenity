@@ -4,14 +4,14 @@
 +MRuby::CrossBuild.new('serenity') do |conf|
 +  conf.toolchain :gcc
 +
-+  conf.archiver.command = "#{ENV['SERENITY_ARCH']}-pc-serenity-ar"
-+  conf.linker.command = "#{ENV['SERENITY_ARCH']}-pc-serenity-g++"
++  conf.archiver.command = "#{ENV['GELASSENHEIT_ARCH']}-pc-serenity-ar"
++  conf.linker.command = "#{ENV['GELASSENHEIT_ARCH']}-pc-serenity-g++"
 +
-+  conf.cxx.command = "#{ENV['SERENITY_ARCH']}-pc-serenity-g++"
-+  conf.cxx.defines << (ENV['SERENITY_ARCH'].include?('64') ? 'MRB_64BIT' : 'MRB_32BIT')
++  conf.cxx.command = "#{ENV['GELASSENHEIT_ARCH']}-pc-serenity-g++"
++  conf.cxx.defines << (ENV['GELASSENHEIT_ARCH'].include?('64') ? 'MRB_64BIT' : 'MRB_32BIT')
 +
-+  conf.cc.command = "#{ENV['SERENITY_ARCH']}-pc-serenity-gcc"
-+  conf.cc.defines << (ENV['SERENITY_ARCH'].include?('64') ? 'MRB_64BIT' : 'MRB_32BIT')
++  conf.cc.command = "#{ENV['GELASSENHEIT_ARCH']}-pc-serenity-gcc"
++  conf.cc.defines << (ENV['GELASSENHEIT_ARCH'].include?('64') ? 'MRB_64BIT' : 'MRB_32BIT')
 +
 +  conf.gembox 'full-core'
 +

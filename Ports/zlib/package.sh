@@ -17,7 +17,7 @@ configure() {
 }
 
 install() {
-    run make DESTDIR=${SERENITY_INSTALL_ROOT} "${installopts[@]}" install
-    ${CC} -shared -o ${SERENITY_INSTALL_ROOT}/usr/local/lib/libz.so -Wl,-soname,libz.so -Wl,--whole-archive ${SERENITY_INSTALL_ROOT}/usr/local/lib/libz.a -Wl,--no-whole-archive
-    rm -f ${SERENITY_INSTALL_ROOT}/usr/local/lib/libz.la
+    run make DESTDIR=${GELASSENHEIT_INSTALL_ROOT} "${installopts[@]}" install
+    ${CC} -shared -o ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libz.so -Wl,-soname,libz.so -Wl,--whole-archive ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libz.a -Wl,--no-whole-archive
+    rm -f ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libz.la
 }

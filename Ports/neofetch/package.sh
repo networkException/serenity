@@ -8,5 +8,5 @@ files="https://github.com/dylanaraps/neofetch/archive/${version}.tar.gz neofetch
 auth_type=sha256
 
 install() {
-    run make DESTDIR=${SERENITY_INSTALL_ROOT} PREFIX=/usr/local "${installopts[@]}" install
+    run make DESTDIR=${GELASSENHEIT_INSTALL_ROOT} PREFIX=/usr/local "${installopts[@]}" install
 }

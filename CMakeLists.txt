@@ -45,7 +45,7 @@ find_package(Lagom CONFIG REQUIRED)
 add_custom_target(all_generated)
 
 add_custom_target(run
-    COMMAND "${CMAKE_COMMAND}" -E env "SERENITY_ARCH=${SERENITY_ARCH}" "${SerenityOS_SOURCE_DIR}/Meta/run.sh"
+    COMMAND "${CMAKE_COMMAND}" -E env "GELASSENHEIT_ARCH=${GELASSENHEIT_ARCH}" "${GelassenheitBS_SOURCE_DIR}/Meta/run.sh"
     USES_TERMINAL
 )
 
@@ -66,32 +66,32 @@ add_custom_target(image
 )
 
 add_custom_target(qemu-image
-    COMMAND "${CMAKE_COMMAND}" -E env "SERENITY_SOURCE_DIR=${SerenityOS_SOURCE_DIR}" "SERENITY_ARCH=${SERENITY_ARCH}" "SERENITY_TOOLCHAIN=${CMAKE_CXX_COMPILER_ID}" "LLVM_VERSION=${CMAKE_CXX_COMPILER_VERSION}" "${SerenityOS_SOURCE_DIR}/Meta/build-image-qemu.sh"
+    COMMAND "${CMAKE_COMMAND}" -E env "GELASSENHEIT_SOURCE_DIR=${GelassenheitBS_SOURCE_DIR}" "GELASSENHEIT_ARCH=${GELASSENHEIT_ARCH}" "GELASSENHEIT_TOOLCHAIN=${CMAKE_CXX_COMPILER_ID}" "LLVM_VERSION=${CMAKE_CXX_COMPILER_VERSION}" "${GelassenheitBS_SOURCE_DIR}/Meta/build-image-qemu.sh"
     BYPRODUCTS "${CMAKE_BINARY_DIR}/_disk_image"
     USES_TERMINAL
 )
 add_custom_target(grub-image
-    COMMAND ${CMAKE_COMMAND} -E env "SERENITY_SOURCE_DIR=${SerenityOS_SOURCE_DIR}" "SERENITY_ARCH=${SERENITY_ARCH}" "SERENITY_TOOLCHAIN=${CMAKE_CXX_COMPILER_ID}" "LLVM_VERSION=${CMAKE_CXX_COMPILER_VERSION}" "${SerenityOS_SOURCE_DIR}/Meta/build-image-grub.sh"
+    COMMAND ${CMAKE_COMMAND} -E env "GELASSENHEIT_SOURCE_DIR=${GelassenheitBS_SOURCE_DIR}" "GELASSENHEIT_ARCH=${GELASSENHEIT_ARCH}" "GELASSENHEIT_TOOLCHAIN=${CMAKE_CXX_COMPILER_ID}" "LLVM_VERSION=${CMAKE_CXX_COMPILER_VERSION}" "${GelassenheitBS_SOURCE_DIR}/Meta/build-image-grub.sh"
     BYPRODUCTS ${CMAKE_BINARY_DIR}/grub_disk_image
     USES_TERMINAL
 )
 add_custom_target(extlinux-image
-    COMMAND "${CMAKE_COMMAND}" -E env "SERENITY_SOURCE_DIR=${SerenityOS_SOURCE_DIR}" "SERENITY_ARCH=${SERENITY_ARCH}" "SERENITY_TOOLCHAIN=${CMAKE_CXX_COMPILER_ID}" "LLVM_VERSION=${CMAKE_CXX_COMPILER_VERSION}" "${SerenityOS_SOURCE_DIR}/Meta/build-image-extlinux.sh"
+    COMMAND "${CMAKE_COMMAND}" -E env "GELASSENHEIT_SOURCE_DIR=${GelassenheitBS_SOURCE_DIR}" "GELASSENHEIT_ARCH=${GELASSENHEIT_ARCH}" "GELASSENHEIT_TOOLCHAIN=${CMAKE_CXX_COMPILER_ID}" "LLVM_VERSION=${CMAKE_CXX_COMPILER_VERSION}" "${GelassenheitBS_SOURCE_DIR}/Meta/build-image-extlinux.sh"
     BYPRODUCTS "${CMAKE_BINARY_DIR}/extlinux_disk_image"
     USES_TERMINAL
 )
 
 add_custom_target(lint-shell-scripts
-    COMMAND "${SerenityOS_SOURCE_DIR}/Meta/lint-shell-scripts.sh"
+    COMMAND "${GelassenheitBS_SOURCE_DIR}/Meta/lint-shell-scripts.sh"
     USES_TERMINAL
 )
 add_custom_target(check-style
-    COMMAND "${SerenityOS_SOURCE_DIR}/Meta/check-style.sh"
+    COMMAND "${GelassenheitBS_SOURCE_DIR}/Meta/check-style.sh"
     USES_TERMINAL
 )
 
 add_custom_target(install-ports
-    COMMAND "${CMAKE_COMMAND}" -E env "SERENITY_SOURCE_DIR=${SerenityOS_SOURCE_DIR}" "SERENITY_ARCH=${SERENITY_ARCH}" "SERENITY_TOOLCHAIN=${CMAKE_CXX_COMPILER_ID}" "${SerenityOS_SOURCE_DIR}/Meta/install-ports-tree.sh"
+    COMMAND "${CMAKE_COMMAND}" -E env "GELASSENHEIT_SOURCE_DIR=${GelassenheitBS_SOURCE_DIR}" "GELASSENHEIT_ARCH=${GELASSENHEIT_ARCH}" "GELASSENHEIT_TOOLCHAIN=${CMAKE_CXX_COMPILER_ID}" "${GelassenheitBS_SOURCE_DIR}/Meta/install-ports-tree.sh"
     USES_TERMINAL
 )
 
@@ -168,7 +168,7 @@ add_compile_options(-Wno-maybe-uninitialized)
 
 add_compile_options(-fdiagnostics-color=always)
 add_compile_options(-fno-delete-null-pointer-checks)
-add_compile_options(-ffile-prefix-map=${SerenityOS_SOURCE_DIR}=.)
+add_compile_options(-ffile-prefix-map=${GelassenheitBS_SOURCE_DIR}=.)
 add_compile_options(-fno-exceptions)
 add_compile_options(-fno-semantic-interposition)
 add_compile_options(-fsized-deallocation)
@@ -196,7 +196,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang$")
     add_compile_options(-fconstexpr-steps=16777216)
 
     # Clang doesn't add compiler_rt to the search path when compiling with -nostdlib.
-    link_directories(${TOOLCHAIN_ROOT}/lib/clang/${CMAKE_CXX_COMPILER_VERSION}/lib/${SERENITY_ARCH}-pc-serenity/)
+    link_directories(${TOOLCHAIN_ROOT}/lib/clang/${CMAKE_CXX_COMPILER_VERSION}/lib/${GELASSENHEIT_ARCH}-pc-serenity/)
     add_link_options(LINKER:--allow-shlib-undefined)
 endif()
 
@@ -246,7 +246,7 @@ serenity_component(
 
 add_subdirectory(AK)
 add_subdirectory(Kernel)
-if(NOT "${SERENITY_ARCH}" STREQUAL "aarch64")
+if(NOT "${GELASSENHEIT_ARCH}" STREQUAL "aarch64")
     add_subdirectory(Userland)
     add_subdirectory(Tests)
 endif()

@@ -8,8 +8,8 @@ auth_type=sha256
 
 configure() {
     run ./configure \
-        --host="${SERENITY_ARCH}-pc-serenity" \
-        --with-sdl-prefix="${SERENITY_INSTALL_ROOT}/usr/local" \
+        --host="${GELASSENHEIT_ARCH}-pc-serenity" \
+        --with-sdl-prefix="${GELASSENHEIT_INSTALL_ROOT}/usr/local" \
         --enable-webp=false --enable-webp-shared=false     \
         LDFLAGS="-lgui -lgfx -lipc -lcore -lm"
 }
@@ -19,7 +19,7 @@ build() {
 }
 
 install() {
-    run make -k DESTDIR="${SERENITY_INSTALL_ROOT}" install
-    ${CC} -shared -o ${SERENITY_INSTALL_ROOT}/usr/local/lib/libSDL2_image.so -Wl,-soname,libSDL2_image.so -Wl,--whole-archive ${SERENITY_INSTALL_ROOT}/usr/local/lib/libSDL2_image.a -Wl,--no-whole-archive -lpng -ljpeg -ltiff
-    rm -f ${SERENITY_INSTALL_ROOT}/usr/local/lib/libSDL2_image.la
+    run make -k DESTDIR="${GELASSENHEIT_INSTALL_ROOT}" install
+    ${CC} -shared -o ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libSDL2_image.so -Wl,-soname,libSDL2_image.so -Wl,--whole-archive ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libSDL2_image.a -Wl,--no-whole-archive -lpng -ljpeg -ltiff
+    rm -f ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libSDL2_image.la
 }

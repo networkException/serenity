@@ -12,7 +12,7 @@ configure() {
     run mkdir -p ../host-build
     run sh -c "cd ../host-build && ../source/configure && make ${makeopts[@]}"
     target_env
-    run ./configure --host="${SERENITY_ARCH}-pc-serenity" "${configopts[@]}"
+    run ./configure --host="${GELASSENHEIT_ARCH}-pc-serenity" "${configopts[@]}"
 }
 
 export CFLAGS="-DU_HAVE_NL_LANGINFO_CODESET=0"

@@ -13,8 +13,8 @@ configopts=(
     "--enable-curses"
     "--enable-sdl2"
     "--enable-sdl2-mixer"
-    "--with-ncurses-prefix=${SERENITY_INSTALL_ROOT}/usr/local"
-    "--with-sdl2-prefix=${SERENITY_INSTALL_ROOT}/usr/local"
-    "CFLAGS=--sysroot=${SERENITY_INSTALL_ROOT} -I${SERENITY_INSTALL_ROOT}/usr/local/include/ncursesw"
+    "--with-ncurses-prefix=${GELASSENHEIT_INSTALL_ROOT}/usr/local"
+    "--with-sdl2-prefix=${GELASSENHEIT_INSTALL_ROOT}/usr/local"
+    "CFLAGS=--sysroot=${GELASSENHEIT_INSTALL_ROOT} -I${GELASSENHEIT_INSTALL_ROOT}/usr/local/include/ncursesw"
     "LIBS=-lncursesw"
 )

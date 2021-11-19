@@ -8,7 +8,7 @@ depends=("ncurses")
 build() {
     run make \
         PKG_CONFIG_CURSES=no \
-        CURSES_CFLAGS="-I${SERENITY_INSTALL_ROOT}/usr/local/include/ncurses" \
+        CURSES_CFLAGS="-I${GELASSENHEIT_INSTALL_ROOT}/usr/local/include/ncurses" \
         CURSES_LDFLAGS="-lncurses -ltinfo" \
         CURSES=ncurses \
         USE_UTF8=no \

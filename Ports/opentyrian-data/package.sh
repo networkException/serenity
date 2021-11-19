@@ -11,6 +11,6 @@ build() {
 }
 
 install() {
-    run_nocd mkdir -p ${SERENITY_INSTALL_ROOT}/usr/local/share/games/opentyrian/
-    run_nocd cp -a tyrian21/* ${SERENITY_INSTALL_ROOT}/usr/local/share/games/opentyrian/
+    run_nocd mkdir -p ${GELASSENHEIT_INSTALL_ROOT}/usr/local/share/games/opentyrian/
+    run_nocd cp -a tyrian21/* ${GELASSENHEIT_INSTALL_ROOT}/usr/local/share/games/opentyrian/
 }

@@ -5,7 +5,7 @@ version="17.04"
 useconfigure=true
 auth_type=sha256
 files="https://github.com/jinfeihan57/p7zip/archive/refs/tags/v${version}.tar.gz p7zip-${version}.tar.gz ea029a2e21d2d6ad0a156f6679bd66836204aa78148a4c5e498fe682e77127ef"
-configopts=("-DCMAKE_TOOLCHAIN_FILE=${SERENITY_BUILD_DIR}/CMakeToolchain.txt")
+configopts=("-DCMAKE_TOOLCHAIN_FILE=${GELASSENHEIT_BUILD_DIR}/CMakeToolchain.txt")
 workdir=$port-$version/CPP
 
 post_fetch() {
@@ -21,10 +21,10 @@ build() {
 }
 
 install() {
-    run cp -r bin/Codecs $SERENITY_INSTALL_ROOT/usr/local/bin
-    run cp bin/7z_ $SERENITY_INSTALL_ROOT/usr/local/bin
-    run cp bin/7z.so $SERENITY_INSTALL_ROOT/usr/local/bin
-    run cp bin/7za $SERENITY_INSTALL_ROOT/usr/local/bin
-    run cp bin/7zCon.sfx $SERENITY_INSTALL_ROOT/usr/local/bin
-    run cp bin/7zr $SERENITY_INSTALL_ROOT/usr/local/bin
+    run cp -r bin/Codecs $GELASSENHEIT_INSTALL_ROOT/usr/local/bin
+    run cp bin/7z_ $GELASSENHEIT_INSTALL_ROOT/usr/local/bin
+    run cp bin/7z.so $GELASSENHEIT_INSTALL_ROOT/usr/local/bin
+    run cp bin/7za $GELASSENHEIT_INSTALL_ROOT/usr/local/bin
+    run cp bin/7zCon.sfx $GELASSENHEIT_INSTALL_ROOT/usr/local/bin
+    run cp bin/7zr $GELASSENHEIT_INSTALL_ROOT/usr/local/bin
 }

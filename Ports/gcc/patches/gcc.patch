@@ -130,8 +130,8 @@ diff -Naur gcc-11.2.0/gcc/config/serenity.h gcc-11.2.0.serenity/gcc/config/seren
 +++ gcc-11.2.0.serenity/gcc/config/serenity.h	2021-07-28 18:28:53.251904345 +0200
 @@ -0,0 +1,44 @@
 +/* Useful if you wish to make target-specific GCC changes. */
-+#undef TARGET_SERENITY
-+#define TARGET_SERENITY 1
++#undef TARGET_GELASSENHEIT
++#define TARGET_GELASSENHEIT 1
 +
 +#if defined(HAVE_LD_EH_FRAME_HDR)
 +#define LINK_EH_SPEC "%{!static|static-pie:--eh-frame-hdr} "

@@ -328,7 +328,7 @@ void ArgsParser::print_usage_markdown(FILE* file, const char* argv0)
 
 void ArgsParser::print_version(FILE* file)
 {
-    outln(file, Core::Version::SERENITY_VERSION);
+    outln(file, Core::Version::GELASSENHEIT_VERSION);
 }
 
 void ArgsParser::add_option(Option&& option)

@@ -28,11 +28,11 @@ echo "This script assumes passwordless sudo."
 sudo true
 
 if [ -z "$BUILD_DIR" ]; then
-    if [ -z "$SERENITY_ARCH" ]; then
-        export SERENITY_ARCH="i686"
-        echo "SERENITY_ARCH not given. Assuming ${SERENITY_ARCH}."
+    if [ -z "$GELASSENHEIT_ARCH" ]; then
+        export GELASSENHEIT_ARCH="i686"
+        echo "GELASSENHEIT_ARCH not given. Assuming ${GELASSENHEIT_ARCH}."
     fi
-    BUILD_DIR=Build/"$SERENITY_ARCH"
+    BUILD_DIR=Build/"$GELASSENHEIT_ARCH"
     echo "BUILD_DIR not given. Assuming ${BUILD_DIR}."
 fi
 
@@ -48,8 +48,8 @@ if ! [ -d Base/usr/share/man/ ]; then
 fi
 
 echo "Using 'ninja run' to generate manpages ..."
-export SERENITY_RUN="ci"
-export SERENITY_KERNEL_CMDLINE="fbdev=off panic=shutdown system_mode=generate-manpages"
+export GELASSENHEIT_RUN="ci"
+export GELASSENHEIT_KERNEL_CMDLINE="fbdev=off panic=shutdown system_mode=generate-manpages"
 # The 'sed' gets rid of the clear-screen escape sequence.
 ninja -C "$BUILD_DIR" -- run | sed -re 's,''c,,'
 echo

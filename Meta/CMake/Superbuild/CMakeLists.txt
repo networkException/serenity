@@ -29,28 +29,28 @@ else()
 endif()
 
 get_filename_component(
-    SERENITY_SOURCE_DIR "${PROJECT_SOURCE_DIR}/../../.."
+    GELASSENHEIT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/../../.."
     ABSOLUTE CACHE
 )
-set(SERENITY_ARCH "i686" CACHE STRING "Target architecture for SerenityOS.")
-set(SERENITY_TOOLCHAIN "GNU" CACHE STRING "Compliler toolchain to use for Serenity (GNU or Clang)")
+set(GELASSENHEIT_ARCH "i686" CACHE STRING "Target architecture for GelassenheitBS.")
+set(GELASSENHEIT_TOOLCHAIN "GNU" CACHE STRING "Compliler toolchain to use for Gelassenheit (GNU or Clang)")
 
 # FIXME: It is preferred to keep all the sub-build artifacts below the binary directory for the superbuild
 #        However, this has an impact on developer's IDE settings and more significantly, the Ports tree.
 #        See https://github.com/SerenityOS/serenity/pull/9297#discussion_r697877603
-set(SERENITY_BUILD_DIR_SUFFIX "")
-if(NOT SERENITY_TOOLCHAIN STREQUAL "GNU")
-  string(TOLOWER "${SERENITY_TOOLCHAIN}" SERENITY_BUILD_DIR_SUFFIX)
+set(GELASSENHEIT_BUILD_DIR_SUFFIX "")
+if(NOT GELASSENHEIT_TOOLCHAIN STREQUAL "GNU")
+  string(TOLOWER "${GELASSENHEIT_TOOLCHAIN}" GELASSENHEIT_BUILD_DIR_SUFFIX)
 endif()
-set(SERENITY_BUILD_DIR "${PROJECT_BINARY_DIR}/../${SERENITY_ARCH}${SERENITY_BUILD_DIR_SUFFIX}")
+set(GELASSENHEIT_BUILD_DIR "${PROJECT_BINARY_DIR}/../${GELASSENHEIT_ARCH}${GELASSENHEIT_BUILD_DIR_SUFFIX}")
 
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "GelassenheitBS")
     message(STATUS "Good job on building cmake!")
 else()
-    configure_file("${SERENITY_SOURCE_DIR}/Toolchain/CMake/${SERENITY_TOOLCHAIN}Toolchain.txt.in" "${SERENITY_BUILD_DIR}/CMakeToolchain.txt" @ONLY)
-    set(SERENITY_TOOLCHAIN_FILE "${SERENITY_BUILD_DIR}/CMakeToolchain.txt" CACHE PATH "Toolchain file to use for cross-compilation")
+    configure_file("${GELASSENHEIT_SOURCE_DIR}/Toolchain/CMake/${GELASSENHEIT_TOOLCHAIN}Toolchain.txt.in" "${GELASSENHEIT_BUILD_DIR}/CMakeToolchain.txt" @ONLY)
+    set(GELASSENHEIT_TOOLCHAIN_FILE "${GELASSENHEIT_BUILD_DIR}/CMakeToolchain.txt" CACHE PATH "Toolchain file to use for cross-compilation")
     # Support non-cross builds by stuffing this in a variable
-    set(SERENITY_TOOLCHAIN_FILE_ARG "-DCMAKE_TOOLCHAIN_FILE:STRING=${SERENITY_TOOLCHAIN_FILE}")
+    set(GELASSENHEIT_TOOLCHAIN_FILE_ARG "-DCMAKE_TOOLCHAIN_FILE:STRING=${GELASSENHEIT_TOOLCHAIN_FILE}")
 endif()
 
 # Allow the Ninja generators to output messages as they happen by assigning
@@ -73,7 +73,7 @@ macro(serenity_option name)
     set(${ARGV})
     list(APPEND lagom_options "-D${name}:STRING=${${name}}")
 endmacro()
-include("${SERENITY_SOURCE_DIR}/Meta/CMake/lagom_options.cmake")
+include("${GELASSENHEIT_SOURCE_DIR}/Meta/CMake/lagom_options.cmake")
 
 # Forward user defined host toolchain to lagom build
 if (DEFINED CMAKE_C_COMPILER)
@@ -87,14 +87,14 @@ endif()
 
 ExternalProject_Add(
     lagom
-    SOURCE_DIR "${SERENITY_SOURCE_DIR}/Meta/Lagom"
+    SOURCE_DIR "${GELASSENHEIT_SOURCE_DIR}/Meta/Lagom"
     BINARY_DIR "${PROJECT_BINARY_DIR}/../lagom"
     INSTALL_DIR "${PROJECT_BINARY_DIR}/../lagom-install"
     EXCLUDE_FROM_ALL YES
     CMAKE_CACHE_ARGS
     "-DCMAKE_INSTALL_PREFIX:STRING=<INSTALL_DIR>"
-    "-DUCD_PATH:STRING=${SERENITY_BUILD_DIR}/UCD"
-    "-DCLDR_PATH:STRING=${SERENITY_BUILD_DIR}/CLDR"
+    "-DUCD_PATH:STRING=${GELASSENHEIT_BUILD_DIR}/UCD"
+    "-DCLDR_PATH:STRING=${GELASSENHEIT_BUILD_DIR}/CLDR"
     ${lagom_options}
     # Always call the build step of tools, so keeping things up-to-date is easy
     BUILD_ALWAYS YES
@@ -111,20 +111,20 @@ macro(serenity_option name)
     set(${ARGV})
     list(APPEND serenity_options "-D${name}:STRING=${${name}}")
 endmacro()
-include("${SERENITY_SOURCE_DIR}/Meta/CMake/serenity_options.cmake")
+include("${GELASSENHEIT_SOURCE_DIR}/Meta/CMake/serenity_options.cmake")
 
 ExternalProject_Add(
     serenity
-    SOURCE_DIR "${SERENITY_SOURCE_DIR}"
-    BINARY_DIR "${SERENITY_BUILD_DIR}"
+    SOURCE_DIR "${GELASSENHEIT_SOURCE_DIR}"
+    BINARY_DIR "${GELASSENHEIT_BUILD_DIR}"
     CMAKE_CACHE_ARGS
     # Tell the find_package(Lagom REQUIRED) command call where to find
     # the CMake package
     "-DCMAKE_PREFIX_PATH:STRING=${PROJECT_BINARY_DIR}/../lagom-install"
-    "-DUCD_PATH:STRING=${SERENITY_BUILD_DIR}/UCD"
-    "-DCLDR_PATH:STRING=${SERENITY_BUILD_DIR}/CLDR"
-    "-DSERENITY_ARCH:STRING=${SERENITY_ARCH}"
-    "${SERENITY_TOOLCHAIN_FILE_ARG}"
+    "-DUCD_PATH:STRING=${GELASSENHEIT_BUILD_DIR}/UCD"
+    "-DCLDR_PATH:STRING=${GELASSENHEIT_BUILD_DIR}/CLDR"
+    "-DGELASSENHEIT_ARCH:STRING=${GELASSENHEIT_ARCH}"
+    "${GELASSENHEIT_TOOLCHAIN_FILE_ARG}"
     ${serenity_options}
     # Always call the build step
     BUILD_ALWAYS YES

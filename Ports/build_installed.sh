@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-packagesdb="${SERENITY_BUILD_DIR}/packages.db"
+packagesdb="${GELASSENHEIT_BUILD_DIR}/packages.db"
 
 clean=false
 case "$1" in

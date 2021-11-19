@@ -10,4 +10,4 @@ build() {
         production=true
 }
 
-export CPPFLAGS="-I${SERENITY_INSTALL_ROOT}/usr/local/include/ncurses"
+export CPPFLAGS="-I${GELASSENHEIT_INSTALL_ROOT}/usr/local/include/ncurses"

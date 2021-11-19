@@ -6,7 +6,7 @@ auth_type=sha256
 depends=("zlib")
 
 pre_configure() {
-    export CFLAGS="-I${SERENITY_INSTALL_ROOT}/usr/local/include"
-    export LDFLAGS="-L${SERENITY_INSTALL_ROOT}/usr/local/lib -lzlib"
+    export CFLAGS="-I${GELASSENHEIT_INSTALL_ROOT}/usr/local/include"
+    export LDFLAGS="-L${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib -lzlib"
 
 }

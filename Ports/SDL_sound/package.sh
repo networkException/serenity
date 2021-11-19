@@ -7,7 +7,7 @@ useconfigure=true
 depends=("SDL2")
 files="https://github.com/icculus/SDL_sound/archive/${_commit}.zip ${_commit}.zip c701f31fcef9238d6a439d94020ce8957aa5aaea29878312dc0b6d1c247d77ca"
 auth_type=sha256
-configopts=("-DCMAKE_TOOLCHAIN_FILE=${SERENITY_BUILD_DIR}/CMakeToolchain.txt")
+configopts=("-DCMAKE_TOOLCHAIN_FILE=${GELASSENHEIT_BUILD_DIR}/CMakeToolchain.txt")
 
 configure() {
     run cmake "${configopts[@]}"

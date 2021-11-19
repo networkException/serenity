@@ -9,8 +9,8 @@ auth_type=sha256
 export CFLAGS=-Wno-deprecated-declarations
 
 # Map LD to the serenity Toolchain, otherwise the host LD is used.
-if [ "$SERENITY_TOOLCHAIN" = "Clang" ]; then
+if [ "$GELASSENHEIT_TOOLCHAIN" = "Clang" ]; then
     export LD=$(CC)
 else
-    export LD="${SERENITY_ARCH}-pc-serenity-ld"
+    export LD="${GELASSENHEIT_ARCH}-pc-serenity-ld"
 fi

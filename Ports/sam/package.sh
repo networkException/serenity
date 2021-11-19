@@ -10,5 +10,5 @@ build() {
 }
 
 install() {
-    run cp sam "${SERENITY_INSTALL_ROOT}/usr/local/bin/sam"
+    run cp sam "${GELASSENHEIT_INSTALL_ROOT}/usr/local/bin/sam"
 }

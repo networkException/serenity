@@ -8,8 +8,8 @@ depends=("SDL2" "libvorbis")
 
 configure() {
     run ./configure \
-        --host="${SERENITY_ARCH}-pc-serenity" \
-        --with-sdl-prefix="${SERENITY_INSTALL_ROOT}/usr/local" \
+        --host="${GELASSENHEIT_ARCH}-pc-serenity" \
+        --with-sdl-prefix="${GELASSENHEIT_INSTALL_ROOT}/usr/local" \
         --enable-music-opus=false --enable-music-opus-shared=false \
         --enable-music-mod-modplug=false --enable-music-mod-modplug-shared=false \
         EXTRA_LDFLAGS="-lgui -lgfx -lipc -lcore -lcompression"
@@ -20,7 +20,7 @@ build() {
 }
 
 install() {
-    run make -k DESTDIR="${SERENITY_INSTALL_ROOT}" install
-    ${CC} -shared -o ${SERENITY_INSTALL_ROOT}/usr/local/lib/libSDL2_mixer.so -Wl,-soname,libSDL2_mixer.so -Wl,--whole-archive ${SERENITY_INSTALL_ROOT}/usr/local/lib/libSDL2_mixer.a -Wl,--no-whole-archive -Wl,--no-as-needed -lvorbis -lvorbisfile
-    rm -f ${SERENITY_INSTALL_ROOT}/usr/local/lib/libSDL2_mixer.la
+    run make -k DESTDIR="${GELASSENHEIT_INSTALL_ROOT}" install
+    ${CC} -shared -o ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libSDL2_mixer.so -Wl,-soname,libSDL2_mixer.so -Wl,--whole-archive ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libSDL2_mixer.a -Wl,--no-whole-archive -Wl,--no-as-needed -lvorbis -lvorbisfile
+    rm -f ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libSDL2_mixer.la
 }

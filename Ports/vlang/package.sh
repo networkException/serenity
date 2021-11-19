@@ -16,7 +16,7 @@ install() {
     # v requires having rw access to the srcdir to rebuild on demand
     # so we just copy that into the default user's home for now.
     # proper system-wide dist builds will be added in vlang later
-    mkdir -p "${SERENITY_INSTALL_ROOT}/home/anon/vlang"
-    cp -rf "$workdir"/* "${SERENITY_INSTALL_ROOT}/home/anon/vlang"
-    ln -fs "${SERENITY_INSTALL_ROOT}/home/anon/vlang/v2" "${SERENITY_INSTALL_ROOT}/usr/local/bin/v"
+    mkdir -p "${GELASSENHEIT_INSTALL_ROOT}/home/anon/vlang"
+    cp -rf "$workdir"/* "${GELASSENHEIT_INSTALL_ROOT}/home/anon/vlang"
+    ln -fs "${GELASSENHEIT_INSTALL_ROOT}/home/anon/vlang/v2" "${GELASSENHEIT_INSTALL_ROOT}/usr/local/bin/v"
 }

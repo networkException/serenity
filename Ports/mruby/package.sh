@@ -17,9 +17,9 @@ build() {
 }
 
 install() {
-    run cp "${build_dir}/bin/mirb" "${SERENITY_INSTALL_ROOT}/bin/"
-    run cp "${build_dir}/bin/mrbc" "${SERENITY_INSTALL_ROOT}/bin/"
-    run cp "${build_dir}/bin/mruby" "${SERENITY_INSTALL_ROOT}/bin/"
-    run cp "${build_dir}/lib/libmruby.a" "${SERENITY_INSTALL_ROOT}/usr/lib/"
-    run cp "${build_dir}/lib/libmruby_core.a" "${SERENITY_INSTALL_ROOT}/usr/lib/"
+    run cp "${build_dir}/bin/mirb" "${GELASSENHEIT_INSTALL_ROOT}/bin/"
+    run cp "${build_dir}/bin/mrbc" "${GELASSENHEIT_INSTALL_ROOT}/bin/"
+    run cp "${build_dir}/bin/mruby" "${GELASSENHEIT_INSTALL_ROOT}/bin/"
+    run cp "${build_dir}/lib/libmruby.a" "${GELASSENHEIT_INSTALL_ROOT}/usr/lib/"
+    run cp "${build_dir}/lib/libmruby_core.a" "${GELASSENHEIT_INSTALL_ROOT}/usr/lib/"
 }

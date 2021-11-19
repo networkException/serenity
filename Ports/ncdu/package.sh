@@ -6,4 +6,4 @@ files="https://dev.yorhel.nl/download/ncdu-${version}.tar.gz ncdu-${version}.tar
 auth_type=sha256
 depends=("ncurses")
 
-export CFLAGS="-I${SERENITY_INSTALL_ROOT}/usr/local/include/ncurses"
+export CFLAGS="-I${GELASSENHEIT_INSTALL_ROOT}/usr/local/include/ncurses"

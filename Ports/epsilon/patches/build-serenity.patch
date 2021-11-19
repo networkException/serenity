@@ -30,7 +30,7 @@ diff --color -rupN e15/ion/src/simulator/serenity/Makefile serenityEpsilon/ion/s
 +  platform_language.cpp \
 +)
 +
-+SFLAGS += -I$(SERENITY_INSTALL_ROOT)/usr/local/include/SDL2 -I$(SERENITY_INSTALL_ROOT)/usr/local/include
++SFLAGS += -I$(GELASSENHEIT_INSTALL_ROOT)/usr/local/include/SDL2 -I$(GELASSENHEIT_INSTALL_ROOT)/usr/local/include
 +LDFLAGS += -lpng -lz -ljpeg -lSDL2
 +
 +ion_src += $(addprefix ion/src/simulator/shared/, \

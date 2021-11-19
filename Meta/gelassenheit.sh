@@ -7,7 +7,7 @@ print_help() {
     NAME=$(basename "$ARG0")
     cat <<EOF
 Usage: $NAME COMMAND [TARGET] [TOOLCHAIN] [ARGS...]
-  Supported TARGETs: aarch64, i686, x86_64, lagom. Defaults to SERENITY_ARCH, or i686 if not set.
+  Supported TARGETs: aarch64, i686, x86_64, lagom. Defaults to GELASSENHEIT_ARCH, or i686 if not set.
   Supported TOOLCHAINs: GNU, Clang. Defaults to GNU if not set.
   Supported COMMANDs:
     build:      Compiles the target binaries, [ARGS...] are passed through to ninja
@@ -85,7 +85,7 @@ fi
 if [ -n "$1" ]; then
     TARGET="$1"; shift
 else
-    TARGET="${SERENITY_ARCH:-"i686"}"
+    TARGET="${GELASSENHEIT_ARCH:-"i686"}"
 fi
 
 CMAKE_ARGS=()
@@ -104,7 +104,7 @@ if [ "$TARGET" != "lagom" ]; then
             TOOLCHAIN_TYPE="GNU"
             ;;
     esac
-    CMAKE_ARGS+=( "-DSERENITY_TOOLCHAIN=$TOOLCHAIN_TYPE" )
+    CMAKE_ARGS+=( "-DGELASSENHEIT_TOOLCHAIN=$TOOLCHAIN_TYPE" )
 fi
 
 CMD_ARGS=( "$@" )
@@ -115,15 +115,15 @@ get_top_dir() {
 
 is_valid_target() {
     if [ "$TARGET" = "aarch64" ]; then
-        CMAKE_ARGS+=("-DSERENITY_ARCH=aarch64")
+        CMAKE_ARGS+=("-DGELASSENHEIT_ARCH=aarch64")
         return 0
     fi
     if [ "$TARGET" = "i686" ]; then
-        CMAKE_ARGS+=("-DSERENITY_ARCH=i686")
+        CMAKE_ARGS+=("-DGELASSENHEIT_ARCH=i686")
         return 0
     fi
     if [ "$TARGET" = "x86_64" ]; then
-        CMAKE_ARGS+=("-DSERENITY_ARCH=x86_64")
+        CMAKE_ARGS+=("-DGELASSENHEIT_ARCH=x86_64")
         return 0
     fi
     if [ "$TARGET" = "lagom" ]; then
@@ -135,9 +135,9 @@ is_valid_target() {
 
 create_build_dir() {
     if [ "$TARGET" != "lagom" ]; then
-        cmake -GNinja "${CMAKE_ARGS[@]}" -S "$SERENITY_SOURCE_DIR/Meta/CMake/Superbuild" -B "$SUPER_BUILD_DIR"
+        cmake -GNinja "${CMAKE_ARGS[@]}" -S "$GELASSENHEIT_SOURCE_DIR/Meta/CMake/Superbuild" -B "$SUPER_BUILD_DIR"
     else
-        cmake -GNinja "${CMAKE_ARGS[@]}" -S "$SERENITY_SOURCE_DIR/Meta/Lagom" -B "$SUPER_BUILD_DIR"
+        cmake -GNinja "${CMAKE_ARGS[@]}" -S "$GELASSENHEIT_SOURCE_DIR/Meta/Lagom" -B "$SUPER_BUILD_DIR"
     fi
 }
 
@@ -173,27 +173,27 @@ cmd_with_target() {
     is_valid_target || ( >&2 echo "Unknown target: $TARGET"; usage )
     pick_gcc
 
-    if [ ! -d "$SERENITY_SOURCE_DIR" ]; then
-        SERENITY_SOURCE_DIR="$(get_top_dir)"
-        export SERENITY_SOURCE_DIR
+    if [ ! -d "$GELASSENHEIT_SOURCE_DIR" ]; then
+        GELASSENHEIT_SOURCE_DIR="$(get_top_dir)"
+        export GELASSENHEIT_SOURCE_DIR
     fi
     local TARGET_TOOLCHAIN=""
     if [[ "$TOOLCHAIN_TYPE" != "GNU" && "$TARGET" != "lagom" ]]; then
         # Only append the toolchain if it's not GNU
         TARGET_TOOLCHAIN=$(echo "$TOOLCHAIN_TYPE" | tr "[:upper:]" "[:lower:]")
     fi
-    BUILD_DIR="$SERENITY_SOURCE_DIR/Build/$TARGET$TARGET_TOOLCHAIN"
+    BUILD_DIR="$GELASSENHEIT_SOURCE_DIR/Build/$TARGET$TARGET_TOOLCHAIN"
     if [ "$TARGET" != "lagom" ]; then
-        export SERENITY_ARCH="$TARGET"
+        export GELASSENHEIT_ARCH="$TARGET"
         if [ "$TOOLCHAIN_TYPE" = "Clang" ]; then
-            TOOLCHAIN_DIR="$SERENITY_SOURCE_DIR/Toolchain/Local/clang"
+            TOOLCHAIN_DIR="$GELASSENHEIT_SOURCE_DIR/Toolchain/Local/clang"
         else
-            TOOLCHAIN_DIR="$SERENITY_SOURCE_DIR/Toolchain/Local/$TARGET_TOOLCHAIN/$TARGET"
+            TOOLCHAIN_DIR="$GELASSENHEIT_SOURCE_DIR/Toolchain/Local/$TARGET_TOOLCHAIN/$TARGET"
         fi
-        SUPER_BUILD_DIR="$SERENITY_SOURCE_DIR/Build/superbuild-$TARGET$TARGET_TOOLCHAIN"
+        SUPER_BUILD_DIR="$GELASSENHEIT_SOURCE_DIR/Build/superbuild-$TARGET$TARGET_TOOLCHAIN"
     else
         SUPER_BUILD_DIR="$BUILD_DIR"
-        CMAKE_ARGS+=("-DCMAKE_INSTALL_PREFIX=$SERENITY_SOURCE_DIR/Build/lagom-install")
+        CMAKE_ARGS+=("-DCMAKE_INSTALL_PREFIX=$GELASSENHEIT_SOURCE_DIR/Build/lagom-install")
     fi
 }
 
@@ -215,7 +215,7 @@ build_target() {
     if [ "$TARGET" = "lagom" ]; then
         # Ensure that all lagom binaries get built, in case user first
         # invoked superbuild for Gelassenheit target that doesn't set -DBUILD_LAGOM=ON
-        cmake -S "$SERENITY_SOURCE_DIR/Meta/Lagom" -B "$BUILD_DIR" -DBUILD_LAGOM=ON
+        cmake -S "$GELASSENHEIT_SOURCE_DIR/Meta/Lagom" -B "$BUILD_DIR" -DBUILD_LAGOM=ON
     fi
     # With zero args, we are doing a standard "build"
     # With multiple args, we are doing an install/image/run
@@ -234,9 +234,9 @@ delete_target() {
 build_toolchain() {
     echo "build_toolchain: $TOOLCHAIN_DIR"
     if [ "$TOOLCHAIN_TYPE" = "Clang" ]; then
-        ( cd "$SERENITY_SOURCE_DIR/Toolchain" && ./BuildClang.sh )
+        ( cd "$GELASSENHEIT_SOURCE_DIR/Toolchain" && ./BuildClang.sh )
     else
-        ( cd "$SERENITY_SOURCE_DIR/Toolchain" && ARCH="$TARGET" ./BuildIt.sh )
+        ( cd "$GELASSENHEIT_SOURCE_DIR/Toolchain" && ARCH="$TARGET" ./BuildIt.sh )
     fi
 }
 
@@ -296,7 +296,7 @@ run_gdb() {
         gdb "$BUILD_DIR/$LAGOM_EXECUTABLE" "${GDB_ARGS[@]}"
     else
         if [ -n "$KERNEL_CMD_LINE" ]; then
-            export SERENITY_KERNEL_CMDLINE="$KERNEL_CMD_LINE"
+            export GELASSENHEIT_KERNEL_CMDLINE="$KERNEL_CMD_LINE"
         fi
         sleep 1
         "$(get_top_dir)/Meta/debug-kernel.sh" "${GDB_ARGS[@]}"
@@ -326,7 +326,7 @@ if [[ "$CMD" =~ ^(build|install|image|copy-src|run|gdb|test|rebuild|recreate|kad
           lagom_unsupported
           build_target
           build_target install
-          export SERENITY_COPY_SOURCE=1
+          export GELASSENHEIT_COPY_SOURCE=1
           build_target image
           ;;
         run)
@@ -338,7 +338,7 @@ if [[ "$CMD" =~ ^(build|install|image|copy-src|run|gdb|test|rebuild|recreate|kad
                 build_target install
                 build_target image
                 if [ -n "${CMD_ARGS[0]}" ]; then
-                    export SERENITY_KERNEL_CMDLINE="${CMD_ARGS[0]}"
+                    export GELASSENHEIT_KERNEL_CMDLINE="${CMD_ARGS[0]}"
                 fi
                 build_target run
             fi
@@ -365,8 +365,8 @@ if [[ "$CMD" =~ ^(build|install|image|copy-src|run|gdb|test|rebuild|recreate|kad
                 build_target image
                 # In contrast to CI, we don't set 'panic=shutdown' here,
                 # in case the user wants to inspect qemu some more.
-                export SERENITY_KERNEL_CMDLINE="fbdev=off system_mode=self-test"
-                export SERENITY_RUN="ci"
+                export GELASSENHEIT_KERNEL_CMDLINE="fbdev=off system_mode=self-test"
+                export GELASSENHEIT_RUN="ci"
                 build_target run
             fi
             ;;
@@ -432,10 +432,10 @@ elif [ "$CMD" = "__tmux_cmd" ]; then
     CMD_ARGS=("${CMD_ARGS[@]:1}")
     if [ "$CMD" = "run" ]; then
         if [ -n "${CMD_ARGS[0]}" ]; then
-            export SERENITY_KERNEL_CMDLINE="${CMD_ARGS[0]}"
+            export GELASSENHEIT_KERNEL_CMDLINE="${CMD_ARGS[0]}"
         fi
         # We need to make sure qemu doesn't start until we continue in gdb
-        export SERENITY_EXTRA_QEMU_ARGS="${SERENITY_EXTRA_QEMU_ARGS} -d int -no-reboot -no-shutdown -S"
+        export GELASSENHEIT_EXTRA_QEMU_ARGS="${GELASSENHEIT_EXTRA_QEMU_ARGS} -d int -no-reboot -no-shutdown -S"
         set_tmux_title 'qemu'
         build_target run
     elif [ "$CMD" = "gdb" ]; then

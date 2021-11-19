@@ -7,6 +7,6 @@ auth_type=sha256
 workdir="sqlite-autoconf-${version}"
 
 post_install() {
-    ${CC} -shared -o ${SERENITY_INSTALL_ROOT}/usr/local/lib/libsqlite3.so -Wl,-soname,libsqlite3.so -Wl,--whole-archive ${SERENITY_INSTALL_ROOT}/usr/local/lib/libsqlite3.a -Wl,--no-whole-archive
-    rm ${SERENITY_INSTALL_ROOT}/usr/local/lib/libsqlite3.la
+    ${CC} -shared -o ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libsqlite3.so -Wl,-soname,libsqlite3.so -Wl,--whole-archive ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libsqlite3.a -Wl,--no-whole-archive
+    rm ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libsqlite3.la
 }

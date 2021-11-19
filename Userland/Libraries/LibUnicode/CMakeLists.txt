@@ -1,4 +1,4 @@
-include(${SerenityOS_SOURCE_DIR}/Meta/CMake/unicode_data.cmake)
+include(${GelassenheitBS_SOURCE_DIR}/Meta/CMake/unicode_data.cmake)
 
 SET(SOURCES
     ${UNICODE_DATA_SOURCES}

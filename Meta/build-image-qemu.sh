@@ -48,8 +48,8 @@ inode_usage() {
 }
 
 INODE_SIZE=128
-INODE_COUNT=$(($(inode_usage "$SERENITY_SOURCE_DIR/Base") + $(inode_usage Root)))
-DISK_SIZE_BYTES=$((($(disk_usage "$SERENITY_SOURCE_DIR/Base") + $(disk_usage Root) + INODE_COUNT) * 1024))
+INODE_COUNT=$(($(inode_usage "$GELASSENHEIT_SOURCE_DIR/Base") + $(inode_usage Root)))
+DISK_SIZE_BYTES=$((($(disk_usage "$GELASSENHEIT_SOURCE_DIR/Base") + $(disk_usage Root) + INODE_COUNT) * 1024))
 
 # Try to use heuristics to guess a good disk size and inode count.
 # The disk must notably fit:

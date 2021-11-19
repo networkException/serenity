@@ -5,11 +5,11 @@ else()
     add_compile_options(-Os)
 endif()
 
-if ("${SERENITY_ARCH}" STREQUAL "aarch64")
+if ("${GELASSENHEIT_ARCH}" STREQUAL "aarch64")
     set(KERNEL_ARCH aarch64)
-elseif ("${SERENITY_ARCH}" STREQUAL "i686")
+elseif ("${GELASSENHEIT_ARCH}" STREQUAL "i686")
     set(KERNEL_ARCH i386)
-elseif("${SERENITY_ARCH}" STREQUAL "x86_64")
+elseif("${GELASSENHEIT_ARCH}" STREQUAL "x86_64")
     set(KERNEL_ARCH x86_64)
 endif()
 
@@ -286,7 +286,7 @@ set(KERNEL_SOURCES
     kprintf.cpp
 )
 
-if ("${SERENITY_ARCH}" STREQUAL "i686" OR "${SERENITY_ARCH}" STREQUAL "x86_64")
+if ("${GELASSENHEIT_ARCH}" STREQUAL "i686" OR "${GELASSENHEIT_ARCH}" STREQUAL "x86_64")
     set(KERNEL_SOURCES
         ${KERNEL_SOURCES}
         Arch/x86/common/ScopedCritical.cpp
@@ -354,7 +354,7 @@ set(CRYPTO_SOURCES
 set(SOURCES
     ${AK_SOURCES}
     )
-if (NOT "${SERENITY_ARCH}" STREQUAL "aarch64")
+if (NOT "${GELASSENHEIT_ARCH}" STREQUAL "aarch64")
     set(SOURCES
         ${KERNEL_SOURCES}
         ${SOURCES}
@@ -383,7 +383,7 @@ endif()
 add_compile_options(-fsigned-char)
 add_compile_options(-Wno-unknown-warning-option -Wvla -Wnull-dereference)
 add_compile_options(-fno-rtti -ffreestanding -fbuiltin)
-if ("${SERENITY_ARCH}" STREQUAL "i686" OR "${SERENITY_ARCH}" STREQUAL "x86_64")
+if ("${GELASSENHEIT_ARCH}" STREQUAL "i686" OR "${GELASSENHEIT_ARCH}" STREQUAL "x86_64")
     add_compile_options(-mno-80387 -mno-mmx -mno-sse -mno-sse2)
 endif()
 add_compile_options(-fno-asynchronous-unwind-tables)
@@ -398,8 +398,8 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         # Zero any registers used within a function on return (to reduce data lifetime and ROP gadgets).
         add_compile_options(-fzero-call-used-regs=used-gpr)
     endif()
-    link_directories(${TOOLCHAIN_ROOT}/${SERENITY_ARCH}-pc-serenity/lib)
-    link_directories(${TOOLCHAIN_ROOT}/lib/gcc/${SERENITY_ARCH}-pc-serenity/${GCC_VERSION}/)
+    link_directories(${TOOLCHAIN_ROOT}/${GELASSENHEIT_ARCH}-pc-serenity/lib)
+    link_directories(${TOOLCHAIN_ROOT}/lib/gcc/${GELASSENHEIT_ARCH}-pc-serenity/${GCC_VERSION}/)
 
     set(TARGET_STRING "")
 else() # Assume Clang
@@ -420,7 +420,7 @@ macro (set_new_alignment alignment)
     endif()
 endmacro()
 
-if ("${SERENITY_ARCH}" STREQUAL "x86_64")
+if ("${GELASSENHEIT_ARCH}" STREQUAL "x86_64")
     add_compile_options(-mcmodel=large -mno-red-zone)
     set_new_alignment(8)
 else()
@@ -473,7 +473,7 @@ endif()
 add_compile_definitions(KERNEL)
 add_link_options(LINKER:-z,notext)
 
-if (NOT "${SERENITY_ARCH}" STREQUAL "aarch64")
+if (NOT "${GELASSENHEIT_ARCH}" STREQUAL "aarch64")
     add_library(kernel_heap STATIC ${KERNEL_HEAP_SOURCES})
 endif()
 add_executable(Kernel ${SOURCES})
@@ -496,12 +496,12 @@ if (ENABLE_KERNEL_LTO)
     check_ipo_supported()
     add_definitions(-DENABLE_KERNEL_LTO)
     set_property(TARGET Kernel PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-    if (NOT "${SERENITY_ARCH}" STREQUAL "aarch64")
+    if (NOT "${GELASSENHEIT_ARCH}" STREQUAL "aarch64")
         set_property(TARGET kernel_heap PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
     endif()
 endif()
 
-if (NOT "${SERENITY_ARCH}" STREQUAL "aarch64")
+if (NOT "${GELASSENHEIT_ARCH}" STREQUAL "aarch64")
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         target_link_libraries(Kernel PRIVATE kernel_heap gcc)
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang$")
@@ -511,7 +511,7 @@ endif()
 
 add_custom_command(
     TARGET Kernel POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E env CXXFILT=${SERENITY_CXXFILT} sh ${CMAKE_CURRENT_SOURCE_DIR}/mkmap.sh
+    COMMAND ${CMAKE_COMMAND} -E env CXXFILT=${GELASSENHEIT_CXXFILT} sh ${CMAKE_CURRENT_SOURCE_DIR}/mkmap.sh
     COMMAND ${CMAKE_COMMAND} -E env OBJCOPY=${CMAKE_OBJCOPY} sh ${CMAKE_CURRENT_SOURCE_DIR}/embedmap.sh
     COMMAND ${CMAKE_OBJCOPY} --only-keep-debug Kernel Kernel.debug
     COMMAND ${CMAKE_OBJCOPY} --strip-debug Kernel

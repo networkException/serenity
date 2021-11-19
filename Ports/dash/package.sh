@@ -15,7 +15,7 @@ configure() {
     run sh -c "cd host-build && ../configure ${configopts[@]} CFLAGS=-I."
     target_env
     run mkdir -p target-build
-    run sh -c "cd target-build && ../configure --host="${SERENITY_ARCH}-pc-serenity" --disable-helpers ${configopts[@]} CFLAGS=-I."
+    run sh -c "cd target-build && ../configure --host="${GELASSENHEIT_ARCH}-pc-serenity" --disable-helpers ${configopts[@]} CFLAGS=-I."
 }
 
 build() {
@@ -27,5 +27,5 @@ build() {
 }
 
 install() {
-    run sh -c "cd target-build && make DESTDIR="${SERENITY_INSTALL_ROOT}" ${installopts[@]} install"
+    run sh -c "cd target-build && make DESTDIR="${GELASSENHEIT_INSTALL_ROOT}" ${installopts[@]} install"
 }

@@ -16,7 +16,7 @@ class AboutDialog final : public Dialog {
 public:
     virtual ~AboutDialog() override;
 
-    static void show(StringView name, const Gfx::Bitmap* icon = nullptr, Window* parent_window = nullptr, const Gfx::Bitmap* window_icon = nullptr, StringView version = Core::Version::SERENITY_VERSION)
+    static void show(StringView name, const Gfx::Bitmap* icon = nullptr, Window* parent_window = nullptr, const Gfx::Bitmap* window_icon = nullptr, StringView version = Core::Version::GELASSENHEIT_VERSION)
     {
         auto dialog = AboutDialog::construct(name, icon, parent_window, version);
         if (window_icon)
@@ -25,7 +25,7 @@ public:
     }
 
 private:
-    AboutDialog(StringView name, const Gfx::Bitmap* icon = nullptr, Window* parent_window = nullptr, StringView version = Core::Version::SERENITY_VERSION);
+    AboutDialog(StringView name, const Gfx::Bitmap* icon = nullptr, Window* parent_window = nullptr, StringView version = Core::Version::GELASSENHEIT_VERSION);
 
     String m_name;
     RefPtr<Gfx::Bitmap> m_icon;

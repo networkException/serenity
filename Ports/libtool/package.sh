@@ -11,6 +11,6 @@ auth_opts=("--keyring" "./gnu-keyring.gpg" "libtool-${version}.tar.xz.sig")
 configopts=("--prefix=/usr/local")
 
 post_install() {
-    mkdir -p "${SERENITY_INSTALL_ROOT}/usr/bin"
-    ln -sf /usr/local/bin/sed "${SERENITY_INSTALL_ROOT}/usr/bin/sed"
+    mkdir -p "${GELASSENHEIT_INSTALL_ROOT}/usr/bin"
+    ln -sf /usr/local/bin/sed "${GELASSENHEIT_INSTALL_ROOT}/usr/bin/sed"
 }

@@ -174,7 +174,7 @@ Note: The Assertion und KUBSan Problem matchers will only run after you have clo
                 ],
                 "options": {
                     "env": {
-                        "SERENITY_RAM_SIZE": "4G",
+                        "GELASSENHEIT_RAM_SIZE": "4G",
                     }
                 },
                 "problemMatcher": [
@@ -214,7 +214,7 @@ Note: The Assertion und KUBSan Problem matchers will only run after you have clo
                 ],
                 "options": {
                     "env": {
-                        // Put your custom run configuration here, e.g. SERENITY_RAM_SIZE
+                        // Put your custom run configuration here, e.g. GELASSENHEIT_RAM_SIZE
                     }
                 },
                 "problemMatcher": [

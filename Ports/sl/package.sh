@@ -7,5 +7,5 @@ auth_type=sha256
 depends=("ncurses")
 
 build() {
-    run ${CC} -I${SERENITY_INSTALL_ROOT}/usr/local/include/ncurses -L${SERENITY_INSTALL_ROOT}/usr/local/lib -o sl sl.c -lncurses -ltinfo
+    run ${CC} -I${GELASSENHEIT_INSTALL_ROOT}/usr/local/include/ncurses -L${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib -o sl sl.c -lncurses -ltinfo
 }

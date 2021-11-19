@@ -8,9 +8,9 @@ auth_type=sha256
 makeopts=("bin/brogue")
 
 install() {
-    datadir="$SERENITY_INSTALL_ROOT/usr/local/share/games/brogue/assets"
-    mkdir -p "${SERENITY_INSTALL_ROOT}/usr/local/bin"
+    datadir="$GELASSENHEIT_INSTALL_ROOT/usr/local/share/games/brogue/assets"
+    mkdir -p "${GELASSENHEIT_INSTALL_ROOT}/usr/local/bin"
     mkdir -p $datadir
     cp $workdir/bin/assets/* $datadir
-    cp "${workdir}/bin/brogue" "${SERENITY_INSTALL_ROOT}/usr/local/bin"
+    cp "${workdir}/bin/brogue" "${GELASSENHEIT_INSTALL_ROOT}/usr/local/bin"
 }

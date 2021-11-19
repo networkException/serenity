@@ -20,10 +20,10 @@ launcher_category=Games
 launcher_command="/usr/local/bin/freedink --software-rendering --truecolor --refdir ${resource_path}"
 
 install() {
-    target_dir="${SERENITY_INSTALL_ROOT}${resource_path}"
+    target_dir="${GELASSENHEIT_INSTALL_ROOT}${resource_path}"
     run_nocd mkdir -p ${target_dir}
     run_nocd tar zxvf ${freedink_data}.tar.gz
     run_nocd cp -R ${freedink_data}/* ${target_dir}
 }
 
-export CPPFLAGS="-I${SERENITY_INSTALL_ROOT}/usr/local/include/SDL2 -I${SERENITY_INSTALL_ROOT}/usr/local/include/libxml2"
+export CPPFLAGS="-I${GELASSENHEIT_INSTALL_ROOT}/usr/local/include/SDL2 -I${GELASSENHEIT_INSTALL_ROOT}/usr/local/include/libxml2"

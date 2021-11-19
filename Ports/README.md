@@ -199,7 +199,7 @@ The file to use for the port launcher icon. The icon file is assumed to have a
 
 Options passed to `make install` in the default `install` function.
 
-`DESTDIR="${SERENITY_INSTALL_ROOT}"` (`"${SERENITY_SOURCE_DIR}/Build/${SERENITY_ARCH}/Root"`)
+`DESTDIR="${GELASSENHEIT_INSTALL_ROOT}"` (`"${GELASSENHEIT_SOURCE_DIR}/Build/${GELASSENHEIT_ARCH}/Root"`)
 is always passed, override the `install` function if that's undesirable.
 
 #### `makeopts`
@@ -224,7 +224,7 @@ is placed in.
 The location of the ports directory, only used for the `package.db` file for
 now. Don't override this in ports contributed to Serenity.
 
-Defaults to `$SERENITY_SOURCE_DIR/Ports`.
+Defaults to `$GELASSENHEIT_SOURCE_DIR/Ports`.
 
 #### `useconfigure`
 

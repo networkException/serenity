@@ -7,11 +7,11 @@ auth_type=sha256
 depends=("libogg")
 
 install() {
-    run make DESTDIR=${SERENITY_INSTALL_ROOT} "${installopts[@]}" install
-    ${CC} -shared -o ${SERENITY_INSTALL_ROOT}/usr/local/lib/libvorbis.so -Wl,-soname,libvorbis.so -Wl,--whole-archive ${SERENITY_INSTALL_ROOT}/usr/local/lib/libvorbis.a -Wl,--no-whole-archive -logg
-    rm -f ${SERENITY_INSTALL_ROOT}/usr/local/lib/libvorbis.la
-    ${CC} -shared -o ${SERENITY_INSTALL_ROOT}/usr/local/lib/libvorbisenc.so -Wl,-soname,libvorbisenc.so -Wl,--whole-archive ${SERENITY_INSTALL_ROOT}/usr/local/lib/libvorbisenc.a -Wl,--no-whole-archive -lvorbis
-    rm -f ${SERENITY_INSTALL_ROOT}/usr/local/lib/libvorbisenc.la
-    ${CC} -shared -o ${SERENITY_INSTALL_ROOT}/usr/local/lib/libvorbisfile.so -Wl,-soname,libvorbisfile.so -Wl,--whole-archive ${SERENITY_INSTALL_ROOT}/usr/local/lib/libvorbisfile.a -Wl,--no-whole-archive -lvorbis
-    rm -f ${SERENITY_INSTALL_ROOT}/usr/local/lib/libvorbisfile.la
+    run make DESTDIR=${GELASSENHEIT_INSTALL_ROOT} "${installopts[@]}" install
+    ${CC} -shared -o ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libvorbis.so -Wl,-soname,libvorbis.so -Wl,--whole-archive ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libvorbis.a -Wl,--no-whole-archive -logg
+    rm -f ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libvorbis.la
+    ${CC} -shared -o ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libvorbisenc.so -Wl,-soname,libvorbisenc.so -Wl,--whole-archive ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libvorbisenc.a -Wl,--no-whole-archive -lvorbis
+    rm -f ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libvorbisenc.la
+    ${CC} -shared -o ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libvorbisfile.so -Wl,-soname,libvorbisfile.so -Wl,--whole-archive ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libvorbisfile.a -Wl,--no-whole-archive -lvorbis
+    rm -f ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libvorbisfile.la
 }

@@ -26,8 +26,8 @@ if [ "$(id -u)" != 0 ]; then
     die "this script needs to run as root"
 fi
 
-[ -z "$SERENITY_SOURCE_DIR" ] && die "SERENITY_SOURCE_DIR is not set"
-[ -d "$SERENITY_SOURCE_DIR/Base" ] || die "$SERENITY_SOURCE_DIR/Base doesn't exist"
+[ -z "$GELASSENHEIT_SOURCE_DIR" ] && die "GELASSENHEIT_SOURCE_DIR is not set"
+[ -d "$GELASSENHEIT_SOURCE_DIR/Base" ] || die "$GELASSENHEIT_SOURCE_DIR/Base doesn't exist"
 
 umask 0022
 
@@ -37,30 +37,30 @@ if ! command -v rsync >/dev/null; then
 fi
 
 if rsync --chown 2>&1 | grep "missing argument" >/dev/null; then
-    rsync -aH --chown=0:0 --inplace "$SERENITY_SOURCE_DIR"/Base/ mnt/
+    rsync -aH --chown=0:0 --inplace "$GELASSENHEIT_SOURCE_DIR"/Base/ mnt/
     rsync -aH --chown=0:0 --inplace Root/ mnt/
 else
-    rsync -aH --inplace "$SERENITY_SOURCE_DIR"/Base/ mnt/
+    rsync -aH --inplace "$GELASSENHEIT_SOURCE_DIR"/Base/ mnt/
     rsync -aH --inplace Root/ mnt/
     chown -R 0:0 mnt/
 fi
 
-SERENITY_ARCH="${SERENITY_ARCH:-i686}"
+GELASSENHEIT_ARCH="${GELASSENHEIT_ARCH:-i686}"
 LLVM_VERSION="${LLVM_VERSION:-13.0.0}"
 
-if [ "$SERENITY_TOOLCHAIN" = "Clang" ]; then
-    TOOLCHAIN_DIR="$SERENITY_SOURCE_DIR"/Toolchain/Local/clang/
+if [ "$GELASSENHEIT_TOOLCHAIN" = "Clang" ]; then
+    TOOLCHAIN_DIR="$GELASSENHEIT_SOURCE_DIR"/Toolchain/Local/clang/
     mkdir -p mnt/usr/lib/clang/"$LLVM_VERSION"/lib/serenity
-    $CP "$TOOLCHAIN_DIR"/lib/clang/"$LLVM_VERSION"/lib/"$SERENITY_ARCH"-pc-serenity/* mnt/usr/lib/clang/"$LLVM_VERSION"/lib/serenity
-    $CP "$TOOLCHAIN_DIR"/lib/"$SERENITY_ARCH"-pc-serenity/* mnt/usr/lib
-elif [ "$SERENITY_ARCH" != "aarch64" ]; then
-    $CP "$SERENITY_SOURCE_DIR"/Toolchain/Local/"$SERENITY_ARCH"/"$SERENITY_ARCH"-pc-serenity/lib/libgcc_s.so mnt/usr/lib
+    $CP "$TOOLCHAIN_DIR"/lib/clang/"$LLVM_VERSION"/lib/"$GELASSENHEIT_ARCH"-pc-serenity/* mnt/usr/lib/clang/"$LLVM_VERSION"/lib/serenity
+    $CP "$TOOLCHAIN_DIR"/lib/"$GELASSENHEIT_ARCH"-pc-serenity/* mnt/usr/lib
+elif [ "$GELASSENHEIT_ARCH" != "aarch64" ]; then
+    $CP "$GELASSENHEIT_SOURCE_DIR"/Toolchain/Local/"$GELASSENHEIT_ARCH"/"$GELASSENHEIT_ARCH"-pc-serenity/lib/libgcc_s.so mnt/usr/lib
 fi
 
 # If umask was 027 or similar when the repo was cloned,
 # file permissions in Base/ are too restrictive. Restore
 # the permissions needed in the image.
-chmod -R g+rX,o+rX "$SERENITY_SOURCE_DIR"/Base/* mnt/
+chmod -R g+rX,o+rX "$GELASSENHEIT_SOURCE_DIR"/Base/* mnt/
 
 chmod 660 mnt/etc/WindowServer.ini
 chown $window_uid:$window_gid mnt/etc/WindowServer.ini
@@ -154,20 +154,20 @@ mkdir -p mnt/home/anon/Downloads
 mkdir -p mnt/home/nona
 rm -fr mnt/home/anon/js-tests mnt/home/anon/web-tests mnt/home/anon/cpp-tests mnt/home/anon/wasm-tests
 mkdir -p mnt/home/anon/cpp-tests/
-cp "$SERENITY_SOURCE_DIR"/README.md mnt/home/anon/
-cp -r "$SERENITY_SOURCE_DIR"/Userland/Libraries/LibJS/Tests mnt/home/anon/js-tests
-cp -r "$SERENITY_SOURCE_DIR"/Userland/Libraries/LibWeb/Tests mnt/home/anon/web-tests
-cp -r "$SERENITY_SOURCE_DIR"/Userland/DevTools/HackStudio/LanguageServers/Cpp/Tests mnt/home/anon/cpp-tests/comprehension
-cp -r "$SERENITY_SOURCE_DIR"/Userland/Libraries/LibCpp/Tests/parser mnt/home/anon/cpp-tests/parser
-cp -r "$SERENITY_SOURCE_DIR"/Userland/Libraries/LibCpp/Tests/preprocessor mnt/home/anon/cpp-tests/preprocessor
-cp -r "$SERENITY_SOURCE_DIR"/Userland/Libraries/LibWasm/Tests mnt/home/anon/wasm-tests
-cp -r "$SERENITY_SOURCE_DIR"/Userland/Libraries/LibJS/Tests/test-common.js mnt/home/anon/wasm-tests
+cp "$GELASSENHEIT_SOURCE_DIR"/README.md mnt/home/anon/
+cp -r "$GELASSENHEIT_SOURCE_DIR"/Userland/Libraries/LibJS/Tests mnt/home/anon/js-tests
+cp -r "$GELASSENHEIT_SOURCE_DIR"/Userland/Libraries/LibWeb/Tests mnt/home/anon/web-tests
+cp -r "$GELASSENHEIT_SOURCE_DIR"/Userland/DevTools/HackStudio/LanguageServers/Cpp/Tests mnt/home/anon/cpp-tests/comprehension
+cp -r "$GELASSENHEIT_SOURCE_DIR"/Userland/Libraries/LibCpp/Tests/parser mnt/home/anon/cpp-tests/parser
+cp -r "$GELASSENHEIT_SOURCE_DIR"/Userland/Libraries/LibCpp/Tests/preprocessor mnt/home/anon/cpp-tests/preprocessor
+cp -r "$GELASSENHEIT_SOURCE_DIR"/Userland/Libraries/LibWasm/Tests mnt/home/anon/wasm-tests
+cp -r "$GELASSENHEIT_SOURCE_DIR"/Userland/Libraries/LibJS/Tests/test-common.js mnt/home/anon/wasm-tests
 
-if [ -n "$SERENITY_COPY_SOURCE" ] ; then
+if [ -n "$GELASSENHEIT_COPY_SOURCE" ] ; then
   printf "\ncopying Serenity's source... "
   rm -fr mnt/home/anon/Source/serenity
   mkdir -p mnt/home/anon/Source/serenity
-  git clone --depth=1 file://"$SERENITY_SOURCE_DIR" mnt/home/anon/Source/serenity
+  git clone --depth=1 file://"$GELASSENHEIT_SOURCE_DIR" mnt/home/anon/Source/serenity
   rm -fr mnt/home/anon/Source/serenity/.git
 fi
 
@@ -199,6 +199,6 @@ ln -sf checksum mnt/bin/sha512sum
 echo "done"
 
 # Run local sync script, if it exists
-if [ -f "${SERENITY_SOURCE_DIR}/sync-local.sh" ]; then
-    sh "${SERENITY_SOURCE_DIR}/sync-local.sh"
+if [ -f "${GELASSENHEIT_SOURCE_DIR}/sync-local.sh" ]; then
+    sh "${GELASSENHEIT_SOURCE_DIR}/sync-local.sh"
 fi

@@ -19,7 +19,7 @@ depends=("bzip2" "libffi" "libuuid" "ncurses" "openssl" "readline" "sqlite" "ter
 
 configopts=("--enable-optimizations" "--disable-ipv6" "--without-ensurepip" "ac_cv_file__dev_ptmx=no" "ac_cv_file__dev_ptc=no")
 
-export CC="${CC} --sysroot=${SERENITY_INSTALL_ROOT}"
+export CC="${CC} --sysroot=${GELASSENHEIT_INSTALL_ROOT}"
 export BLDSHARED="${CC} -shared"
 
 pre_configure() {

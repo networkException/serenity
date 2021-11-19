@@ -167,7 +167,7 @@ RecursionDecision MarkdownLinkage::visit(Markdown::Text::LinkNode const& link_no
         return RecursionDecision::Recurse;
     }
     if (href.starts_with("file://")) {
-        // TODO: Resolve relative to $SERENITY_SOURCE_DIR/Base/
+        // TODO: Resolve relative to $GELASSENHEIT_SOURCE_DIR/Base/
         // Currently, this affects only one link, so it's not worth the effort.
         outln("Not checking local link {}", href);
         return RecursionDecision::Recurse;

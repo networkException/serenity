@@ -9,5 +9,5 @@ auth_import_key="C52048C0C0748FEE227D47A2702353E0F7E48EDB"
 auth_opts=("mawk-${version}.tgz.asc" "mawk-${version}.tgz")
 
 post_install() {
-    ln -sf mawk "${SERENITY_INSTALL_ROOT}/usr/local/bin/awk"
+    ln -sf mawk "${GELASSENHEIT_INSTALL_ROOT}/usr/local/bin/awk"
 }

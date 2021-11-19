@@ -859,8 +859,8 @@ String HackStudioWidget::get_full_path_of_serenity_source(const String& file)
     path_parts.remove(0);
     StringBuilder relative_path_builder;
     relative_path_builder.join("/", path_parts);
-    constexpr char SERENITY_LIBS_PREFIX[] = "/usr/src/serenity";
-    LexicalPath serenity_sources_base(SERENITY_LIBS_PREFIX);
+    constexpr char GELASSENHEIT_LIBS_PREFIX[] = "/usr/src/serenity";
+    LexicalPath serenity_sources_base(GELASSENHEIT_LIBS_PREFIX);
     return String::formatted("{}/{}", serenity_sources_base, relative_path_builder.to_string());
 }
 

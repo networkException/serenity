@@ -57,14 +57,14 @@ def run(root_path, arch):
 
 
 if __name__ == '__main__':
-    if 'SERENITY_SOURCE_DIR' not in os.environ:
-        print('Must set SERENITY_SOURCE_DIR first!', file=sys.stderr)
+    if 'GELASSENHEIT_SOURCE_DIR' not in os.environ:
+        print('Must set GELASSENHEIT_SOURCE_DIR first!', file=sys.stderr)
         exit(1)
     if len(sys.argv) == 2:
         with open('/tmp/the_arg', 'w') as fp:
             fp.write(sys.argv[1])
-        run(os.environ['SERENITY_SOURCE_DIR'], sys.argv[1])
+        run(os.environ['GELASSENHEIT_SOURCE_DIR'], sys.argv[1])
     else:
-        print('Usage: SERENITY_SOURCE_DIR=/path/to/serenity {} SERENITY_BUILD_ARCH'
+        print('Usage: GELASSENHEIT_SOURCE_DIR=/path/to/serenity {} GELASSENHEIT_BUILD_ARCH'
               .format(sys.argv[0]), file=sys.stderr)
         exit(1)

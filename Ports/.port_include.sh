@@ -2,8 +2,8 @@
 set -eu
 
 SCRIPT="$(dirname "${0}")"
-export SERENITY_ARCH="${SERENITY_ARCH:-i686}"
-export SERENITY_TOOLCHAIN="${SERENITY_TOOLCHAIN:-GCC}"
+export GELASSENHEIT_ARCH="${GELASSENHEIT_ARCH:-i686}"
+export GELASSENHEIT_TOOLCHAIN="${GELASSENHEIT_TOOLCHAIN:-GCC}"
 
 if [ -z "${HOST_CC:=}" ]; then
     export HOST_CC="${CC:=cc}"
@@ -26,10 +26,10 @@ maybe_source() {
 
 enable_ccache() {
     if command -v ccache &>/dev/null; then
-        ccache_tooldir="${SERENITY_BUILD_DIR}/ccache"
+        ccache_tooldir="${GELASSENHEIT_BUILD_DIR}/ccache"
         mkdir -p "$ccache_tooldir"
         for tool in gcc g++ c++; do
-            ln -sf "$(command -v ccache)" "${ccache_tooldir}/${SERENITY_ARCH}-pc-serenity-${tool}"
+            ln -sf "$(command -v ccache)" "${ccache_tooldir}/${GELASSENHEIT_ARCH}-pc-serenity-${tool}"
         done
         export PATH="${ccache_tooldir}:$PATH"
     fi
@@ -96,7 +96,7 @@ ensure_build() {
         echo "libc.so could not be found. This likely means that SerenityOS:"
         echo "- has not been built and/or installed yet"
         echo "- has been installed in an unexpected location"
-        echo "The currently configured build directory is ${SERENITY_BUILD_DIR}. Resolve this issue and try again."
+        echo "The currently configured build directory is ${GELASSENHEIT_BUILD_DIR}. Resolve this issue and try again."
         exit 1
     fi
 }
@@ -345,7 +345,7 @@ func_defined pre_configure || pre_configure() {
 }
 func_defined configure || configure() {
     chmod +x "${workdir}"/"$configscript"
-    run ./"$configscript" --host="${SERENITY_ARCH}-pc-serenity" "${configopts[@]}"
+    run ./"$configscript" --host="${GELASSENHEIT_ARCH}-pc-serenity" "${configopts[@]}"
 }
 func_defined post_configure || post_configure() {
     :

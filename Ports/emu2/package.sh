@@ -5,6 +5,6 @@ files="https://github.com/dmsc/emu2/archive/refs/tags/v${version}.tar.gz emu2-${
 auth_type=sha256
 
 build() {
-    export CC="${SERENITY_SOURCE_DIR}/Toolchain/Local/${SERENITY_ARCH}/bin/${SERENITY_ARCH}-pc-serenity-gcc"
-    run make DESTDIR="${SERENITY_INSTALL_ROOT}" CC="${CC}" "${installopts[@]}"
+    export CC="${GELASSENHEIT_SOURCE_DIR}/Toolchain/Local/${GELASSENHEIT_ARCH}/bin/${GELASSENHEIT_ARCH}-pc-serenity-gcc"
+    run make DESTDIR="${GELASSENHEIT_INSTALL_ROOT}" CC="${CC}" "${installopts[@]}"
 }

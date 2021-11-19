@@ -11,6 +11,6 @@ build() {
 }
 
 install() {
-    run_nocd mkdir -p ${SERENITY_INSTALL_ROOT}/usr/local/share/games/openttd/baseset/
-    run_nocd cp -a opengfx-${version}/* ${SERENITY_INSTALL_ROOT}/usr/local/share/games/openttd/baseset/
+    run_nocd mkdir -p ${GELASSENHEIT_INSTALL_ROOT}/usr/local/share/games/openttd/baseset/
+    run_nocd cp -a opengfx-${version}/* ${GELASSENHEIT_INSTALL_ROOT}/usr/local/share/games/openttd/baseset/
 }

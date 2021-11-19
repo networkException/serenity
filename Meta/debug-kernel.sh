@@ -2,19 +2,19 @@
 
 SCRIPT_DIR="$(dirname "${0}")"
 
-if [ -z "$SERENITY_ARCH" ]; then
-    SERENITY_ARCH="i686"
+if [ -z "$GELASSENHEIT_ARCH" ]; then
+    GELASSENHEIT_ARCH="i686"
 fi
 
 # Set this environment variable to override the default debugger.
 #
-if [ -z "$SERENITY_KERNEL_DEBUGGER" ]; then
-    if [ "$SERENITY_ARCH" = "aarch64" ]; then
+if [ -z "$GELASSENHEIT_KERNEL_DEBUGGER" ]; then
+    if [ "$GELASSENHEIT_ARCH" = "aarch64" ]; then
         # Prepend the toolchain aarch64 bin directory so we pick up GDB from there
         PATH="$SCRIPT_DIR/../Toolchain/Local/aarch64/bin:$PATH"
-        SERENITY_KERNEL_DEBUGGER="aarch64-pc-serenity-gdb"
+        GELASSENHEIT_KERNEL_DEBUGGER="aarch64-pc-serenity-gdb"
     else
-        SERENITY_KERNEL_DEBUGGER="gdb"
+        GELASSENHEIT_KERNEL_DEBUGGER="gdb"
     fi
 fi
 
@@ -22,15 +22,15 @@ fi
 # remote on localhost:1234. So point our debugger there, and inform
 # the debugger which binary to load symbols, etc from.
 #
-if [ "$SERENITY_ARCH" = "x86_64" ]; then
+if [ "$GELASSENHEIT_ARCH" = "x86_64" ]; then
     gdb_arch=i386:x86-64
     prekernel_image=Prekernel64
     kernel_base=0x2000200000
-elif [ "$SERENITY_ARCH" = "i686" ]; then
+elif [ "$GELASSENHEIT_ARCH" = "i686" ]; then
     gdb_arch=i386:intel
     prekernel_image=Prekernel32
     kernel_base=0xc0200000
-elif [ "$SERENITY_ARCH" = "aarch64" ]; then
+elif [ "$GELASSENHEIT_ARCH" = "aarch64" ]; then
     gdb_arch=aarch64:armv8-r
     prekernel_image=Prekernel
     kernel_base=0xc0000000 # FIXME
@@ -44,11 +44,11 @@ else
 fi
 
 
-exec $SERENITY_KERNEL_DEBUGGER \
-    -ex "file $SCRIPT_DIR/../Build/${SERENITY_ARCH:-i686}/Kernel/Prekernel/$prekernel_image" \
+exec $GELASSENHEIT_KERNEL_DEBUGGER \
+    -ex "file $SCRIPT_DIR/../Build/${GELASSENHEIT_ARCH:-i686}/Kernel/Prekernel/$prekernel_image" \
     -ex "set confirm off" \
-    -ex "directory $SCRIPT_DIR/../Build/${SERENITY_ARCH:-i686}/" \
-    -ex "add-symbol-file $SCRIPT_DIR/../Build/${SERENITY_ARCH:-i686}/Kernel/Kernel -o $kernel_base" \
+    -ex "directory $SCRIPT_DIR/../Build/${GELASSENHEIT_ARCH:-i686}/" \
+    -ex "add-symbol-file $SCRIPT_DIR/../Build/${GELASSENHEIT_ARCH:-i686}/Kernel/Kernel -o $kernel_base" \
     -ex "set confirm on" \
     -ex "set arch $gdb_arch" \
     -ex "set print frame-arguments none" \

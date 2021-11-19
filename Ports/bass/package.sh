@@ -16,7 +16,7 @@ build() {
 }
 
 install() {
-    target_dir="${SERENITY_INSTALL_ROOT}${bass_resource_path}"
+    target_dir="${GELASSENHEIT_INSTALL_ROOT}${bass_resource_path}"
     run_nocd mkdir -p ${target_dir}
     run_nocd cp ${workdir}/sky.{dnr,dsk} ${target_dir}
 }

@@ -7,7 +7,7 @@ auth_type=sha256
 depends=("libiconv")
 
 install() {
-    run make DESTDIR=${SERENITY_INSTALL_ROOT} "${installopts[@]}" install
-    ${CC} -shared -pthread -o ${SERENITY_INSTALL_ROOT}/usr/local/lib/libintl.so -Wl,-soname,libintl.so -Wl,--whole-archive ${SERENITY_INSTALL_ROOT}/usr/local/lib/libintl.a -Wl,--no-whole-archive -liconv
-    rm -f ${SERENITY_INSTALL_ROOT}/usr/local/lib/libintl.la
+    run make DESTDIR=${GELASSENHEIT_INSTALL_ROOT} "${installopts[@]}" install
+    ${CC} -shared -pthread -o ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libintl.so -Wl,-soname,libintl.so -Wl,--whole-archive ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libintl.a -Wl,--no-whole-archive -liconv
+    rm -f ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libintl.la
 }

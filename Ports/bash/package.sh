@@ -13,6 +13,6 @@ build() {
 }
 
 post_install() {
-    mkdir -p "${SERENITY_INSTALL_ROOT}/bin"
-    ln -sf /usr/local/bin/bash "${SERENITY_INSTALL_ROOT}/bin/bash"
+    mkdir -p "${GELASSENHEIT_INSTALL_ROOT}/bin"
+    ln -sf /usr/local/bin/bash "${GELASSENHEIT_INSTALL_ROOT}/bin/bash"
 }

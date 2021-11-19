@@ -53,8 +53,8 @@ There are some optional features that can be enabled during compilation that are
 - `BUILD_LAGOM`: builds [Lagom](../Meta/Lagom/ReadMe.md), which makes various SerenityOS libraries and programs available on the host system.
 - `ENABLE_KERNEL_LTO`: builds the kernel with link-time optimization.
 - `INCLUDE_WASM_SPEC_TESTS`: downloads and includes the WebAssembly spec testsuite tests. In order to use this option, you will need to install `prettier` and `wabt`. wabt version 1.0.23 or higher is required to pre-process the WebAssembly spec testsuite.
-- `SERENITY_TOOLCHAIN`: Specifies whether to use the established GNU toolchain, or the experimental Clang-based toolchain for building SerenityOS. See the [Clang-based toolchain](#clang-based-toolchain) section below.
-- `SERENITY_ARCH`: Specifies which architecture to build for. Currently supported options are `i686` and `x86_64`. `x86_64` requires a separate toolchain build from `i686`.
+- `GELASSENHEIT_TOOLCHAIN`: Specifies whether to use the established GNU toolchain, or the experimental Clang-based toolchain for building SerenityOS. See the [Clang-based toolchain](#clang-based-toolchain) section below.
+- `GELASSENHEIT_ARCH`: Specifies which architecture to build for. Currently supported options are `i686` and `x86_64`. `x86_64` requires a separate toolchain build from `i686`.
 - `BUILD_<component>`: builds the specified component, e.g. `BUILD_HEARTS` (note: must be all caps). Check the components.ini file in your build directory for a list of available components. Make sure to run `ninja clean` and `rm -rf Build/i686/Root` after disabling components. These options can be easily configured by using the `ConfigureComponents` utility. See the [Component Configuration](#component-configuration) section below.
 - `BUILD_EVERYTHING`: builds all optional components, overrides other `BUILD_<component>` flags when enabled
 
@@ -94,7 +94,7 @@ and unifies the approach taken towards different compiler toolchains and archite
 The recommended way to build and run the system, `./Meta/gelassenheit.sh run`, invokes the SuperBuild equivalently to the commands below:
 
 ```console
-$ cmake -GNinja -S Meta/CMake/Superbuild -B Build/superbuild-i686 -DSERENITY_ARCH=i686 -DSERENITY_TOOLCHAIN=GNU
+$ cmake -GNinja -S Meta/CMake/Superbuild -B Build/superbuild-i686 -DGELASSENHEIT_ARCH=i686 -DGELASSENHEIT_TOOLCHAIN=GNU
 $ cmake --build Build/superbuild-i686
 $ ninja -C Build/i686 setup-and-run
 ```
@@ -105,7 +105,7 @@ to build all the code generators and other host tools needed for the main Sereni
 target architecture using the selected toolchain.
 
 The `superbuild-<arch>` configuration also generates the [CMake toolchain file](https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html#cross-compiling)
-for the selected compiler toolchain and architecture via the `-DSERENITY_ARCH` and `-DSERENITY_TOOLCHAIN` arguments to the SuperBuild configuration step.
+for the selected compiler toolchain and architecture via the `-DGELASSENHEIT_ARCH` and `-DGELASSENHEIT_TOOLCHAIN` arguments to the SuperBuild configuration step.
 The Serenity project depends on the install step of the Lagom build, as it uses [find_package](https://cmake.org/cmake/help/latest/command/find_package.html) to locate
 the host tools for use in the code generation custom commands.
 
@@ -115,15 +115,15 @@ The SuperBuild build steps are roughly equivalent to the following commands:
 # Generate CMakeToolchain.txt
 mkdir -p Build/i686
 cp Toolchain/CMake/GNUToolchain.txt.in Build/i686/CMakeToolchain.txt
-sed -i 's/@SERENITY_ARCH@/i686/g' Build/i686/CMakeToolchain.txt
-sed -i 's/@SERENITY_SOURCE_DIR@/'"$PWD"'/g' Build/i686/CMakeToolchain.txt
-sed -i 's/@SERENITY_BUILD_DIR@/'"$PWD"'\/Build\/i686/g' Build/i686/CMakeToolchain.txt
+sed -i 's/@GELASSENHEIT_ARCH@/i686/g' Build/i686/CMakeToolchain.txt
+sed -i 's/@GELASSENHEIT_SOURCE_DIR@/'"$PWD"'/g' Build/i686/CMakeToolchain.txt
+sed -i 's/@GELASSENHEIT_BUILD_DIR@/'"$PWD"'\/Build\/i686/g' Build/i686/CMakeToolchain.txt
 
 # Configure and install Lagom
 cmake -GNinja -S Meta/Lagom -B Build/lagom -DCMAKE_INSTALL_PREFIX=${PWD}/Build/lagom-install
 ninja -C Build/lagom install
 # Configure and install Serenity, pointing it to Lagom's install prefix
-cmake -GNinja -B Build/i686 -DCMAKE_PREFIX_PATH=${PWD}/Build/lagom-install -DSERENITY_ARCH=i686 -DCMAKE_TOOLCHAIN_FILE=${PWD}/Build/i686/CMakeToolchain.txt
+cmake -GNinja -B Build/i686 -DCMAKE_PREFIX_PATH=${PWD}/Build/lagom-install -DGELASSENHEIT_ARCH=i686 -DCMAKE_TOOLCHAIN_FILE=${PWD}/Build/i686/CMakeToolchain.txt
 ninja -C Build/i686 install
 ```
 
@@ -139,7 +139,7 @@ The debug flags might be manipulated after a build per the following commands:
 
 ```console
 # Initial build, generate binary directories for both child builds
-$ cmake -GNinja -S Meta/CMake/Superbuild -B Build/superbuild-i686 -DSERENITY_ARCH=i686 -DSERENITY_TOOLCHAIN=GNU
+$ cmake -GNinja -S Meta/CMake/Superbuild -B Build/superbuild-i686 -DGELASSENHEIT_ARCH=i686 -DGELASSENHEIT_TOOLCHAIN=GNU
 $ cmake --build Build/superbuild-i686
 
 # Turn on process debug and don't build the browser for the Serenity build
@@ -182,7 +182,7 @@ of the WSL2 installation without going via the 9P network file share. The root o
 network path `\\wsl$\{distro-name}`.
 
 Alternatively, you may prefer to copy `Build/_disk_image` and `Build/Kernel/Kernel` to a native Windows partition (e.g.
-`/mnt/c`) before running `ninja run`, in which case `SERENITY_DISK_IMAGE` will be a regular Windows path (e.g.
+`/mnt/c`) before running `ninja run`, in which case `GELASSENHEIT_DISK_IMAGE` will be a regular Windows path (e.g.
 `'D:\serenity\_disk_image'`).
 
 ## Clang-based toolchain
@@ -203,5 +203,5 @@ toolchain.
 intervals.  This generally happens if you have more CPU cores than free RAM in gigabytes. To fix this, limit the number
 of parallel compile tasks be setting the `MAKEJOBS` environment variable to a number less than your CPU core count.
 
-Once the build script finishes, you can use it to compile SerenityOS if you set the `SERENITY_TOOLCHAIN` build
+Once the build script finishes, you can use it to compile SerenityOS if you set the `GELASSENHEIT_TOOLCHAIN` build
 option to `Clang` as shown [above](#cmake-build-options).

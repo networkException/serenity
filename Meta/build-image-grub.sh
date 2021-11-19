@@ -31,7 +31,7 @@ else
 fi
 }
 
-DISK_SIZE=$(($(disk_usage "$SERENITY_SOURCE_DIR/Base") + $(disk_usage Root) + 300))
+DISK_SIZE=$(($(disk_usage "$GELASSENHEIT_SOURCE_DIR/Base") + $(disk_usage Root) + 300))
 
 echo "setting up disk image..."
 if [ "$1" = "ebr" ]; then
@@ -102,7 +102,7 @@ script_path=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 "$script_path/build-root-filesystem.sh"
 
 if [ -z "$2" ]; then
-    grub_cfg="$SERENITY_SOURCE_DIR"/Meta/grub-"${partition_scheme}".cfg
+    grub_cfg="$GELASSENHEIT_SOURCE_DIR"/Meta/grub-"${partition_scheme}".cfg
 else
     grub_cfg=$2
 fi

@@ -33,7 +33,7 @@ WHPX acceleration enabled.
 On some Windows systems running with >100% scaling, the booting phase of Serenity might slow to a crawl. Changing the
 zoom settings of the QEMU window will speed up the emulation, but you'll have to squint harder to read the smaller display.
 
-The default display backend (`SERENITY_QEMU_DISPLAY_BACKEND=sdl,gl=off`) does _not_ have this problem. If you're
+The default display backend (`GELASSENHEIT_QEMU_DISPLAY_BACKEND=sdl,gl=off`) does _not_ have this problem. If you're
 running into this problem, make sure you haven't changed the QEMU display backend.
 
 A quick workaround is opening the properties of the QEMU executable at `C:\Program Files\qemu\qemu-system-x86_64.exe`, and

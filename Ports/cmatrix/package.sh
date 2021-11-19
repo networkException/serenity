@@ -3,7 +3,7 @@ port=cmatrix
 useconfigure=true
 version=3112b127babe72d2222059edd2d7eb7fb8bddfb1
 depends=("ncurses")
-configopts=("-DCMAKE_TOOLCHAIN_FILE=${SERENITY_BUILD_DIR}/CMakeToolchain.txt")
+configopts=("-DCMAKE_TOOLCHAIN_FILE=${GELASSENHEIT_BUILD_DIR}/CMakeToolchain.txt")
 files="https://github.com/abishekvashok/cmatrix/archive/${version}.tar.gz ${port}-${version}.tar.gz a1d313d49a39cb5ae3a1c675872712f9f871114a161c38cbe94ce78967825f87"
 auth_type=sha256
 launcher_name=cmatrix
@@ -16,5 +16,5 @@ configure() {
 }
 
 install() {
-    run cp cmatrix "${SERENITY_INSTALL_ROOT}/bin"
+    run cp cmatrix "${GELASSENHEIT_INSTALL_ROOT}/bin"
 }

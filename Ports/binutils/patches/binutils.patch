@@ -72,9 +72,9 @@ diff -Naur binutils-2.37/ld/configure.tgt binutils-2.37.serenity/ld/configure.tg
  aarch64_be-*-elf)	targ_emul=aarch64elfb
  			targ_extra_emuls="aarch64elf aarch64elf32 aarch64elf32b armelfb armelf"
  			;;
-diff -Naur binutils-2.37/ld/emulparams/armelf_serenity.sh binutils-2.37.serenity/ld/emulparams/armelf_serenity.sh
---- binutils-2.37/ld/emulparams/armelf_serenity.sh	1970-01-01 01:00:00.000000000 +0100
-+++ binutils-2.37.serenity/ld/emulparams/armelf_serenity.sh	2021-07-28 18:03:58.972705458 +0200
+diff -Naur binutils-2.37/ld/emulparams/armelf_gelassenheit.sh binutils-2.37.serenity/ld/emulparams/armelf_serenity.sh
+--- binutils-2.37/ld/emulparams/armelf_gelassenheit.sh	1970-01-01 01:00:00.000000000 +0100
++++ binutils-2.37.serenity/ld/emulparams/armelf_gelassenheit.sh	2021-07-28 18:03:58.972705458 +0200
 @@ -0,0 +1,7 @@
 +. ${srcdir}/emulparams/armelf.sh
 +MAXPAGESIZE="CONSTANT (MAXPAGESIZE)"
@@ -83,16 +83,16 @@ diff -Naur binutils-2.37/ld/emulparams/armelf_serenity.sh binutils-2.37.serenity
 +
 +unset STACK_ADDR
 +unset EMBEDDED
-diff -Naur binutils-2.37/ld/emulparams/elf_i386_serenity.sh binutils-2.37.serenity/ld/emulparams/elf_i386_serenity.sh
---- binutils-2.37/ld/emulparams/elf_i386_serenity.sh	1970-01-01 01:00:00.000000000 +0100
-+++ binutils-2.37.serenity/ld/emulparams/elf_i386_serenity.sh	2021-07-28 18:03:58.972705458 +0200
+diff -Naur binutils-2.37/ld/emulparams/elf_i386_gelassenheit.sh binutils-2.37.serenity/ld/emulparams/elf_i386_serenity.sh
+--- binutils-2.37/ld/emulparams/elf_i386_gelassenheit.sh	1970-01-01 01:00:00.000000000 +0100
++++ binutils-2.37.serenity/ld/emulparams/elf_i386_gelassenheit.sh	2021-07-28 18:03:58.972705458 +0200
 @@ -0,0 +1,3 @@
 +. ${srcdir}/emulparams/elf_i386.sh
 +GENERATE_SHLIB_SCRIPT=yes
 +GENERATE_PIE_SCRIPT=yes
-diff -Naur binutils-2.37/ld/emulparams/elf_x86_64_serenity.sh binutils-2.37.serenity/ld/emulparams/elf_x86_64_serenity.sh
---- binutils-2.37/ld/emulparams/elf_x86_64_serenity.sh	1970-01-01 01:00:00.000000000 +0100
-+++ binutils-2.37.serenity/ld/emulparams/elf_x86_64_serenity.sh	2021-07-28 18:03:58.972705458 +0200
+diff -Naur binutils-2.37/ld/emulparams/elf_x86_64_gelassenheit.sh binutils-2.37.serenity/ld/emulparams/elf_x86_64_serenity.sh
+--- binutils-2.37/ld/emulparams/elf_x86_64_gelassenheit.sh	1970-01-01 01:00:00.000000000 +0100
++++ binutils-2.37.serenity/ld/emulparams/elf_x86_64_gelassenheit.sh	2021-07-28 18:03:58.972705458 +0200
 @@ -0,0 +1 @@
 +. ${srcdir}/emulparams/elf_x86_64.sh
 diff -Naur binutils-2.37/ld/Makefile.am binutils-2.37.serenity/ld/Makefile.am

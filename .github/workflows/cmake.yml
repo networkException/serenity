@@ -6,7 +6,7 @@ env:
   # Don't mix these up!
   # runner.workspace = /home/runner/work/Gelassenheit
   # github.workspace = /home/runner/work/Gelassenheit/Gelassenheit
-  SERENITY_SOURCE_DIR: ${{ github.workspace }}
+  GELASSENHEIT_SOURCE_DIR: ${{ github.workspace }}
 
 concurrency:
   group: ${{ github.head_ref || format('{0}-{1}', github.ref, github.run_number) }}
@@ -137,8 +137,8 @@ jobs:
         # However, it is unwieldy and slow to run tests with them enabled, so we will build twice.
         run: |
           cmake -S Meta/CMake/Superbuild -B Build/superbuild -GNinja \
-            -DSERENITY_ARCH=${{ matrix.arch }} \
-            -DSERENITY_TOOLCHAIN=GNU \
+            -DGELASSENHEIT_ARCH=${{ matrix.arch }} \
+            -DGELASSENHEIT_TOOLCHAIN=GNU \
             -DBUILD_LAGOM=ON \
             -DCMAKE_C_COMPILER=gcc-10 \
             -DCMAKE_CXX_COMPILER=g++-10 \
@@ -153,8 +153,8 @@ jobs:
         run:  |
           cmake -S Meta/CMake/Superbuild -B Build/superbuild -GNinja \
             -DENABLE_COMPILETIME_HEADER_CHECK=ON \
-            -DSERENITY_ARCH=${{ matrix.arch }} \
-            -DSERENITY_TOOLCHAIN=GNU \
+            -DGELASSENHEIT_ARCH=${{ matrix.arch }} \
+            -DGELASSENHEIT_TOOLCHAIN=GNU \
             -DCMAKE_C_COMPILER=gcc-10 \
             -DCMAKE_CXX_COMPILER=g++-10 \
             -DENABLE_UNDEFINED_SANITIZER=ON \
@@ -182,9 +182,9 @@ jobs:
         if: ${{ matrix.debug-options == 'NORMAL_DEBUG'}}
         working-directory: ${{ github.workspace }}/Build/${{ matrix.arch }}
         env:
-          SERENITY_QEMU_CPU: "max,vmx=off"
-          SERENITY_KERNEL_CMDLINE: "fbdev=off panic=shutdown system_mode=self-test"
-          SERENITY_RUN: "ci"
+          GELASSENHEIT_QEMU_CPU: "max,vmx=off"
+          GELASSENHEIT_KERNEL_CMDLINE: "fbdev=off panic=shutdown system_mode=self-test"
+          GELASSENHEIT_RUN: "ci"
         run: |
           echo "::group::ninja run # Qemu output"
           ninja run
@@ -212,9 +212,9 @@ jobs:
         if: ${{ matrix.debug-options == 'NORMAL_DEBUG' && matrix.arch == 'i686'}}
         working-directory: ${{ github.workspace }}/Build/${{ matrix.arch }}
         env:
-          # The script already sets the correct SERENITY_RUN and SERENITY_KERNEL_CMDLINE envvars.
-          SERENITY_ARCH: ${{ matrix.arch }}
-          SERENITY_QEMU_CPU: "max,vmx=off"
+          # The script already sets the correct GELASSENHEIT_RUN and GELASSENHEIT_KERNEL_CMDLINE envvars.
+          GELASSENHEIT_ARCH: ${{ matrix.arch }}
+          GELASSENHEIT_QEMU_CPU: "max,vmx=off"
         run: |
           # Running the tests apparently leaves the image sufficiently broken
           rm _disk_image

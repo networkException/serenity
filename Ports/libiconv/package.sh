@@ -7,7 +7,7 @@ files="https://ftpmirror.gnu.org/gnu/libiconv/libiconv-${version}.tar.gz libicon
 auth_type="sha256"
 
 install() {
-    run make DESTDIR=${SERENITY_INSTALL_ROOT} "${installopts[@]}" install
-    run ${SERENITY_ARCH}-pc-serenity-gcc -shared -o ${SERENITY_INSTALL_ROOT}/usr/local/lib/libiconv.so -Wl,-soname,libiconv.so -Wl,--whole-archive ${SERENITY_INSTALL_ROOT}/usr/local/lib/libiconv.a -Wl,--no-whole-archive
-    rm -f ${SERENITY_INSTALL_ROOT}/usr/local/lib/libiconv.la
+    run make DESTDIR=${GELASSENHEIT_INSTALL_ROOT} "${installopts[@]}" install
+    run ${GELASSENHEIT_ARCH}-pc-serenity-gcc -shared -o ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libiconv.so -Wl,-soname,libiconv.so -Wl,--whole-archive ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libiconv.a -Wl,--no-whole-archive
+    rm -f ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libiconv.la
 }

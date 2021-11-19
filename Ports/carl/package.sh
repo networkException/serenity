@@ -10,6 +10,6 @@ build() {
 }
 
 install() {
-    run mkdir -p "${SERENITY_INSTALL_ROOT}/usr/local"
-    run cp carl "${SERENITY_INSTALL_ROOT}/usr/local/bin"
+    run mkdir -p "${GELASSENHEIT_INSTALL_ROOT}/usr/local"
+    run cp carl "${GELASSENHEIT_INSTALL_ROOT}/usr/local/bin"
 }

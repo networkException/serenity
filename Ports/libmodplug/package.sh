@@ -8,7 +8,7 @@ auth_type=sha256
 workdir="libmodplug-$version"
 
 install() {
-    run make DESTDIR=${SERENITY_INSTALL_ROOT} "${installopts[@]}" install
-    ${CC} -shared -o ${SERENITY_INSTALL_ROOT}/usr/local/lib/libmodplug.so -Wl,-soname,libmodplug.so -Wl,--whole-archive ${SERENITY_INSTALL_ROOT}/usr/local/lib/libmodplug.a -Wl,--no-whole-archive
-    rm -f ${SERENITY_INSTALL_ROOT}/usr/local/lib/libmodplug.la
+    run make DESTDIR=${GELASSENHEIT_INSTALL_ROOT} "${installopts[@]}" install
+    ${CC} -shared -o ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libmodplug.so -Wl,-soname,libmodplug.so -Wl,--whole-archive ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libmodplug.a -Wl,--no-whole-archive
+    rm -f ${GELASSENHEIT_INSTALL_ROOT}/usr/local/lib/libmodplug.la
 }
