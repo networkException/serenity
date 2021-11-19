@@ -90,7 +90,7 @@ I'm also on [Patreon](https://www.patreon.com/serenityos) and [GitHub Sponsors](
 
 ## How do I read the documentation?
 
-Man pages are available online at [man.serenityos.org](https://man.serenityos.org). These pages are generated from the Markdown source files in [`Base/usr/share/man`](https://github.com/SerenityOS/serenity/tree/master/Base/usr/share/man) and updated automatically.
+Man pages are available online at [gelassenheitbs.github.io/Benutzerhandbuch-Internetseite/](https://gelassenheitbs.github.io/Benutzerhandbuch-Internetseite/). These pages are generated from the Markdown source files in [`Base/usr/share/man`](https://github.com/GelassenheitBS/Gelassenheit/tree/master/Base/usr/share/man) and updated automatically.
 
 When running SerenityOS you can use `man` for the terminal interface, or `help` for the GUI.
 

@@ -4,12 +4,12 @@ on:
   push:
     paths:
       - "Base/usr/share/man/**"
-      - "Meta/Websites/man.serenityos.org/**"
+      - "Meta/Websites/gelassenheitbs.github.io/Benutzerhandbuch-Internetseite/**"
 
 jobs:
   convert_using_pandoc:
     runs-on: ubuntu-20.04
-    if: always() && github.repository == 'GelassenheitBS/Gelassenheit' && github.ref == 'refs/heads/master'
+    if: always() && github.repository == 'GelassenheitBS/Gelassenheit' && github.ref == 'refs/heads/master' && never() # BEHEBEMICH: Generiere ein neues Token, und baue es hier ein.
     steps:
       - uses: actions/checkout@v2
       - uses: r-lib/actions/setup-pandoc@v1
