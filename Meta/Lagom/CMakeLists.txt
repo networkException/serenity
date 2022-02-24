@@ -137,6 +137,7 @@ include_directories(./Libraries/)
 include_directories(../../)
 include_directories(../../Userland/)
 include_directories(../../Userland/Libraries/)
+include_directories(${CMAKE_BINARY_DIR}/Userland/Libraries/)
 include_directories(${CMAKE_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -175,6 +176,33 @@ function(lagom_lib library fs_name)
     if (NOT ENABLE_OSS_FUZZ AND NOT ENABLE_FUZZER_SANITIZER)
         # alias for parity with exports
         add_library(Lagom::${library} ALIAS ${target_name})
+    endif()
+
+    # FIXME: do this properly and not here.
+    # Currently LibGUI is the only one that uses GML and we have no proper
+    # way to handle adding custom target dependenices to libraries.
+    if ("${library}" STREQUAL "GUI")
+        # Custom compile_gml function based on code_generators.cmake
+        function(compile_gml source output string_name)
+            set(output ${CMAKE_BINARY_DIR}/Userland/Libraries/LibGUI/${output})
+            add_custom_command(
+                OUTPUT ${output}
+                COMMAND ${SERENITY_PROJECT_ROOT}/Meta/text-to-cpp-string.sh ${string_name} ${source} > ${output}.tmp
+                COMMAND "${CMAKE_COMMAND}" -E copy_if_different ${output}.tmp ${output}
+                COMMAND "${CMAKE_COMMAND}" -E remove ${output}.tmp
+                VERBATIM
+                DEPENDS ${SERENITY_PROJECT_ROOT}/Meta/text-to-cpp-string.sh
+                MAIN_DEPENDENCY ${source}
+            )
+            get_filename_component(output_name ${output} NAME)
+            add_custom_target(generate_${output_name} DEPENDS ${output})
+            add_dependencies(${target_name} generate_${output_name})
+        endfunction()
+
+        # TODO: Customizable array?
+        compile_gml("../../Userland/Libraries/LibGUI/FontPickerDialog.gml" FontPickerDialogGML.h font_picker_dialog_gml)
+        compile_gml("../../Userland/Libraries/LibGUI/FilePickerDialog.gml" FilePickerDialogGML.h file_picker_dialog_gml)
+        compile_gml("../../Userland/Libraries/LibGUI/PasswordInputDialog.gml" PasswordInputDialogGML.h password_input_dialog_gml)
     endif()
 
     set_target_properties(
@@ -472,7 +500,6 @@ if (BUILD_LAGOM)
     if(${SDL2_FOUND})
         file(GLOB LIBGUI_LAGOM_SOURCES CONFIGURE_DEPENDS "./Libraries/LibGUI/*.cpp")
         file(GLOB LIBGUI_SOURCES CONFIGURE_DEPENDS "../../Userland/Libraries/LibGUI/*.cpp")
-        file(GLOB LIBGUI_SUBDIR_SOURCES CONFIGURE_DEPENDS "../../Userland/Libraries/LibGUI/Lagom/*.cpp")
 
         # Re-impl in `Libraries/LibGUI`
         list(FILTER LIBGUI_SOURCES EXCLUDE REGEX "../../Userland/Libraries/LibGUI/Clipboard.*")
@@ -482,18 +509,17 @@ if (BUILD_LAGOM)
 
         # FIXME: Let's exclude a bunch of things to get something building :^)
         list(FILTER LIBGUI_SOURCES EXCLUDE REGEX "../../Userland/Libraries/LibGUI/ColorInput.*")
+        list(FILTER LIBGUI_SOURCES EXCLUDE REGEX "../../Userland/Libraries/LibGUI/ColorPicker.*")
         list(FILTER LIBGUI_SOURCES EXCLUDE REGEX "../../Userland/Libraries/LibGUI/DisplayLink.*")
+        list(FILTER LIBGUI_SOURCES EXCLUDE REGEX "../../Userland/Libraries/LibGUI/FilePicker.*")
+        list(FILTER LIBGUI_SOURCES EXCLUDE REGEX "../../Userland/Libraries/LibGUI/FileSystemModel.*")
         list(FILTER LIBGUI_SOURCES EXCLUDE REGEX "../../Userland/Libraries/LibGUI/Notification.*")
         list(FILTER LIBGUI_SOURCES EXCLUDE REGEX "../../Userland/Libraries/LibGUI/MouseTracker.*")
-        list(FILTER LIBGUI_SOURCES EXCLUDE REGEX "../../Userland/Libraries/LibGUI/FileSystemModel.*")
-        list(FILTER LIBGUI_SOURCES EXCLUDE REGEX "../../Userland/Libraries/LibGUI/PasswordInputDialog.*")
-        list(FILTER LIBGUI_SOURCES EXCLUDE REGEX "../../Userland/Libraries/LibGUI/ScreenLayout.*")
-        list(FILTER LIBGUI_SOURCES EXCLUDE REGEX "../../Userland/Libraries/LibGUI/SettingsWindow.*")
         list(FILTER LIBGUI_SOURCES EXCLUDE REGEX "../../Userland/Libraries/LibGUI/ProcessChooser.*")
-        list(FILTER LIBGUI_SOURCES EXCLUDE REGEX "../../Userland/Libraries/LibGUI/(.*)Picker(.*).*")
+        list(FILTER LIBGUI_SOURCES EXCLUDE REGEX "../../Userland/Libraries/LibGUI/ScreenLayout.*")
 
         lagom_lib(GUI gui
-            SOURCES ${SDL2_INCLUDE_DIRS} ${LIBGUI_LAGOM_SOURCES} ${LIBGUI_SUBDIR_SOURCES} ${LIBGUI_SOURCES}
+            SOURCES ${SDL2_INCLUDE_DIRS} ${LIBGUI_LAGOM_SOURCES} ${LIBGUI_SOURCES}
             LIBS SDL2::SDL2 LagomELF LagomGfx LagomGML LagomRegex
         )
     endif()
