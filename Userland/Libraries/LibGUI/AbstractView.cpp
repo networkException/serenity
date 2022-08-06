@@ -126,6 +126,11 @@ void AbstractView::toggle_selection(ModelIndex const& new_index)
     m_selection.toggle(new_index);
 }
 
+void AbstractView::toggle_all_selection(Vector<ModelIndex> const& indices)
+{
+    m_selection.toggle_all(indices);
+}
+
 void AbstractView::did_update_selection()
 {
     if (!model() || selection().first() != m_edit_index)
@@ -235,29 +240,48 @@ NonnullRefPtr<Gfx::Font> AbstractView::font_for_index(ModelIndex const& index) c
 
 void AbstractView::mousedown_event(MouseEvent& event)
 {
+    dbgln("a");
+
     AbstractScrollableWidget::mousedown_event(event);
 
     if (!model())
         return;
 
+    dbgln("b");
+
     if (event.button() == MouseButton::Primary)
         m_left_mousedown_position = event.position();
+
+    dbgln("c");
 
     auto index = index_at_event_position(event.position());
     m_might_drag = false;
 
+    dbgln("d");
+
     if (!index.is_valid()) {
+        dbgln("1");
+
         clear_selection();
     } else if (event.modifiers() & Mod_Ctrl) {
+        dbgln("2");
+
         set_cursor(index, SelectionUpdate::Ctrl);
     } else if (event.modifiers() & Mod_Shift) {
+        dbgln("3");
+
         set_cursor(index, SelectionUpdate::Shift);
     } else if (event.button() == MouseButton::Primary && m_selection.contains(index) && !m_model->drag_data_type().is_null()) {
+        dbgln("4");
         // We might be starting a drag, so don't throw away other selected items yet.
         m_might_drag = true;
     } else if (event.button() == MouseButton::Secondary) {
+        dbgln("5");
+
         set_cursor(index, SelectionUpdate::ClearIfNotSelected);
     } else {
+        dbgln("6");
+
         set_cursor(index, SelectionUpdate::Set);
         m_might_drag = true;
     }
@@ -360,6 +384,7 @@ void AbstractView::mouseup_event(MouseEvent& event)
         auto index = index_at_event_position(event.position());
         if (index.is_valid()) {
             set_selection(index);
+            dbgln("AbstractView::mouseup_event(): calling set_selection_start_index({})", index);
             set_selection_start_index(index);
         } else
             clear_selection();
@@ -455,6 +480,8 @@ void AbstractView::set_key_column_and_sort_order(int column, SortOrder sort_orde
 
 void AbstractView::select_range(ModelIndex const& index)
 {
+    dbgln("AbstractView::select_range(index: {}, selection_start_index(): {})", index, selection_start_index());
+
     auto min_row = min(selection_start_index().row(), index.row());
     auto max_row = max(selection_start_index().row(), index.row());
     auto min_column = min(selection_start_index().column(), index.column());
@@ -478,27 +505,48 @@ void AbstractView::set_cursor(ModelIndex index, SelectionUpdate selection_update
         return;
     }
 
+    dbgln("z");
+
     if (!m_cursor_index.is_valid() || model()->parent_index(m_cursor_index) != model()->parent_index(index))
         stop_highlighted_search_timer();
+
+    dbgln("y");
 
     if (selection_mode() == SelectionMode::SingleSelection && (selection_update == SelectionUpdate::Ctrl || selection_update == SelectionUpdate::Shift))
         selection_update = SelectionUpdate::Set;
 
+    dbgln("x");
+
     if (model()->is_within_range(index)) {
+        dbgln("w");
+
         if (selection_update == SelectionUpdate::Set) {
+            dbgln("I");
+
             set_selection(index);
+            dbgln("AbstractView::set_cursor(): calling set_selection_start_index({})", index);
             set_selection_start_index(index);
         } else if (selection_update == SelectionUpdate::Ctrl) {
+            dbgln("II");
+
             toggle_selection(index);
         } else if (selection_update == SelectionUpdate::ClearIfNotSelected) {
+            dbgln("III");
+
             if (!m_selection.contains(index))
                 clear_selection();
         } else if (selection_update == SelectionUpdate::Shift) {
+            dbgln("IV");
+
             select_range(index);
+
+            if (m_selection_cursor_position == SelectionCursorPosition::Start) {
+                update();
+                return;
+            }
         }
 
         // FIXME: Support the other SelectionUpdate types
-
         auto old_cursor_index = m_cursor_index;
         m_cursor_index = index;
         did_change_cursor_index(old_cursor_index, m_cursor_index);

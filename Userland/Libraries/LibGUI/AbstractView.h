@@ -51,6 +51,11 @@ public:
         NoSelection,
     };
 
+    enum class SelectionCursorPosition {
+        Start,
+        End
+    };
+
     virtual void move_cursor(CursorMovement, SelectionUpdate) { }
 
     void set_model(RefPtr<Model>);
@@ -85,6 +90,9 @@ public:
 
     SelectionMode selection_mode() const { return m_selection_mode; }
     void set_selection_mode(SelectionMode);
+
+    SelectionCursorPosition selection_cursor_position() const { return m_selection_cursor_position; }
+    void set_selection_cursor_position(SelectionCursorPosition cursor_position) { m_selection_cursor_position = cursor_position; }
 
     virtual void model_did_update(unsigned flags) override;
     virtual void did_update_selection();
@@ -156,6 +164,7 @@ protected:
     virtual void add_selection(ModelIndex const&);
     virtual void remove_selection(ModelIndex const&);
     virtual void toggle_selection(ModelIndex const&);
+    virtual void toggle_all_selection(Vector<ModelIndex> const&);
     virtual void select_range(ModelIndex const&);
     virtual void did_change_hovered_index([[maybe_unused]] ModelIndex const& old_index, [[maybe_unused]] ModelIndex const& new_index) { }
     virtual void did_change_cursor_index([[maybe_unused]] ModelIndex const& old_index, [[maybe_unused]] ModelIndex const& new_index) { }
@@ -203,6 +212,7 @@ private:
     RefPtr<Core::Timer> m_highlighted_search_timer;
     SelectionBehavior m_selection_behavior { SelectionBehavior::SelectItems };
     SelectionMode m_selection_mode { SelectionMode::SingleSelection };
+    SelectionCursorPosition m_selection_cursor_position { SelectionCursorPosition::End };
     unsigned m_edit_triggers { EditTrigger::DoubleClicked | EditTrigger::EditKeyPressed };
     bool m_activates_on_selection { false };
     bool m_tab_key_navigation_enabled { false };

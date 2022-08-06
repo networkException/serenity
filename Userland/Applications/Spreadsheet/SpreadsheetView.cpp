@@ -216,10 +216,10 @@ void InfinitelyScrollableTableView::mousedown_event(GUI::MouseEvent& event)
         AbstractTableView::mousedown_event(adjusted_event);
     } else {
         AbstractTableView::mousedown_event(event);
-        if (event.button() == GUI::Primary) {
+        /* if (event.button() == GUI::Primary) {
             auto index = index_at_event_position(event.position());
-            AbstractTableView::set_cursor(index, SelectionUpdate::Set);
-        }
+            set_cursor(index, SelectionUpdate::Set);
+        } */
     }
 }
 
@@ -295,6 +295,34 @@ void InfinitelyScrollableTableView::drop_event(GUI::DropEvent& event)
     }
 }
 
+void InfinitelyScrollableTableView::select_range(GUI::ModelIndex const& index)
+{
+    dbgln("InfinitelyScrollableTableView::select_range(index: {}, cursor_index(): {})", index, cursor_index());
+
+    auto min_row = min(cursor_index().row(), index.row());
+    auto max_row = max(cursor_index().row(), index.row());
+    auto min_column = min(cursor_index().column(), index.column());
+    auto max_column = max(cursor_index().column(), index.column());
+
+    clear_selection();
+    Vector<GUI::ModelIndex> indices_to_toggle;
+
+    for (auto row = min_row; row <= max_row; ++row) {
+        for (auto column = min_column; column <= max_column; ++column) {
+            dbgln("at ({},{})", row, column);
+
+            auto new_index = model()->index(row, column);
+            if (new_index.is_valid()) {
+                indices_to_toggle.append(new_index);
+
+                dbgln("indices_to_toggle.append({})", new_index);
+            }
+        }
+    }
+
+    toggle_all_selection(indices_to_toggle);
+}
+
 void SpreadsheetView::update_with_model()
 {
     m_sheet_model->update();
@@ -309,6 +337,8 @@ SpreadsheetView::SpreadsheetView(Sheet& sheet)
     m_table_view = add<InfinitelyScrollableTableView>();
     m_table_view->set_grid_style(GUI::TableView::GridStyle::Both);
     m_table_view->set_selection_behavior(GUI::AbstractView::SelectionBehavior::SelectItems);
+    m_table_view->set_selection_mode(GUI::AbstractView::SelectionMode::MultiSelection);
+    m_table_view->set_selection_cursor_position(GUI::AbstractView::SelectionCursorPosition::Start);
     m_table_view->set_edit_triggers(GUI::AbstractView::EditTrigger::EditKeyPressed | GUI::AbstractView::AnyKeyPressed | GUI::AbstractView::DoubleClicked);
     m_table_view->set_tab_key_navigation_enabled(true);
     m_table_view->row_header().set_visible(true);

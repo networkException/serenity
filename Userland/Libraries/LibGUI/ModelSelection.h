@@ -41,6 +41,7 @@ public:
     void add(ModelIndex const&);
     void add_all(Vector<ModelIndex> const&);
     void toggle(ModelIndex const&);
+    void toggle_all(Vector<ModelIndex> const&);
     bool remove(ModelIndex const&);
     void clear();
 

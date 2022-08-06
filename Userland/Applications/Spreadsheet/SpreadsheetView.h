@@ -77,6 +77,7 @@ private:
     virtual void mousedown_event(GUI::MouseEvent&) override;
     virtual void mouseup_event(GUI::MouseEvent&) override;
     virtual void drop_event(GUI::DropEvent&) override;
+    virtual void select_range(GUI::ModelIndex const&) override;
 
     bool is_dragging() const { return m_is_dragging_for_cut || m_is_dragging_for_extend || m_is_dragging_for_select; }
 

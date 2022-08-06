@@ -55,6 +55,23 @@ void ModelSelection::toggle(ModelIndex const& index)
     notify_selection_changed();
 }
 
+void ModelSelection::toggle_all(Vector<ModelIndex> const& indices)
+{
+    {
+        TemporaryChange notify_change { m_disable_notify, true };
+        for (auto const& index : indices) {
+            VERIFY(index.is_valid());
+            if (m_indices.contains(index))
+                m_indices.remove(index);
+            else
+                m_indices.set(index);
+        }
+    }
+
+    if (m_notify_pending)
+        notify_selection_changed();
+}
+
 bool ModelSelection::remove(ModelIndex const& index)
 {
     VERIFY(index.is_valid());
