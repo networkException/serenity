@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <AK/Tuple.h>
 #include <AK/URL.h>
 #include <LibJS/Runtime/ExecutionContext.h>
 #include <LibJS/Runtime/GlobalObject.h>
@@ -15,6 +16,7 @@
 #include <LibWeb/HTML/BrowsingContext.h>
 #include <LibWeb/HTML/EventLoop/EventLoop.h>
 #include <LibWeb/HTML/Origin.h>
+#include <LibWeb/HTML/Scripting/ModuleScript.h>
 
 namespace Web::HTML {
 
@@ -54,6 +56,7 @@ enum class RunScriptDecision {
 struct EnvironmentSettingsObject
     : public Environment
     , public JS::Realm::HostDefined {
+
     virtual ~EnvironmentSettingsObject() override;
 
     // https://html.spec.whatwg.org/multipage/webappapis.html#concept-environment-target-browsing-context
@@ -103,6 +106,8 @@ struct EnvironmentSettingsObject
 
     bool is_scripting_enabled() const;
     bool is_scripting_disabled() const;
+
+    bool module_type_allowed(String const& module_type) const;
 
 protected:
     explicit EnvironmentSettingsObject(NonnullOwnPtr<JS::ExecutionContext>);

@@ -13,6 +13,7 @@
 #include <AK/ScopeGuard.h>
 #include <AK/StringBuilder.h>
 #include <AK/TemporaryChange.h>
+#include <AK/URLParser.h>
 #include <LibCrypto/BigInt/SignedBigInteger.h>
 #include <LibJS/AST.h>
 #include <LibJS/Heap/MarkedVector.h>
@@ -4751,6 +4752,45 @@ ModuleRequest::ModuleRequest(FlyString module_specifier_, Vector<Assertion> asse
     quick_sort(assertions, [](Assertion const& lhs, Assertion const& rhs) {
         return lhs.key < rhs.key;
     });
+}
+
+// https://html.spec.whatwg.org/multipage/webappapis.html#module-type-from-module-request
+String ModuleRequest::module_type() const
+{
+    // 1. Let moduleType be "javascript".
+    String module_type = "javascript"sv;
+
+    // 2. If moduleRequest.[[Assertions]] has a Record entry such that entry.[[Key]] is "type", then:
+    for (auto const& entry : assertions) {
+        if (entry.key != "type"sv)
+            continue;
+
+        // 1. If entry.[[Value]] is "javascript", then set moduleType to null.
+        if (entry.value == "javascript"sv)
+            module_type = nullptr;
+        // 2. Otherwise, set moduleType to entry.[[Value]].
+        else
+            module_type = entry.value;
+    }
+
+    return module_type;
+}
+
+// https://html.spec.whatwg.org/multipage/webappapis.html#resolve-a-module-specifier
+AK::URL ModuleRequest::resolve_specifier(AK::URL const& base_url) const
+{
+    // 1. Apply the URL parser to specifier. If the result is not failure, return the result.
+    auto result = URLParser::parse(module_specifier);
+    if (result.is_valid())
+        return result;
+
+    // 2. If specifier does not start with the character U+002F SOLIDUS (/), the two-character sequence U+002E FULL STOP,
+    //    U+002F SOLIDUS (./), or the three-character sequence U+002E FULL STOP, U+002E FULL STOP, U+002F SOLIDUS (../), return failure.
+    if (!module_specifier.starts_with("/"sv) || module_specifier.starts_with("./"sv) || module_specifier.starts_with("../"sv))
+        return {};
+
+    // 3. Return the result of applying the URL parser to specifier with base URL.
+    return URLParser::parse(module_specifier, &base_url);
 }
 
 }

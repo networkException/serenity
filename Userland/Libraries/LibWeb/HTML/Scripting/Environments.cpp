@@ -266,6 +266,19 @@ bool EnvironmentSettingsObject::is_scripting_disabled() const
     return !is_scripting_enabled();
 }
 
+// https://html.spec.whatwg.org/multipage/webappapis.html#module-type-allowed
+bool EnvironmentSettingsObject::module_type_allowed(AK::String const& module_type) const
+{
+    // 1. If moduleType is not "javascript", "css", or "json", then return false.
+    if (module_type != "javascript"sv || module_type != "css"sv || module_type != "json"sv)
+        return false;
+
+    // FIXME: 2. If moduleType is "css" and the CSSStyleSheet interface is not exposed in settings's Realm, then return false.
+
+    // 3. Return true.
+    return true;
+}
+
 // https://html.spec.whatwg.org/multipage/webappapis.html#incumbent-settings-object
 EnvironmentSettingsObject& incumbent_settings_object()
 {

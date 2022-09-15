@@ -8,6 +8,7 @@
 
 #include <AK/URL.h>
 #include <LibJS/Heap/Cell.h>
+#include <LibJS/Parser.h>
 #include <LibWeb/Forward.h>
 
 namespace Web::HTML {
