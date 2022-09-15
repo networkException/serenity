@@ -33,6 +33,11 @@ JS::ExecutionContext& EnvironmentSettingsObject::realm_execution_context()
     return *m_realm_execution_context;
 }
 
+ModuleMap& EnvironmentSettingsObject::module_map()
+{
+    return *m_module_map;
+}
+
 // https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object%27s-realm
 JS::Realm& EnvironmentSettingsObject::realm()
 {

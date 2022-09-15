@@ -134,16 +134,16 @@ static void fetch_inline_module_script_graph(String const& filename, String cons
         return;
     }
 
-    // FIXME: 3. Let visited set be an empty set.
+    // 3. Let visited set be an empty set.
+    HashTable<ModuleMap::Key> visited_set;
 
     // 4. Fetch the descendants of and link script, given settings object, the destination "script",
     //    and visited set. When this asynchronously completes with final result, asynchronously complete this algorithm with final result.
-    // FIXME: Pass visited set.
-    script->fetch_descendants_and_link(settings_object, "script"sv, move(callback));
+    script->fetch_descendants_and_link(settings_object, "script"sv, visited_set, move(callback));
 }
 
 // https://html.spec.whatwg.org/multipage/webappapis.html#fetch-a-single-module-script
-static void fetch_single_module_script(AK::URL const& url, EnvironmentSettingsObject&, StringView, EnvironmentSettingsObject& module_map_settings_object, StringView, Optional<JS::ModuleRequest> module_request, Function<void(ModuleScript const*)> callback)
+static void fetch_single_module_script(AK::URL const& url, EnvironmentSettingsObject&, StringView, EnvironmentSettingsObject& module_map_settings_object, StringView, Optional<JS::ModuleRequest> module_request, Function<void(JavaScriptModuleScript*)> callback)
 {
     // 1. Let moduleType be "javascript".
     auto module_type = "javascript"sv;
@@ -189,7 +189,7 @@ static void fetch_external_module_script_graph(AK::URL const& url, EnvironmentSe
     // 1. Fetch a single module script given url, settings object, "script", options, settings object, "client",
     //    and with the top-level module fetch flag set. If the caller of this algorithm specified custom perform the fetch steps,
     //    pass those along as well. Wait until the algorithm asynchronously completes with result.
-    fetch_single_module_script(url, settings_object, "script"sv, settings_object, "client"sv, {}, [&settings_object, &callback](JavaScriptModuleScript const* result) {
+    fetch_single_module_script(url, settings_object, "script"sv, settings_object, "client"sv, {}, [&settings_object, &callback](JavaScriptModuleScript* result) {
         // 2. If result is null, asynchronously complete this algorithm with null, and return.
         if (!result) {
             callback({});
@@ -438,7 +438,7 @@ void HTMLScriptElement::prepare_script()
             // 2. Fetch an inline module script graph, given source text, base URL, settings object, and options.
             //    When this asynchronously completes, set the script's script to the result. At that time, the script is ready.
             // FIXME: Pass options
-            fetch_inline_module_script_graph(m_document->url().to_string(), source_text, base_url, document().relevant_settings_object(), [this](ModuleScript const* result) {
+            fetch_inline_module_script_graph(m_document->url().to_string(), source_text, base_url, document().relevant_settings_object(), [this](JavaScriptModuleScript const* result) {
                 m_script = result;
                 script_became_ready();
             });
