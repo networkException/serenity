@@ -15,9 +15,10 @@
 #include <LibWeb/HTML/EventNames.h>
 #include <LibWeb/HTML/HTMLScriptElement.h>
 #include <LibWeb/HTML/Scripting/ClassicScript.h>
-#include <LibWeb/HTML/Scripting/ModuleScript.h>
+#include <LibWeb/HTML/Scripting/Fetching.h>
 #include <LibWeb/HTML/Window.h>
 #include <LibWeb/Loader/ResourceLoader.h>
+#include <LibWeb/MimeSniff/MimeType.h>
 
 namespace Web::HTML {
 
@@ -109,102 +110,6 @@ void HTMLScriptElement::execute_script()
         dispatch_event(*DOM::Event::create(document().window(), HTML::EventNames::load));
 }
 
-// https://mimesniff.spec.whatwg.org/#javascript-mime-type
-static bool is_javascript_mime_type(String const& string)
-{
-    return string.is_one_of("application/ecmascript", "application/javascript", "application/x-ecmascript", "application/x-javascript", "text/ecmascript", "text/javascript", "text/javascript1.0", "text/javascript1.1", "text/javascript1.2", "text/javascript1.3", "text/javascript1.4", "text/javascript1.5", "text/jscript", "text/livescript", "text/x-ecmascript", "text/x-javascript");
-}
-
-// https://mimesniff.spec.whatwg.org/#javascript-mime-type-essence-match
-static bool is_javascript_mime_type_essence_match(String const& string)
-{
-    auto lowercase_string = string.to_lowercase();
-    return is_javascript_mime_type(lowercase_string);
-}
-
-// https://html.spec.whatwg.org/multipage/webappapis.html#fetch-an-inline-module-script-graph
-static void fetch_inline_module_script_graph(String const& filename, String const& source_text, AK::URL const& base_url, EnvironmentSettingsObject& settings_object, Function<void(ModuleScript const*)> callback)
-{
-    // 1. Let script be the result of creating a JavaScript module script using source text, settings object, base URL, and options.
-    auto script = JavaScriptModuleScript::create(filename, source_text, settings_object, base_url);
-
-    // 2. If script is null, asynchronously complete this algorithm with null, and return.
-    if (!script) {
-        callback({});
-        return;
-    }
-
-    // 3. Let visited set be an empty set.
-    HashTable<ModuleMap::Key> visited_set;
-
-    // 4. Fetch the descendants of and link script, given settings object, the destination "script",
-    //    and visited set. When this asynchronously completes with final result, asynchronously complete this algorithm with final result.
-    script->fetch_descendants_and_link(settings_object, "script"sv, visited_set, move(callback));
-}
-
-// https://html.spec.whatwg.org/multipage/webappapis.html#fetch-a-single-module-script
-static void fetch_single_module_script(AK::URL const& url, EnvironmentSettingsObject&, StringView, EnvironmentSettingsObject& module_map_settings_object, StringView, Optional<JS::ModuleRequest> module_request, Function<void(JavaScriptModuleScript*)> callback)
-{
-    // 1. Let moduleType be "javascript".
-    auto module_type = "javascript"sv;
-
-    // 2. If moduleRequest was given, then set moduleType to the result of running the module type from module request steps given moduleRequest.
-    if (module_request.has_value())
-        module_type = module_request->module_type();
-
-    // 3. Assert: the result of running the module type allowed steps given moduleType and module map settings object is true.
-    //    Otherwise we would not have reached this point because a failure would have been raised when inspecting moduleRequest.[[Assertions]]
-    //    in create a JavaScript module script or fetch an import() module script graph.
-    VERIFY(module_map_settings_object.module_type_allowed(module_type));
-
-    // FIXME: Implement steps 4 to 20.
-
-    auto request = LoadRequest::create_for_url_on_page(url, nullptr);
-
-    ResourceLoader::the().load(
-        request,
-        [url, module_type, &module_map_settings_object, &callback](auto data, auto& response_headers, auto) {
-            if (data.is_null()) {
-                dbgln("HTMLScriptElement: Failed to load {}", url);
-                return;
-            }
-
-            auto content_type_header = response_headers.get("Content-Type");
-            if (!content_type_header.has_value())
-                return;
-
-            if (is_javascript_mime_type(*content_type_header) && module_type == "javascript"sv) {
-                callback(JavaScriptModuleScript::create(url.basename(), data, module_map_settings_object, url).ptr());
-                return;
-            }
-        },
-        [](auto&, auto) {
-            dbgln("HONK! Failed to load script, but ready nonetheless.");
-        });
-}
-
-// https://html.spec.whatwg.org/multipage/webappapis.html#fetch-a-module-script-tree
-static void fetch_external_module_script_graph(AK::URL const& url, EnvironmentSettingsObject& settings_object, Function<void(JavaScriptModuleScript const*)> callback)
-{
-    // 1. Fetch a single module script given url, settings object, "script", options, settings object, "client",
-    //    and with the top-level module fetch flag set. If the caller of this algorithm specified custom perform the fetch steps,
-    //    pass those along as well. Wait until the algorithm asynchronously completes with result.
-    fetch_single_module_script(url, settings_object, "script"sv, settings_object, "client"sv, {}, [&settings_object, &callback](JavaScriptModuleScript* result) {
-        // 2. If result is null, asynchronously complete this algorithm with null, and return.
-        if (!result) {
-            callback({});
-            return;
-        }
-
-        // FIXME: 3. Let visited set be « (url, "javascript") ».
-
-        // 4. Fetch the descendants of and link result given settings object, "script", and visited set.
-        //    When this asynchronously completes with final result, asynchronously complete this algorithm with final result.
-        // FIXME: Pass visited set.
-        result->fetch_descendants_and_link(settings_object, "script"sv, move(callback));
-    });
-}
-
 // https://html.spec.whatwg.org/multipage/scripting.html#prepare-a-script
 void HTMLScriptElement::prepare_script()
 {
@@ -259,7 +164,7 @@ void HTMLScriptElement::prepare_script()
     }
 
     // Determine the script's type as follows:
-    if (is_javascript_mime_type_essence_match(script_block_type.trim_whitespace())) {
+    if (MimeSniff::is_javascript_mime_type_essence_match(script_block_type.trim_whitespace())) {
         // - If the script block's type string with leading and trailing ASCII whitespace stripped is a JavaScript MIME type essence match, the script's type is "classic".
         m_script_type = ScriptType::Classic;
     } else if (script_block_type.equals_ignoring_case("module"sv)) {
@@ -409,7 +314,7 @@ void HTMLScriptElement::prepare_script()
         } else if (m_script_type == ScriptType::Module) {
             // Fetch an external module script graph given url, settings object, and options.
             // FIXME: Pass options.
-            fetch_external_module_script_graph(url, document().relevant_settings_object(), [](ModuleScript const*) {
+            fetch_external_module_script_graph(url, document().relevant_settings_object(), [](auto const*) {
                 // FIXME: When the chosen algorithm asynchronously completes with result, mark as ready el given result.
                 TODO();
             });
@@ -438,7 +343,7 @@ void HTMLScriptElement::prepare_script()
             // 2. Fetch an inline module script graph, given source text, base URL, settings object, and options.
             //    When this asynchronously completes, set the script's script to the result. At that time, the script is ready.
             // FIXME: Pass options
-            fetch_inline_module_script_graph(m_document->url().to_string(), source_text, base_url, document().relevant_settings_object(), [this](JavaScriptModuleScript const* result) {
+            fetch_inline_module_script_graph(m_document->url().to_string(), source_text, base_url, document().relevant_settings_object(), [this](auto const* result) {
                 m_script = result;
                 script_became_ready();
             });

@@ -11,6 +11,9 @@
 
 namespace Web::MimeSniff {
 
+bool is_javascript_mime_type(String const&);
+bool is_javascript_mime_type_essence_match(String const&);
+
 // https://mimesniff.spec.whatwg.org/#mime-type
 class MimeType {
 public:

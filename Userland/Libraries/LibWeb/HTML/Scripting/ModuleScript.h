@@ -31,10 +31,7 @@ public:
 
     static JS::GCPtr<JavaScriptModuleScript> create(String const& filename, StringView source, EnvironmentSettingsObject&, AK::URL base_url);
 
-    void fetch_descendants(EnvironmentSettingsObject& fetch_client_settings_object, StringView destination, HashTable<ModuleLocationTuple> visited_set, Function<void(JavaScriptModuleScript const*)> callback);
-    void fetch_descendants_and_link(EnvironmentSettingsObject& fetch_client_settings_object, StringView destination, HashTable<ModuleLocationTuple> visited_set, Function<void(JavaScriptModuleScript const*)> callback);
-
-    JS::SourceTextModule const& record() const { return *m_record; };
+    JS::SourceTextModule const* record() const { return m_record.ptr(); };
 
 protected:
     JavaScriptModuleScript(AK::URL base_url, String filename, EnvironmentSettingsObject& environment_settings_object);

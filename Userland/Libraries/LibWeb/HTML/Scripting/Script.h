@@ -24,6 +24,7 @@ public:
     String const& filename() const { return m_filename; }
 
     EnvironmentSettingsObject& settings_object() { return m_settings_object; }
+    EnvironmentSettingsObject& settings_object() const { return m_settings_object; }
 
 protected:
     Script(AK::URL base_url, String filename, EnvironmentSettingsObject& environment_settings_object);
