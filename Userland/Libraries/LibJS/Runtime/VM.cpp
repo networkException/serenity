@@ -68,10 +68,12 @@ VM::VM(OwnPtr<CustomData> custom_data)
     };
 
     host_resolve_imported_module = [&](ScriptOrModule referencing_script_or_module, ModuleRequest const& specifier) {
+        dbgln("host resolve imported module default!");
         return resolve_imported_module(move(referencing_script_or_module), specifier);
     };
 
     host_import_module_dynamically = [&](ScriptOrModule, ModuleRequest const&, PromiseCapability promise_capability) {
+        dbgln("host resolve module dynamically default!");
         // By default, we throw on dynamic imports this is to prevent arbitrary file access by scripts.
         VERIFY(current_realm());
         auto& realm = *current_realm();
@@ -99,17 +101,21 @@ VM::VM(OwnPtr<CustomData> custom_data)
     };
 
     host_finish_dynamic_import = [&](ScriptOrModule referencing_script_or_module, ModuleRequest const& specifier, PromiseCapability promise_capability, Promise* promise) {
+        dbgln("host finish dynamic import default!");
         return finish_dynamic_import(move(referencing_script_or_module), specifier, promise_capability, promise);
     };
 
     host_get_import_meta_properties = [&](SourceTextModule const&) -> HashMap<PropertyKey, Value> {
+        dbgln("host get import meta properties default!");
         return {};
     };
 
     host_finalize_import_meta = [&](Object*, SourceTextModule const&) {
+        dbgln("host finalize import meta default!");
     };
 
     host_get_supported_import_assertions = [&] {
+        dbgln("host get supported import assertions default!");
         return Vector<String> { "type" };
     };
 

@@ -41,18 +41,22 @@ public:
     enum class EntryType {
         Fetching,
         Failed,
-        Module
+        ModuleScript
     };
 
     struct Entry {
         EntryType type;
-        ModuleScript* module_script;
+        JavaScriptModuleScript* module_script;
     };
 
     bool is_fetching(AK::URL const& url, String const& type) const;
     bool is_failed(AK::URL const& url, String const& type) const;
 
     bool is(AK::URL const& url, String const& type, EntryType) const;
+
+    Optional<Entry> get(AK::URL const& url, String const& type) const;
+
+    AK::HashSetResult set(AK::URL const& url, String const& type, Entry);
 
 private:
     HashMap<ModuleLocationTuple, Entry> m_values;

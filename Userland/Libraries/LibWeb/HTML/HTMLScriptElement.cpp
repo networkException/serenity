@@ -101,7 +101,7 @@ void HTMLScriptElement::execute_script()
         VERIFY(!document().current_script());
 
         // 2. Run the module script given by the script's script for scriptElement.
-        verify_cast<JavaScriptModuleScript>(*m_script).run();
+        (void)verify_cast<JavaScriptModuleScript>(*m_script).run();
     }
 
     // 6. Decrement the ignore-destructive-writes counter of document, if it was incremented in the earlier step.

@@ -30,8 +30,10 @@ JS::GCPtr<JavaScriptModuleScript> JavaScriptModuleScript::create(String const& f
     if (settings_object.is_scripting_disabled())
         source = ""sv;
 
+    auto& realm = settings_object.realm();
+
     // 2. Let script be a new module script that this algorithm will subsequently initialize.
-    auto* script = settings_object.realm().heap().allocate<JavaScriptModuleScript>(settings_object.realm(), move(base_url), filename, settings_object);
+    auto* script = realm.heap().allocate<JavaScriptModuleScript>(realm, move(base_url), filename, settings_object);
 
     // 3. Set script's settings object to settings. (NOTE: This was already done when constructing.)
 
@@ -49,7 +51,7 @@ JS::GCPtr<JavaScriptModuleScript> JavaScriptModuleScript::create(String const& f
     // 8. If result is a list of errors, then:
     if (result.is_error()) {
         auto& parse_error = result.error().first();
-        dbgln_if(HTML_SCRIPT_DEBUG, "JavaScriptModuleScript: Failed to parse: {}", parse_error.to_string());
+        dbgln("JavaScriptModuleScript: Failed to parse: {}", parse_error.to_string());
 
         // FIXME: 1. Set script's parse error to result[0].
 
@@ -57,8 +59,11 @@ JS::GCPtr<JavaScriptModuleScript> JavaScriptModuleScript::create(String const& f
         return script;
     }
 
+    dbgln("did parse {}", filename);
+
     // 10. For each ModuleRequest record requested of result.[[RequestedModules]]:
     for (auto const& requested : result.value()->requested_modules()) {
+        dbgln("got requested module: {}", requested.module_specifier);
         // 9. Assert: requested.[[Assertions]] does not contain any Record entry such that entry.[[Key]] is not "type",
         //            because we only asked for "type" assertions in HostGetSupportedImportAssertions.
         for (auto const& assertion : requested.assertions) {
@@ -78,58 +83,65 @@ JS::GCPtr<JavaScriptModuleScript> JavaScriptModuleScript::create(String const& f
 
             // FIXME: 2. Set script's parse error to error.
 
+            dbgln("oops url not valid or module type not allowed! {} [{}], {}", url, url.is_valid(), module_type);
             // 3. Return script.
             return script;
         }
     }
 
-    dbgln("setting m_record to result.value");
-
     // 11. Set script's record to result.
     script->m_record = result.value();
 
+    dbgln("{} should be fine!", filename);
     // 12. Return script.
     return script;
 }
 
 // https://html.spec.whatwg.org/multipage/webappapis.html#run-a-module-script
-JS::Value JavaScriptModuleScript::run(PreventErrorReporting)
+JS::Promise* JavaScriptModuleScript::run(PreventErrorReporting)
 {
     // 1. Let settings be the settings object of script.
     auto& settings = settings_object();
 
     // 2. Check if we can run script with settings. If this returns "do not run", then return a promise resolved with undefined.
     if (settings.can_run_script() == RunScriptDecision::DoNotRun) {
-        auto* promise = JS::Promise::create(settings.realm());
-        promise->fulfill(JS::js_undefined());
-        return promise;
+        return JS::Promise::create_fulfilled(settings.realm(), JS::js_undefined());
     }
 
     // 3. Prepare to run script given settings.
     settings.prepare_to_run_script();
 
     // 4. Let evaluationPromise be null.
-    auto evaluation_promise = JS::js_null();
+    JS::Promise* evaluation_promise = nullptr;
 
     // FIXME: 5. If script's error to rethrow is not null, then set evaluationPromise to a promise rejected with script's error to rethrow.
 
     // 6. Otherwise:
+    if (m_record) {
+        // 1. Let record be script's record.
+        auto record = m_record;
 
-    // 1. Let record be script's record.
-    auto record = m_record;
+        // 2. Set evaluationPromise to record.Evaluate().
+        auto elevation_promise_or_error = record->evaluate(vm());
 
-    // 2. Set evaluationPromise to record.Evaluate().
-    auto evaluated = record->evaluate(vm());
+        dbgln("evaluated module! {}", elevation_promise_or_error.is_error());
+        if (elevation_promise_or_error.is_error()) {
+            dbgln("error: {}", elevation_promise_or_error.release_error().value().value());
+        }
 
-    // If Evaluate fails to complete as a result of the user agent aborting the running script,
-    // then set evaluationPromise to a promise rejected with a new "QuotaExceededError" DOMException.
-    if (evaluated.is_error()) {
-        auto* promise = JS::Promise::create(settings_object().realm());
-        promise->reject(DOM::QuotaExceededError::create(current_global_object(), "Failed to evaluate module script").ptr());
+        // NOTE: This step will recursively evaluate all of the module's dependencies.
+        // If Evaluate fails to complete as a result of the user agent aborting the running script,
+        // then set evaluationPromise to a promise rejected with a new "QuotaExceededError" DOMException.
+        if (elevation_promise_or_error.is_error()) {
+            auto* promise = JS::Promise::create(settings_object().realm());
+            promise->reject(DOM::QuotaExceededError::create(current_global_object(), "Failed to evaluate module script").ptr());
 
-        evaluation_promise = promise;
+            evaluation_promise = promise;
+        } else {
+            evaluation_promise = elevation_promise_or_error.value();
+        }
     } else {
-        evaluation_promise = evaluated.value();
+        dbgln("parsing failed!???");
     }
 
     // FIXME: 7. If preventErrorReporting is false, then upon rejection of evaluationPromise with reason, report the exception given by reason for script.

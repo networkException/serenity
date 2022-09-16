@@ -296,10 +296,28 @@ JS::VM& main_thread_vm()
         // FIXME: Implement 8.1.5.5.1 HostGetImportMetaProperties(moduleRecord), https://html.spec.whatwg.org/multipage/webappapis.html#hostgetimportmetaproperties
         // FIXME: Implement 8.1.5.5.2 HostImportModuleDynamically(referencingScriptOrModule, moduleRequest, promiseCapability), https://html.spec.whatwg.org/multipage/webappapis.html#hostimportmoduledynamically(referencingscriptormodule,-modulerequest,-promisecapability)
         // FIXME: Implement 8.1.5.5.3 HostResolveImportedModule(referencingScriptOrModule, moduleRequest), https://html.spec.whatwg.org/multipage/webappapis.html#hostresolveimportedmodule(referencingscriptormodule,-modulerequest)
-        // FIXME: Implement 8.1.5.5.4 HostGetSupportedImportAssertions(), https://html.spec.whatwg.org/multipage/webappapis.html#hostgetsupportedimportassertions
+
+        vm->host_get_import_meta_properties = [](auto&) -> HashMap<JS::PropertyKey, JS::Value> {
+            VERIFY_NOT_REACHED();
+        };
+
+        vm->host_import_module_dynamically = [](auto, auto, auto) {
+            VERIFY_NOT_REACHED();
+        };
+
+        // 8.1.5.5.4 HostGetSupportedImportAssertions(), https://html.spec.whatwg.org/multipage/webappapis.html#hostgetsupportedimportassertions
+        vm->host_get_supported_import_assertions = []() -> Vector<String> {
+            // 1. Return « "type" ».
+            return { "type"sv };
+        };
 
         vm->host_resolve_imported_module = [](JS::ScriptOrModule, JS::ModuleRequest const&) -> JS::ThrowCompletionOr<JS::NonnullGCPtr<JS::Module>> {
+            VERIFY_NOT_REACHED();
             return vm->throw_completion<JS::InternalError>(JS::ErrorType::NotImplemented, "Modules in the browser");
+        };
+
+        vm->host_finish_dynamic_import = [](auto, auto&, auto, auto*) {
+            VERIFY_NOT_REACHED();
         };
 
         // NOTE: We push a dummy execution context onto the JS execution context stack,

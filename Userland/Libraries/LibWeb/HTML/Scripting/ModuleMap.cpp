@@ -27,4 +27,14 @@ bool ModuleMap::is(AK::URL const& url, AK::String const& type, EntryType entry_t
     return value->type == entry_type;
 }
 
+Optional<ModuleMap::Entry> ModuleMap::get(AK::URL const& url, AK::String const& type) const
+{
+    return m_values.get({ url, type });
+}
+
+AK::HashSetResult ModuleMap::set(AK::URL const& url, AK::String const& type, Entry entry)
+{
+    return m_values.set({ url, type}, entry);
+}
+
 }

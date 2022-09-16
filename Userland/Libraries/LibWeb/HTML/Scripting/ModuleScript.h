@@ -35,7 +35,7 @@ public:
         Yes, No
     };
 
-    JS::Value run(PreventErrorReporting = PreventErrorReporting::No);
+    JS::Promise* run(PreventErrorReporting = PreventErrorReporting::No);
 
     JS::SourceTextModule const* record() const { return m_record.ptr(); };
     JS::SourceTextModule* record() { return m_record.ptr(); };
