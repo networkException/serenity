@@ -51,6 +51,8 @@ void HTMLScriptElement::execute_script()
     // 1. Let document be scriptElement's node document.
     JS::NonnullGCPtr<DOM::Document> node_document = document();
 
+    // FIXME: Update the steps to match the newer spec.
+
     // 2. If scriptElement's preparation-time document is not equal to document, then return.
     if (m_preparation_time_document.ptr() != node_document.ptr()) {
         dbgln("HTMLScriptElement: Refusing to run script because the preparation time document is not the same as the node document.");
@@ -95,10 +97,11 @@ void HTMLScriptElement::execute_script()
     } else {
         // -> "module"
         // 1. Assert: document's currentScript attribute is null.
+        dbgln("B");
         VERIFY(!document().current_script());
 
-        // FIXME: 2. Run the module script given by the script's script for scriptElement.
-        TODO();
+        // 2. Run the module script given by the script's script for scriptElement.
+        verify_cast<JavaScriptModuleScript>(*m_script).run();
     }
 
     // 6. Decrement the ignore-destructive-writes counter of document, if it was incremented in the earlier step.
@@ -316,6 +319,7 @@ void HTMLScriptElement::prepare_script()
             // FIXME: Pass options.
             fetch_external_module_script_graph(url, document().relevant_settings_object(), [](auto const*) {
                 // FIXME: When the chosen algorithm asynchronously completes with result, mark as ready el given result.
+                dbgln("C");
                 TODO();
             });
         }

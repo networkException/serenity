@@ -275,7 +275,7 @@ bool EnvironmentSettingsObject::is_scripting_disabled() const
 bool EnvironmentSettingsObject::module_type_allowed(AK::String const& module_type) const
 {
     // 1. If moduleType is not "javascript", "css", or "json", then return false.
-    if (module_type != "javascript"sv || module_type != "css"sv || module_type != "json"sv)
+    if (module_type != "javascript"sv && module_type != "css"sv && module_type != "json"sv)
         return false;
 
     // FIXME: 2. If moduleType is "css" and the CSSStyleSheet interface is not exposed in settings's Realm, then return false.

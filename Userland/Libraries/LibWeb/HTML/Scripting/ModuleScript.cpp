@@ -31,7 +31,7 @@ JS::GCPtr<JavaScriptModuleScript> JavaScriptModuleScript::create(String const& f
         source = ""sv;
 
     // 2. Let script be a new module script that this algorithm will subsequently initialize.
-    auto script = JavaScriptModuleScript(move(base_url), filename, settings_object);
+    auto* script = settings_object.realm().heap().allocate<JavaScriptModuleScript>(settings_object.realm(), move(base_url), filename, settings_object);
 
     // 3. Set script's settings object to settings. (NOTE: This was already done when constructing.)
 
@@ -61,11 +61,13 @@ JS::GCPtr<JavaScriptModuleScript> JavaScriptModuleScript::create(String const& f
     for (auto const& requested : result.value()->requested_modules()) {
         // 9. Assert: requested.[[Assertions]] does not contain any Record entry such that entry.[[Key]] is not "type",
         //            because we only asked for "type" assertions in HostGetSupportedImportAssertions.
-        for (auto const& assertion : requested.assertions)
+        for (auto const& assertion : requested.assertions) {
+            dbgln("A");
             VERIFY(assertion.key == "type"sv);
+        }
 
         // 1. Let url be the result of resolving a module specifier given script's base URL and requested.[[Specifier]].
-        auto url = requested.resolve_specifier(script.base_url());
+        auto url = requested.resolve_specifier(script->base_url());
 
         // 2. Let moduleType be the result of running the module type from module request steps given requested.
         auto module_type = requested.module_type();
@@ -81,17 +83,68 @@ JS::GCPtr<JavaScriptModuleScript> JavaScriptModuleScript::create(String const& f
         }
     }
 
+    dbgln("setting m_record to result.value");
+
     // 11. Set script's record to result.
-    script.m_record = result.value();
+    script->m_record = result.value();
 
     // 12. Return script.
     return script;
 }
 
+// https://html.spec.whatwg.org/multipage/webappapis.html#run-a-module-script
+JS::Value JavaScriptModuleScript::run(PreventErrorReporting)
+{
+    // 1. Let settings be the settings object of script.
+    auto& settings = settings_object();
+
+    // 2. Check if we can run script with settings. If this returns "do not run", then return a promise resolved with undefined.
+    if (settings.can_run_script() == RunScriptDecision::DoNotRun) {
+        auto* promise = JS::Promise::create(settings.realm());
+        promise->fulfill(JS::js_undefined());
+        return promise;
+    }
+
+    // 3. Prepare to run script given settings.
+    settings.prepare_to_run_script();
+
+    // 4. Let evaluationPromise be null.
+    auto evaluation_promise = JS::js_null();
+
+    // FIXME: 5. If script's error to rethrow is not null, then set evaluationPromise to a promise rejected with script's error to rethrow.
+
+    // 6. Otherwise:
+
+    // 1. Let record be script's record.
+    auto record = m_record;
+
+    // 2. Set evaluationPromise to record.Evaluate().
+    auto evaluated = record->evaluate(vm());
+
+    // If Evaluate fails to complete as a result of the user agent aborting the running script,
+    // then set evaluationPromise to a promise rejected with a new "QuotaExceededError" DOMException.
+    if (evaluated.is_error()) {
+        auto* promise = JS::Promise::create(settings_object().realm());
+        promise->reject(DOM::QuotaExceededError::create(current_global_object(), "Failed to evaluate module script").ptr());
+
+        evaluation_promise = promise;
+    } else {
+        evaluation_promise = evaluated.value();
+    }
+
+    // FIXME: 7. If preventErrorReporting is false, then upon rejection of evaluationPromise with reason, report the exception given by reason for script.
+
+    // 8. Clean up after running script with settings.
+    settings.clean_up_after_running_script();
+
+    // 9. Return evaluationPromise.
+    return evaluation_promise;
+}
+
 void JavaScriptModuleScript::visit_edges(Cell::Visitor& visitor)
 {
     Base::visit_edges(visitor);
-    visitor.visit(*m_record);
+    visitor.visit(m_record);
 }
 
 }

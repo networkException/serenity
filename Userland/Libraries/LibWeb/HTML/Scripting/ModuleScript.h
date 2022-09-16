@@ -31,7 +31,14 @@ public:
 
     static JS::GCPtr<JavaScriptModuleScript> create(String const& filename, StringView source, EnvironmentSettingsObject&, AK::URL base_url);
 
+    enum class PreventErrorReporting {
+        Yes, No
+    };
+
+    JS::Value run(PreventErrorReporting = PreventErrorReporting::No);
+
     JS::SourceTextModule const* record() const { return m_record.ptr(); };
+    JS::SourceTextModule* record() { return m_record.ptr(); };
 
 protected:
     JavaScriptModuleScript(AK::URL base_url, String filename, EnvironmentSettingsObject& environment_settings_object);

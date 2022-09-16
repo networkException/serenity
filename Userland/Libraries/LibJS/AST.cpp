@@ -4786,7 +4786,7 @@ AK::URL ModuleRequest::resolve_specifier(AK::URL const& base_url) const
 
     // 2. If specifier does not start with the character U+002F SOLIDUS (/), the two-character sequence U+002E FULL STOP,
     //    U+002F SOLIDUS (./), or the three-character sequence U+002E FULL STOP, U+002E FULL STOP, U+002F SOLIDUS (../), return failure.
-    if (!module_specifier.starts_with("/"sv) || module_specifier.starts_with("./"sv) || module_specifier.starts_with("../"sv))
+    if (!module_specifier.starts_with("/"sv) && !module_specifier.starts_with("./"sv) && !module_specifier.starts_with("../"sv))
         return {};
 
     // 3. Return the result of applying the URL parser to specifier with base URL.

@@ -14,25 +14,28 @@
 namespace Web::HTML {
 
 // https://html.spec.whatwg.org/multipage/webappapis.html#internal-module-script-graph-fetching-procedure
-void fetch_internal_module_script_graph(JS::ModuleRequest const& module_request, EnvironmentSettingsObject& fetch_client_settings_object, StringView destination, EnvironmentSettingsObject& module_script_settings_object, HashTable<ModuleLocationTuple> const& visited_set, AK::URL const& referrer, Function<void(JavaScriptModuleScript const*)> callback)
+void fetch_internal_module_script_graph(JS::ModuleRequest const& module_request, EnvironmentSettingsObject& fetch_client_settings_object, StringView destination, EnvironmentSettingsObject& module_script_settings_object, HashTable<ModuleLocationTuple> const& visited_set, AK::URL const& referrer, Function<void(JavaScriptModuleScript*)> callback)
 {
     // 1. Let url be the result of resolving a module specifier given referrer and moduleRequest.[[Specifier]].
     auto url = module_request.resolve_specifier(referrer);
 
     // 2. Assert: url is never failure, because resolving a module specifier must have been previously successful with these same two arguments.
+    dbgln("2");
     VERIFY(url.is_valid());
 
     // 3. Let moduleType be the result of running the module type from module request steps given moduleRequest.
     auto module_type = module_request.module_type();
 
     // 4. Assert: visited set contains (url, moduleType).
+    dbgln("3");
     VERIFY(visited_set.contains({ url, module_type }));
 
     // 5. Fetch a single module script given url, fetch client settings object, destination, options, module map settings object,
     //    referrer, moduleRequest, and with the top-level module fetch flag unset.
     //    If the caller of this algorithm specified custom perform the fetch steps, pass those along while fetching a single module script.
     // FIXME: Pass options.
-    fetch_single_module_script(url, fetch_client_settings_object, destination, module_script_settings_object, referrer, module_request, [&callback, &fetch_client_settings_object, &destination, &visited_set](auto const* result) {
+    fetch_single_module_script(url, fetch_client_settings_object, destination, module_script_settings_object, referrer, module_request, [&callback, &fetch_client_settings_object, &destination, &visited_set](auto* result) {
+        dbgln("here2");
         // 6. Return from this algorithm, and run the following steps when fetching a single module script asynchronously completes with result:
 
         // 7. If result is null, asynchronously complete this algorithm with null, and return.
@@ -48,7 +51,7 @@ void fetch_internal_module_script_graph(JS::ModuleRequest const& module_request,
 }
 
 // https://html.spec.whatwg.org/multipage/webappapis.html#fetch-the-descendants-of-a-module-script
-void fetch_descendants_of_a_module_script(JavaScriptModuleScript const& module_script, EnvironmentSettingsObject& fetch_client_settings_object, StringView destination, HashTable<ModuleLocationTuple> visited_set, Function<void(JavaScriptModuleScript const*)> callback)
+void fetch_descendants_of_a_module_script(JavaScriptModuleScript& module_script, EnvironmentSettingsObject& fetch_client_settings_object, StringView destination, HashTable<ModuleLocationTuple> visited_set, Function<void(JavaScriptModuleScript*)> callback)
 {
     // 1. If module script's record is null, then asynchronously complete this algorithm with module script and return.
     if (!module_script.record()) {
@@ -75,6 +78,7 @@ void fetch_descendants_of_a_module_script(JavaScriptModuleScript const& module_s
         auto url = requested.resolve_specifier(module_script.base_url());
 
         // 2. Assert: url is never failure, because resolving a module specifier must have been previously successful with these same two arguments.
+        dbgln("4");
         VERIFY(url.is_valid());
 
         // 3. Let moduleType be the result of running the module type from module request steps given requested.
@@ -108,24 +112,26 @@ void fetch_descendants_of_a_module_script(JavaScriptModuleScript const& module_s
         //        Asynchronously complete this algorithm with module script.
         // FIXME: Pass options.
         fetch_internal_module_script_graph(request, fetch_client_settings_object, destination, module_script.settings_object(), visited_set, module_script.base_url(), [](auto const*) {
+            dbgln("hitting TODO in fetch_descendants_of_a_module_script");
             TODO();
         });
     }
 }
 
 // https://html.spec.whatwg.org/multipage/webappapis.html#fetch-a-single-module-script
-void fetch_single_module_script(AK::URL const& url, EnvironmentSettingsObject&, StringView, EnvironmentSettingsObject& module_map_settings_object, AK::URL const&, Optional<JS::ModuleRequest> const& module_request, Function<void(JavaScriptModuleScript const*)> callback)
+void fetch_single_module_script(AK::URL const& url, EnvironmentSettingsObject&, StringView, EnvironmentSettingsObject& module_map_settings_object, AK::URL const&, Optional<JS::ModuleRequest> const& module_request, Function<void(JavaScriptModuleScript*)>& callback)
 {
     // 1. Let moduleType be "javascript".
-    auto module_type = "javascript"sv;
+    String module_type = "javascript"sv;
 
     // 2. If moduleRequest was given, then set moduleType to the result of running the module type from module request steps given moduleRequest.
     if (module_request.has_value())
-        module_type = module_request->module_type().view();
+        module_type = module_request->module_type();
 
     // 3. Assert: the result of running the module type allowed steps given moduleType and module map settings object is true.
     //    Otherwise we would not have reached this point because a failure would have been raised when inspecting moduleRequest.[[Assertions]]
     //    in create a JavaScript module script or fetch an import() module script graph.
+    dbgln("1");
     VERIFY(module_map_settings_object.module_type_allowed(module_type));
 
     // FIXME: Implement steps 4 to 20.
@@ -145,7 +151,9 @@ void fetch_single_module_script(AK::URL const& url, EnvironmentSettingsObject&, 
                 return;
 
             if (MimeSniff::is_javascript_mime_type(*content_type_header) && module_type == "javascript"sv) {
-                callback(JavaScriptModuleScript::create(url.basename(), data, module_map_settings_object, url).ptr());
+                auto module = JavaScriptModuleScript::create(url.basename(), data, module_map_settings_object, url);
+                dbgln("before invoking callback");
+                callback(module);
                 return;
             }
         },
@@ -155,12 +163,14 @@ void fetch_single_module_script(AK::URL const& url, EnvironmentSettingsObject&, 
 }
 
 // https://html.spec.whatwg.org/multipage/webappapis.html#fetch-a-module-script-tree
-void fetch_external_module_script_graph(AK::URL const& url, EnvironmentSettingsObject& settings_object, Function<void(JavaScriptModuleScript const*)> callback)
+void fetch_external_module_script_graph(AK::URL const& url, EnvironmentSettingsObject& settings_object, Function<void(JavaScriptModuleScript*)> callback)
 {
     // 1. Fetch a single module script given url, settings object, "script", options, settings object, "client",
     //    and with the top-level module fetch flag set. If the caller of this algorithm specified custom perform the fetch steps,
     //    pass those along as well. Wait until the algorithm asynchronously completes with result.
-    fetch_single_module_script(url, settings_object, "script"sv, settings_object, "client"sv, {}, [&settings_object, &callback, &url](JavaScriptModuleScript const* result) {
+    fetch_single_module_script(url, settings_object, "script"sv, settings_object, "client"sv, {}, [&settings_object, &callback, &url](auto* result) {
+        dbgln("here1");
+
         // 2. If result is null, asynchronously complete this algorithm with null, and return.
         if (!result) {
             callback(nullptr);
@@ -198,10 +208,10 @@ void fetch_inline_module_script_graph(String const& filename, String const& sour
 }
 
 // https://html.spec.whatwg.org/multipage/webappapis.html#fetch-the-descendants-of-and-link-a-module-script
-void fetch_descendants_of_and_link_a_module_script(JavaScriptModuleScript const& module_script, EnvironmentSettingsObject& fetch_client_settings_object, StringView destination, HashTable<ModuleLocationTuple> const& visited_set, Function<void(JavaScriptModuleScript const*)> callback)
+void fetch_descendants_of_and_link_a_module_script(JavaScriptModuleScript& module_script, EnvironmentSettingsObject& fetch_client_settings_object, StringView destination, HashTable<ModuleLocationTuple> const& visited_set, Function<void(JavaScriptModuleScript*)> callback)
 {
     // 1. Fetch the descendants of module script, given fetch client settings object, destination, and visited set.
-    fetch_descendants_of_a_module_script(module_script, fetch_client_settings_object, destination, visited_set, [&callback](auto const* result) {
+    fetch_descendants_of_a_module_script(module_script, fetch_client_settings_object, destination, visited_set, [&callback, &fetch_client_settings_object](JavaScriptModuleScript* result) {
         // 2. Return from this algorithm, and run the following steps when fetching the descendants of a module script asynchronously completes with result.
 
         // 3. If result is null, then asynchronously complete this algorithm with result.
@@ -210,7 +220,23 @@ void fetch_descendants_of_and_link_a_module_script(JavaScriptModuleScript const&
             return;
         }
 
-        // FIXME: Implement steps 4 - 6.
+        // FIXME: 4. Let parse error be the result of finding the first parse error given result.
+
+        // 5. If parse error is null, then:
+        // 1. Let record be result's record.
+        auto* record = result->record();
+
+        if (!record) {
+            dbgln("record was null");
+            VERIFY_NOT_REACHED();
+        }
+
+        // 2. Perform record.Link().
+        record->link(fetch_client_settings_object.realm().vm());
+
+        // FIXME: If this throws an exception, set result's error to rethrow to that exception.
+
+        // FIXME: 6. Otherwise, set result's error to rethrow to parse error.
 
         // 7. Asynchronously complete this algorithm with result.
         callback(result);
