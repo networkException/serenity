@@ -11,6 +11,8 @@
 
 namespace Web::MimeSniff {
 
+bool is_javascript_mime_type_essence_match(String const&);
+
 // https://mimesniff.spec.whatwg.org/#mime-type
 class MimeType {
 public:
@@ -22,6 +24,8 @@ public:
     String const& type() const { return m_type; }
     String const& subtype() const { return m_subtype; }
     OrderedHashMap<String, String> const& parameters() const { return m_parameters; }
+
+    bool is_javascript() const;
 
     void set_parameter(String const& name, String const& value);
 
