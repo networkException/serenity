@@ -28,6 +28,8 @@ public:
     };
 
     static Promise* create(Realm&);
+    static Promise* create_fulfilled(Realm&, Value);
+    static Promise* create_rejected(Realm&, Value reason);
 
     virtual ~Promise() = default;
 

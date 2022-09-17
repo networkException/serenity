@@ -11,6 +11,7 @@
 #include <LibWeb/HTML/PromiseRejectionEvent.h>
 #include <LibWeb/HTML/Scripting/Environments.h>
 #include <LibWeb/HTML/Scripting/ExceptionReporter.h>
+#include <LibWeb/HTML/Scripting/WindowEnvironmentSettingsObject.h>
 #include <LibWeb/HTML/Window.h>
 #include <LibWeb/Page/Page.h>
 
@@ -32,6 +33,11 @@ JS::ExecutionContext& EnvironmentSettingsObject::realm_execution_context()
 {
     // NOTE: All environment settings objects are created with a realm execution context, so it's stored and returned here in the base class.
     return *m_realm_execution_context;
+}
+
+ModuleMap& EnvironmentSettingsObject::module_map()
+{
+    return m_module_map;
 }
 
 // https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object%27s-realm
@@ -322,6 +328,8 @@ EnvironmentSettingsObject& current_settings_object()
 {
     auto& event_loop = HTML::main_thread_event_loop();
     auto& vm = event_loop.vm();
+
+    dbgln("vm.current_realm()->host_defined() has value: {}", (bool) vm.current_realm()->host_defined());
 
     // Then, the current settings object is the environment settings object of the current Realm Record.
     return verify_cast<EnvironmentSettingsObject>(*vm.current_realm()->host_defined());

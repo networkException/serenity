@@ -64,6 +64,8 @@ void WindowEnvironmentSettingsObject::setup(AK::URL const& creation_url, Nonnull
     settings_object->top_level_creation_url = top_level_creation_url;
     settings_object->top_level_origin = top_level_origin;
 
+    dbgln("7. Set realm's [[HostDefined]] field to settings object.");
+
     // 7. Set realm's [[HostDefined]] field to settings object.
     realm->set_host_defined(move(settings_object));
 }
