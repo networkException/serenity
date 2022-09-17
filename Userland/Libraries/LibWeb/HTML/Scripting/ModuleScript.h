@@ -32,7 +32,8 @@ public:
     static JS::GCPtr<JavaScriptModuleScript> create(String const& filename, StringView source, EnvironmentSettingsObject&, AK::URL base_url);
 
     enum class PreventErrorReporting {
-        Yes, No
+        Yes,
+        No
     };
 
     JS::Promise* run(PreventErrorReporting = PreventErrorReporting::No);
@@ -47,6 +48,11 @@ private:
     virtual void visit_edges(JS::Cell::Visitor&) override;
 
     JS::GCPtr<JS::SourceTextModule> m_record;
+
+    size_t m_fetch_internal_request_count { 0 };
+    size_t m_completed_fetch_internal_request_count { 0 };
+
+    Function<void(JavaScriptModuleScript const*)> m_completed_fetch_internal_callback;
 };
 
 }

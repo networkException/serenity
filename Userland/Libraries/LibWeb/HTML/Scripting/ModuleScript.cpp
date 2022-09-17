@@ -59,17 +59,12 @@ JS::GCPtr<JavaScriptModuleScript> JavaScriptModuleScript::create(String const& f
         return script;
     }
 
-    dbgln("did parse {}", filename);
-
     // 10. For each ModuleRequest record requested of result.[[RequestedModules]]:
     for (auto const& requested : result.value()->requested_modules()) {
-        dbgln("got requested module: {}", requested.module_specifier);
         // 9. Assert: requested.[[Assertions]] does not contain any Record entry such that entry.[[Key]] is not "type",
         //            because we only asked for "type" assertions in HostGetSupportedImportAssertions.
-        for (auto const& assertion : requested.assertions) {
-            dbgln("A");
+        for (auto const& assertion : requested.assertions)
             VERIFY(assertion.key == "type"sv);
-        }
 
         // 1. Let url be the result of resolving a module specifier given script's base URL and requested.[[Specifier]].
         auto url = requested.resolve_specifier(script->base_url());
@@ -92,7 +87,6 @@ JS::GCPtr<JavaScriptModuleScript> JavaScriptModuleScript::create(String const& f
     // 11. Set script's record to result.
     script->m_record = result.value();
 
-    dbgln("{} should be fine!", filename);
     // 12. Return script.
     return script;
 }

@@ -34,6 +34,8 @@ private:
 
 // https://html.spec.whatwg.org/multipage/webappapis.html#module-map
 class ModuleMap {
+    AK_MAKE_NONCOPYABLE(ModuleMap);
+
 public:
     ModuleMap() = default;
     ~ModuleMap() = default;
@@ -58,8 +60,13 @@ public:
 
     AK::HashSetResult set(AK::URL const& url, String const& type, Entry);
 
+    void wait_for_change(AK::URL const& url, String const& type, Function<void(Entry)> callback);
+
+    void print_debug() const;
+
 private:
     HashMap<ModuleLocationTuple, Entry> m_values;
+    HashMap<ModuleLocationTuple, Vector<Function<void(Entry)>>> m_callbacks;
 };
 
 }

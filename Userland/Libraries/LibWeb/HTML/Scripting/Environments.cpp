@@ -11,7 +11,6 @@
 #include <LibWeb/HTML/Scripting/Environments.h>
 #include <LibWeb/HTML/Scripting/ExceptionReporter.h>
 #include <LibWeb/HTML/Window.h>
-#include <LibWeb/Page/Page.h>
 
 namespace Web::HTML {
 

@@ -6,23 +6,21 @@
 
 #include <AK/CharacterTypes.h>
 #include <AK/GenericLexer.h>
+#include <AK/Array.h>
 #include <AK/StringBuilder.h>
 #include <LibWeb/Fetch/Infrastructure/HTTP.h>
 #include <LibWeb/MimeSniff/MimeType.h>
 
 namespace Web::MimeSniff {
 
-// https://mimesniff.spec.whatwg.org/#javascript-mime-type
-bool is_javascript_mime_type(String const& string)
-{
-    return string.is_one_of("application/ecmascript", "application/javascript", "application/x-ecmascript", "application/x-javascript", "text/ecmascript", "text/javascript", "text/javascript1.0", "text/javascript1.1", "text/javascript1.2", "text/javascript1.3", "text/javascript1.4", "text/javascript1.5", "text/jscript", "text/livescript", "text/x-ecmascript", "text/x-javascript");
-}
-
 // https://mimesniff.spec.whatwg.org/#javascript-mime-type-essence-match
 bool is_javascript_mime_type_essence_match(String const& string)
 {
-    auto lowercase_string = string.to_lowercase();
-    return is_javascript_mime_type(lowercase_string);
+    // NOTE: The mime type parser automatically lowercases the essence.
+    auto type = MimeType::from_string(string);
+    if (!type.has_value())
+        return false;
+    return type->is_javascript();
 }
 
 static bool contains_only_http_quoted_string_token_code_points(StringView string)
@@ -192,6 +190,29 @@ void MimeType::set_parameter(String const& name, String const& value)
     VERIFY(contains_only_http_quoted_string_token_code_points(name));
     VERIFY(contains_only_http_quoted_string_token_code_points(value));
     m_parameters.set(name, value);
+}
+
+// https://mimesniff.spec.whatwg.org/#javascript-mime-type
+bool MimeType::is_javascript() const
+{
+    return essence().is_one_of(
+        "application/ecmascript"sv,
+        "application/javascript"sv,
+        "application/x-ecmascript"sv,
+        "application/x-javascript"sv,
+        "text/ecmascript"sv,
+        "text/javascript"sv,
+        "text/javascript1.0"sv,
+        "text/javascript1.1"sv,
+        "text/javascript1.2"sv,
+        "text/javascript1.3"sv,
+        "text/javascript1.4"sv,
+        "text/javascript1.5"sv,
+        "text/jscript"sv,
+        "text/livescript"sv,
+        "text/x-ecmascript"sv,
+        "text/x-javascript"sv
+    );
 }
 
 }
