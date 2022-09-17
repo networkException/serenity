@@ -296,6 +296,9 @@ struct ModuleRequest {
         assertions.empend(move(key), move(value));
     }
 
+    String module_type() const;
+    AK::URL resolve_specifier(AK::URL const& base_url) const;
+
     FlyString module_specifier;   // [[Specifier]]
     Vector<Assertion> assertions; // [[Assertions]]
 };
