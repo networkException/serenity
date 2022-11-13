@@ -21,6 +21,12 @@
                 name: "profile_picture"
                 bitmap: "/res/icons/32x32/app-catdog.png"
                 // bitmap: "/res/icons/32x32/app-gameoflife.png"
+
+                should_stretch: true
+                auto_resize: false
+
+                fixed_width: 32
+                fixed_height: 32
             }
 
             @GUI::Widget {
