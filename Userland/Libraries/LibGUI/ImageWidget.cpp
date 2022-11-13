@@ -27,6 +27,11 @@ ImageWidget::ImageWidget(StringView)
     REGISTER_BOOL_PROPERTY("auto_resize", auto_resize, set_auto_resize);
     REGISTER_BOOL_PROPERTY("should_stretch", should_stretch, set_should_stretch);
     REGISTER_STRING_PROPERTY("bitmap", bitmap, load_from_file);
+    REGISTER_ENUM_PROPERTY("scaling_mode", scaling_mode, set_scaling_mode, Gfx::Painter::ScalingMode,
+        { Gfx::Painter::ScalingMode::NearestNeighbor, "NearestNeighbor" },
+        { Gfx::Painter::ScalingMode::BilinearBlend, "BilinearBlend" },
+        { Gfx::Painter::ScalingMode::None, "None" },
+        { Gfx::Painter::ScalingMode::SmoothPixels, "SmoothPixels" });
 }
 
 void ImageWidget::set_bitmap(Gfx::Bitmap const* bitmap)
@@ -47,6 +52,15 @@ void ImageWidget::set_auto_resize(bool value)
 
     if (m_bitmap)
         set_fixed_size(m_bitmap->size());
+}
+
+void ImageWidget::set_scaling_mode(Gfx::Painter::ScalingMode scaling_mode)
+{
+    if (m_scaling_mode == scaling_mode)
+        return;
+
+    m_scaling_mode = scaling_mode;
+    update();
 }
 
 // Same as ImageViewer::ViewWidget::animate(), you probably want to keep any changes in sync
@@ -111,7 +125,7 @@ void ImageWidget::paint_event(PaintEvent& event)
     painter.add_clip_rect(event.rect());
 
     if (m_should_stretch) {
-        painter.draw_scaled_bitmap(frame_inner_rect(), *m_bitmap, m_bitmap->rect(), (float)opacity_percent() / 100.0f);
+        painter.draw_scaled_bitmap(frame_inner_rect(), *m_bitmap, m_bitmap->rect(), (float)opacity_percent() / 100.0f, m_scaling_mode);
     } else {
         auto location = frame_inner_rect().center().translated(-(m_bitmap->width() / 2), -(m_bitmap->height() / 2));
         painter.blit(location, *m_bitmap, m_bitmap->rect(), (float)opacity_percent() / 100.0f);

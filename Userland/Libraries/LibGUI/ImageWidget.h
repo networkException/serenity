@@ -10,6 +10,7 @@
 #include <LibCore/Timer.h>
 #include <LibGUI/Frame.h>
 #include <LibGfx/ImageDecoder.h>
+#include <LibGfx/Painter.h>
 
 namespace GUI {
 
@@ -27,6 +28,9 @@ public:
 
     void set_auto_resize(bool value);
     bool auto_resize() const { return m_auto_resize; }
+
+    void set_scaling_mode(Gfx::Painter::ScalingMode);
+    Gfx::Painter::ScalingMode scaling_mode() const { return m_scaling_mode; }
 
     void animate();
     void load_from_file(StringView);
@@ -46,6 +50,8 @@ private:
     RefPtr<Gfx::Bitmap> m_bitmap;
     bool m_should_stretch { false };
     bool m_auto_resize { false };
+
+    Gfx::Painter::ScalingMode m_scaling_mode { Gfx::Painter::ScalingMode::NearestNeighbor };
 
     RefPtr<Gfx::ImageDecoder> m_image_decoder;
     size_t m_current_frame_index { 0 };
