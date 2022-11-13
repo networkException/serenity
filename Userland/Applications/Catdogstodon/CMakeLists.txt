@@ -14,4 +14,4 @@ set(SOURCES
 )
 
 serenity_bin(Catdogstodon)
-target_link_libraries(Catdogstodon PRIVATE LibCore LibGfx LibGUI LibMain LibProtocol)
+target_link_libraries(Catdogstodon PRIVATE LibCore LibGfx LibGUI LibMain LibProtocol LibImageDecoderClient)

@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "Post.h"
 #include <LibGUI/Frame.h>
 
 namespace Catdogstodon {
@@ -22,7 +21,7 @@ public:
     void set_profile_picture(Gfx::Bitmap const&);
 
     void set_content(String const&);
-    void set_metadata(Core::DateTime, Post::Visibility);
+    void set_metadata(Core::DateTime);
 
 private:
     PostWidget();

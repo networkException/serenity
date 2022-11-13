@@ -45,9 +45,9 @@ void PostWidget::set_content(String const& content)
     m_content->set_text(content);
 }
 
-void PostWidget::set_metadata(Core::DateTime time, Post::Visibility visibility)
+void PostWidget::set_metadata(Core::DateTime time)
 {
-    m_content->set_text(String::formatted("{} ({})", time.to_string(), visibility == Post::Visibility::Public ? "Public" : "Private"));
+    m_content->set_text(String::formatted("{}", time.to_string()));
 }
 
 }
