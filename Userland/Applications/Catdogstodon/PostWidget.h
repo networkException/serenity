@@ -30,7 +30,7 @@ private:
     RefPtr<GUI::Label> m_account_name;
     RefPtr<GUI::ImageWidget> m_profile_picture;
 
-    RefPtr<GUI::Label> m_content;
+    RefPtr<GUI::Widget> m_content;
     RefPtr<GUI::Label> m_metadata;
 };
 

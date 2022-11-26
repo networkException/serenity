@@ -9,9 +9,10 @@ compile_gml(Post.gml PostGML.h post_gml)
 set(SOURCES
     main.cpp
     MainWidget.cpp
+    PostContentConversion.cpp
     PostWidget.cpp
     PostGML.h
 )
 
 serenity_bin(Catdogstodon)
-target_link_libraries(Catdogstodon PRIVATE LibCore LibGfx LibGUI LibMain LibProtocol LibImageDecoderClient)
+target_link_libraries(Catdogstodon PRIVATE LibCore LibGfx LibGUI LibMain LibProtocol LibImageDecoderClient LibXML)

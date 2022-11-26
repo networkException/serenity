@@ -5,6 +5,8 @@
  */
 
 #include "PostWidget.h"
+#include "PostContentConversion.h"
+#include <AK/NonnullRefPtr.h>
 #include <Applications/Catdogstodon/PostGML.h>
 #include <LibCore/DateTime.h>
 #include <LibGUI/ImageWidget.h>
@@ -21,7 +23,7 @@ PostWidget::PostWidget()
     m_account_name = find_descendant_of_type_named<GUI::Label>("account_name");
     m_profile_picture = find_descendant_of_type_named<GUI::ImageWidget>("profile_picture");
 
-    m_content = find_descendant_of_type_named<GUI::Label>("content");
+    m_content = find_descendant_of_type_named<GUI::Widget>("content");
     m_metadata = find_descendant_of_type_named<GUI::Label>("metadata");
 }
 
@@ -42,12 +44,21 @@ void PostWidget::set_profile_picture(Gfx::Bitmap const& profile_picture)
 
 void PostWidget::set_content(String const& content)
 {
-    m_content->set_text(content);
+    m_content->remove_all_children();
+    auto result = try_dehtmlify_post_content(content);
+    if (result.is_error()) {
+        dbgln("Couldn't run de-HTMLify on post contents:\n{}", content);
+        auto text_child = GUI::Label::construct(content);
+        m_content->add_child(text_child);
+    } else {
+        for (auto child : result.release_value())
+            m_content->add_child(child);
+    }
 }
 
 void PostWidget::set_metadata(Core::DateTime time)
 {
-    m_content->set_text(String::formatted("{}", time.to_string()));
+    m_metadata->set_text(String::formatted("{}", time.to_string()));
 }
 
 }

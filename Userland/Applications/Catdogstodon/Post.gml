@@ -2,8 +2,7 @@
     layout: @GUI::VerticalBoxLayout {
         margins: [3]
     }
-
-    fixed_height: 152
+    max_height: "shrink"
 
     // Post bodys
     @GUI::Widget {
@@ -21,10 +20,8 @@
                 name: "profile_picture"
                 bitmap: "/res/icons/32x32/app-catdog.png"
                 // bitmap: "/res/icons/32x32/app-gameoflife.png"
-
                 should_stretch: true
                 auto_resize: false
-
                 fixed_width: 32
                 fixed_height: 32
             }
@@ -52,11 +49,11 @@
         @GUI::Widget {
             layout: @GUI::VerticalBoxLayout {}
 
-            @GUI::Label {
+            @GUI::Widget {
                 name: "content"
-                text: "Well hello friends! :^)"
-                text_alignment: "TopLeft"
-                text_wrapping: "Wrap"
+                layout: @GUI::VerticalBoxLayout {}
+                // FIXME: Change this to a "resize vertically if necessary" computed height once that is supported
+                min_height: 60
             }
 
             @GUI::Label {
