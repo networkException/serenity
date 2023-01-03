@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2022, Luke Wilde <lukew@serenityos.org>
  * Copyright (c) 2022-2023, Linus Groh <linusg@serenityos.org>
- * Copyright (c) 2022, networkException <networkexception@serenityos.org>
+ * Copyright (c) 2022-2023, networkException <networkexception@serenityos.org>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
@@ -258,6 +258,12 @@ bool MimeType::is_javascript() const
         "text/livescript"sv,
         "text/x-ecmascript"sv,
         "text/x-javascript"sv);
+}
+
+// https://mimesniff.spec.whatwg.org/#json-mime-type
+bool MimeType::is_json() const
+{
+    return subtype().ends_with_bytes("+json"sv) || essence() == "application/json"sv || essence() == "text/json"sv;
 }
 
 }

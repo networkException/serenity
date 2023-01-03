@@ -27,6 +27,7 @@ public:
     OrderedHashMap<String, String> const& parameters() const { return m_parameters; }
 
     bool is_javascript() const;
+    bool is_json() const;
 
     ErrorOr<void> set_parameter(String name, String value);
 
