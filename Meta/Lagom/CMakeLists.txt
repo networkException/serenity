@@ -553,6 +553,9 @@ if (BUILD_LAGOM)
             target_compile_definitions(test262-runner PRIVATE ASSERT_FAIL_HAS_INT)
         endif()
 
+        add_executable(url ../../Userland/Utilities/url.cpp)
+        target_link_libraries(url LibCore LibMain)
+
         add_executable(wasm ../../Userland/Utilities/wasm.cpp)
         target_link_libraries(wasm LibCore LibWasm LibLine LibMain LibJS)
 
