@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2022-2023, Linus Groh <linusg@serenityos.org>
+ * Copyright (c) 2023, networkException <networkexception@serenityos.org>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
@@ -32,7 +33,7 @@ class Request final : public JS::Cell {
 
 public:
     // Members are implementation-defined
-    struct Priority { };
+    struct InternalPriority { };
 
     using BodyType = Variant<Empty, ByteBuffer, Body>;
     using OriginType = Variant<Requesting::Origin, HTML::Origin>;
@@ -88,8 +89,11 @@ public:
     [[nodiscard]] Optional<Requesting::Destination> const& destination() const { return m_destination; }
     void set_destination(Optional<Requesting::Destination> destination) { m_destination = move(destination); }
 
-    [[nodiscard]] Optional<Priority> const& priority() const { return m_priority; }
-    void set_priority(Optional<Priority> priority) { m_priority = move(priority); }
+    [[nodiscard]] Optional<Requesting::Priority> const& priority() const { return m_priority; }
+    void set_priority(Optional<Requesting::Priority> priority) { m_priority = move(priority); }
+
+    [[nodiscard]] Optional<InternalPriority> const& internal_priority() const { return m_internal_priority; }
+    void set_internal_priority(Optional<InternalPriority> internal_priority) { m_internal_priority = move(internal_priority); }
 
     [[nodiscard]] OriginType const& origin() const { return m_origin; }
     void set_origin(OriginType origin) { m_origin = move(origin); }
@@ -268,9 +272,13 @@ private:
     //       those destinations skip service workers.
     Optional<Requesting::Destination> m_destination;
 
-    // https://fetch.spec.whatwg.org/#concept-request-priority
-    // A request has an associated priority (null or a user-agent-defined object). Unless otherwise stated it is null.
-    Optional<Priority> m_priority;
+    // https://fetch.spec.whatwg.org/#request-priority
+    // A request has an associated priority, which is "high", "low", or "auto". Unless stated otherwise it is "auto".
+    Optional<Requesting::Priority> m_priority { Requesting::Priority::Auto };
+
+    // https://fetch.spec.whatwg.org/#request-internal-priority
+    // A request has an associated internal priority (null or an implementation-defined object). Unless otherwise stated it is null.
+    Optional<InternalPriority> m_internal_priority;
 
     // https://fetch.spec.whatwg.org/#concept-request-origin
     // A request has an associated origin, which is "client" or an origin. Unless stated otherwise it is "client".

@@ -102,6 +102,12 @@ enum class PolicyContainer {
     Client,
 };
 
+enum class Priority {
+    High,
+    Low,
+    Auto
+};
+
 enum class RedirectMode {
     Follow,
     Error,
