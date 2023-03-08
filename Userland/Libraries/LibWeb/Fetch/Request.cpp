@@ -110,7 +110,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<Request>> Request::construct_impl(JS::Realm
     JS::GCPtr<Infrastructure::Request> input_request;
 
     // 2. Let fallbackMode be null.
-    Optional<Infrastructure::Request::Mode> fallback_mode;
+    Optional<Infrastructure::Requesting::Mode> fallback_mode;
 
     // 3. Let baseURL be this’s relevant settings object’s API base URL.
     auto base_url = HTML::relevant_settings_object(*request_object).api_base_url();
@@ -136,7 +136,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<Request>> Request::construct_impl(JS::Realm
         input_request->set_url(move(parsed_url));
 
         // 5. Set fallbackMode to "cors".
-        fallback_mode = Infrastructure::Request::Mode::CORS;
+        fallback_mode = Infrastructure::Requesting::Mode::CORS;
     }
     // 6. Otherwise:
     else {
@@ -154,7 +154,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<Request>> Request::construct_impl(JS::Realm
     auto const& origin = HTML::relevant_settings_object(*request_object).origin();
 
     // 8. Let window be "client".
-    auto window = Infrastructure::Request::WindowType { Infrastructure::Request::Window::Client };
+    auto window = Infrastructure::Request::WindowType { Infrastructure::Requesting::Window::Client };
 
     // 9. If request’s window is an environment settings object and its origin is same origin with origin, then set window to request’s window.
     if (input_request->window().has<HTML::EnvironmentSettingsObject*>()) {
@@ -169,7 +169,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<Request>> Request::construct_impl(JS::Realm
 
     // 11. If init["window"] exists, then set window to "no-window".
     if (init.window.has_value())
-        window = Infrastructure::Request::Window::NoWindow;
+        window = Infrastructure::Requesting::Window::NoWindow;
 
     // 12. Set request to a new request with the following properties:
     // NOTE: This is done at the beginning as the 'this' value Request object
@@ -257,13 +257,13 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<Request>> Request::construct_impl(JS::Realm
 
     // initiator type
     //     "fetch".
-    request->set_initiator_type(Infrastructure::Request::InitiatorType::Fetch);
+    request->set_initiator_type(Infrastructure::Requesting::InitiatorType::Fetch);
 
     // 13. If init is not empty, then:
     if (!init.is_empty()) {
         // 1. If request’s mode is "navigate", then set it to "same-origin".
-        if (request->mode() == Infrastructure::Request::Mode::Navigate)
-            request->set_mode(Infrastructure::Request::Mode::SameOrigin);
+        if (request->mode() == Infrastructure::Requesting::Mode::Navigate)
+            request->set_mode(Infrastructure::Requesting::Mode::SameOrigin);
 
         // 2. Unset request’s reload-navigation flag.
         request->set_reload_navigation(false);
@@ -272,10 +272,10 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<Request>> Request::construct_impl(JS::Realm
         request->set_history_navigation(false);
 
         // 4. Set request’s origin to "client".
-        request->set_origin(Infrastructure::Request::Origin::Client);
+        request->set_origin(Infrastructure::Requesting::Origin::Client);
 
         // 5. Set request’s referrer to "client".
-        request->set_referrer(Infrastructure::Request::Referrer::Client);
+        request->set_referrer(Infrastructure::Requesting::Referrer::Client);
 
         // 6. Set request’s referrer policy to the empty string.
         request->set_referrer_policy({});
@@ -294,7 +294,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<Request>> Request::construct_impl(JS::Realm
 
         // 2. If referrer is the empty string, then set request’s referrer to "no-referrer".
         if (referrer.is_empty()) {
-            request->set_referrer(Infrastructure::Request::Referrer::NoReferrer);
+            request->set_referrer(Infrastructure::Requesting::Referrer::NoReferrer);
         }
         // 3. Otherwise:
         else {
@@ -311,7 +311,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<Request>> Request::construct_impl(JS::Realm
             // then set request’s referrer to "client".
             // FIXME: Actually use the given origin once we have https://url.spec.whatwg.org/#concept-url-origin.
             if ((parsed_referrer.scheme() == "about"sv && parsed_referrer.path() == "client"sv) || !HTML::Origin().is_same_origin(origin)) {
-                request->set_referrer(Infrastructure::Request::Referrer::Client);
+                request->set_referrer(Infrastructure::Requesting::Referrer::Client);
             }
             // 4. Otherwise, set request’s referrer to parsedReferrer.
             else {
@@ -330,7 +330,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<Request>> Request::construct_impl(JS::Realm
         : fallback_mode;
 
     // 17. If mode is "navigate", then throw a TypeError.
-    if (mode == Infrastructure::Request::Mode::Navigate)
+    if (mode == Infrastructure::Requesting::Mode::Navigate)
         return WebIDL::SimpleException { WebIDL::SimpleExceptionType::TypeError, "Mode must not be 'navigate"sv };
 
     // 18. If mode is non-null, set request’s mode to mode.
@@ -346,7 +346,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<Request>> Request::construct_impl(JS::Realm
         request->set_cache_mode(from_bindings_enum(*init.cache));
 
     // 21. If request’s cache mode is "only-if-cached" and request’s mode is not "same-origin", then throw a TypeError.
-    if (request->cache_mode() == Infrastructure::Request::CacheMode::OnlyIfCached && request->mode() != Infrastructure::Request::Mode::SameOrigin)
+    if (request->cache_mode() == Infrastructure::Requesting::CacheMode::OnlyIfCached && request->mode() != Infrastructure::Requesting::Mode::SameOrigin)
         return WebIDL::SimpleException { WebIDL::SimpleExceptionType::TypeError, "Mode must be 'same-origin' when cache mode is 'only-if-cached'"sv };
 
     // 22. If init["redirect"] exists, then set request’s redirect mode to it.
@@ -400,7 +400,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<Request>> Request::construct_impl(JS::Realm
     request_object->m_headers->set_guard(Headers::Guard::Request);
 
     // 31. If this’s request’s mode is "no-cors", then:
-    if (request_object->request()->mode() == Infrastructure::Request::Mode::NoCORS) {
+    if (request_object->request()->mode() == Infrastructure::Requesting::Mode::NoCORS) {
         // 1. If this’s request’s method is not a CORS-safelisted method, then throw a TypeError.
         if (!Infrastructure::is_cors_safelisted_method(request_object->request()->method()))
             return WebIDL::SimpleException { WebIDL::SimpleExceptionType::TypeError, "Method must be one of GET, HEAD, or POST"sv };
@@ -473,7 +473,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<Request>> Request::construct_impl(JS::Realm
             return WebIDL::SimpleException { WebIDL::SimpleExceptionType::TypeError, "Body without source requires 'duplex' value to be set"sv };
 
         // 2. If this’s request’s mode is neither "same-origin" nor "cors", then throw a TypeError.
-        if (request_object->request()->mode() != Infrastructure::Request::Mode::SameOrigin && request_object->request()->mode() != Infrastructure::Request::Mode::CORS)
+        if (request_object->request()->mode() != Infrastructure::Requesting::Mode::SameOrigin && request_object->request()->mode() != Infrastructure::Requesting::Mode::CORS)
             return WebIDL::SimpleException { WebIDL::SimpleExceptionType::TypeError, "Request mode must be 'same-origin' or 'cors'"sv };
 
         // 3. Set this’s request’s use-CORS-preflight flag.
@@ -536,13 +536,13 @@ WebIDL::ExceptionOr<String> Request::referrer() const
 {
     auto& vm = this->vm();
     return m_request->referrer().visit(
-        [&](Infrastructure::Request::Referrer const& referrer) -> WebIDL::ExceptionOr<String> {
+        [&](Infrastructure::Requesting::Referrer const& referrer) -> WebIDL::ExceptionOr<String> {
             switch (referrer) {
             // 1. If this’s request’s referrer is "no-referrer", then return the empty string.
-            case Infrastructure::Request::Referrer::NoReferrer:
+            case Infrastructure::Requesting::Referrer::NoReferrer:
                 return String {};
             // 2. If this’s request’s referrer is "client", then return "about:client".
-            case Infrastructure::Request::Referrer::Client:
+            case Infrastructure::Requesting::Referrer::Client:
                 return TRY_OR_THROW_OOM(vm, "about:client"_string);
             default:
                 VERIFY_NOT_REACHED();

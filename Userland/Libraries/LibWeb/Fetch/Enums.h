@@ -14,17 +14,17 @@
 namespace Web::Fetch {
 
 [[nodiscard]] Optional<ReferrerPolicy::ReferrerPolicy> from_bindings_enum(Bindings::ReferrerPolicy);
-[[nodiscard]] Infrastructure::Request::Mode from_bindings_enum(Bindings::RequestMode);
-[[nodiscard]] Infrastructure::Request::CredentialsMode from_bindings_enum(Bindings::RequestCredentials);
-[[nodiscard]] Infrastructure::Request::CacheMode from_bindings_enum(Bindings::RequestCache);
-[[nodiscard]] Infrastructure::Request::RedirectMode from_bindings_enum(Bindings::RequestRedirect);
+[[nodiscard]] Infrastructure::Requesting::Mode from_bindings_enum(Bindings::RequestMode);
+[[nodiscard]] Infrastructure::Requesting::CredentialsMode from_bindings_enum(Bindings::RequestCredentials);
+[[nodiscard]] Infrastructure::Requesting::CacheMode from_bindings_enum(Bindings::RequestCache);
+[[nodiscard]] Infrastructure::Requesting::RedirectMode from_bindings_enum(Bindings::RequestRedirect);
 
 [[nodiscard]] Bindings::ReferrerPolicy to_bindings_enum(Optional<ReferrerPolicy::ReferrerPolicy> const&);
-[[nodiscard]] Bindings::RequestDestination to_bindings_enum(Optional<Infrastructure::Request::Destination> const&);
-[[nodiscard]] Bindings::RequestMode to_bindings_enum(Infrastructure::Request::Mode);
-[[nodiscard]] Bindings::RequestCredentials to_bindings_enum(Infrastructure::Request::CredentialsMode);
-[[nodiscard]] Bindings::RequestCache to_bindings_enum(Infrastructure::Request::CacheMode);
-[[nodiscard]] Bindings::RequestRedirect to_bindings_enum(Infrastructure::Request::RedirectMode);
+[[nodiscard]] Bindings::RequestDestination to_bindings_enum(Optional<Infrastructure::Requesting::Destination> const&);
+[[nodiscard]] Bindings::RequestMode to_bindings_enum(Infrastructure::Requesting::Mode);
+[[nodiscard]] Bindings::RequestCredentials to_bindings_enum(Infrastructure::Requesting::CredentialsMode);
+[[nodiscard]] Bindings::RequestCache to_bindings_enum(Infrastructure::Requesting::CacheMode);
+[[nodiscard]] Bindings::RequestRedirect to_bindings_enum(Infrastructure::Requesting::RedirectMode);
 [[nodiscard]] Bindings::ResponseType to_bindings_enum(Infrastructure::Response::Type);
 
 }

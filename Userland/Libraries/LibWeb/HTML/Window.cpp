@@ -371,7 +371,7 @@ WebIDL::ExceptionOr<JS::GCPtr<HTML::WindowProxy>> Window::open_impl(StringView u
 
             // 2. If noreferrer is true, then set request's referrer to "no-referrer".
             if (no_referrer)
-                request->set_referrer(Fetch::Infrastructure::Request::Referrer::NoReferrer);
+                request->set_referrer(Fetch::Infrastructure::Requesting::Referrer::NoReferrer);
 
             // 3. Navigate target browsing context to request, with exceptionsEnabled set to true and the source browsing context set to source browsing context.
             TRY(target_browsing_context->navigate(request, *source_browsing_context, true));
@@ -396,7 +396,7 @@ WebIDL::ExceptionOr<JS::GCPtr<HTML::WindowProxy>> Window::open_impl(StringView u
 
             // 4. If noreferrer is true, then set request's referrer to "noreferrer".
             if (no_referrer)
-                request->set_referrer(Fetch::Infrastructure::Request::Referrer::NoReferrer);
+                request->set_referrer(Fetch::Infrastructure::Requesting::Referrer::NoReferrer);
 
             // 5. Navigate target browsing context to request, with exceptionsEnabled set to true and the source browsing context set to source browsing context.
             TRY(target_browsing_context->navigate(request, *source_browsing_context, true));

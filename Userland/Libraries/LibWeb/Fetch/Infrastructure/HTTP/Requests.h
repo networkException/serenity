@@ -19,6 +19,7 @@
 #include <LibJS/Heap/GCPtr.h>
 #include <LibWeb/Fetch/Infrastructure/HTTP/Bodies.h>
 #include <LibWeb/Fetch/Infrastructure/HTTP/Headers.h>
+#include <LibWeb/Fetch/Infrastructure/HTTP/Requesting.h>
 #include <LibWeb/HTML/Origin.h>
 #include <LibWeb/HTML/PolicyContainers.h>
 #include <LibWeb/HTML/Scripting/Environments.h>
@@ -30,135 +31,15 @@ class Request final : public JS::Cell {
     JS_CELL(Request, JS::Cell);
 
 public:
-    enum class CacheMode {
-        Default,
-        NoStore,
-        Reload,
-        NoCache,
-        ForceCache,
-        OnlyIfCached,
-    };
-
-    enum class CredentialsMode {
-        Omit,
-        SameOrigin,
-        Include,
-    };
-
-    enum class Destination {
-        Audio,
-        AudioWorklet,
-        Document,
-        Embed,
-        Font,
-        Frame,
-        IFrame,
-        Image,
-        Manifest,
-        Object,
-        PaintWorklet,
-        Report,
-        Script,
-        ServiceWorker,
-        SharedWorker,
-        Style,
-        Track,
-        Video,
-        WebIdentity,
-        Worker,
-        XSLT,
-    };
-
-    enum class Initiator {
-        Download,
-        ImageSet,
-        Manifest,
-        Prefetch,
-        Prerender,
-        XSLT,
-    };
-
-    enum class InitiatorType {
-        Audio,
-        Beacon,
-        Body,
-        CSS,
-        EarlyHint,
-        Embed,
-        Fetch,
-        Font,
-        Frame,
-        IFrame,
-        Image,
-        IMG,
-        Input,
-        Link,
-        Object,
-        Ping,
-        Script,
-        Track,
-        Video,
-        XMLHttpRequest,
-        Other,
-    };
-
-    enum class Mode {
-        SameOrigin,
-        CORS,
-        NoCORS,
-        Navigate,
-        WebSocket,
-    };
-
-    enum class Origin {
-        Client,
-    };
-
-    enum class ParserMetadata {
-        ParserInserted,
-        NotParserInserted,
-    };
-
-    enum class PolicyContainer {
-        Client,
-    };
-
-    enum class RedirectMode {
-        Follow,
-        Error,
-        Manual,
-    };
-
-    enum class Referrer {
-        NoReferrer,
-        Client,
-    };
-
-    enum class ResponseTainting {
-        Basic,
-        CORS,
-        Opaque,
-    };
-
-    enum class ServiceWorkersMode {
-        All,
-        None,
-    };
-
-    enum class Window {
-        NoWindow,
-        Client,
-    };
-
     // Members are implementation-defined
     struct Priority { };
 
     using BodyType = Variant<Empty, ByteBuffer, Body>;
-    using OriginType = Variant<Origin, HTML::Origin>;
-    using PolicyContainerType = Variant<PolicyContainer, HTML::PolicyContainer>;
-    using ReferrerType = Variant<Referrer, AK::URL>;
+    using OriginType = Variant<Requesting::Origin, HTML::Origin>;
+    using PolicyContainerType = Variant<Requesting::PolicyContainer, HTML::PolicyContainer>;
+    using ReferrerType = Variant<Requesting::Referrer, AK::URL>;
     using ReservedClientType = Variant<Empty, HTML::Environment*, HTML::EnvironmentSettingsObject*>;
-    using WindowType = Variant<Window, HTML::EnvironmentSettingsObject*>;
+    using WindowType = Variant<Requesting::Window, HTML::EnvironmentSettingsObject*>;
 
     [[nodiscard]] static JS::NonnullGCPtr<Request> create(JS::VM&);
 
@@ -195,17 +76,17 @@ public:
     [[nodiscard]] bool keepalive() const { return m_keepalive; }
     void set_keepalive(bool keepalive) { m_keepalive = keepalive; }
 
-    [[nodiscard]] Optional<InitiatorType> const& initiator_type() const { return m_initiator_type; }
-    void set_initiator_type(Optional<InitiatorType> initiator_type) { m_initiator_type = move(initiator_type); }
+    [[nodiscard]] Optional<Requesting::InitiatorType> const& initiator_type() const { return m_initiator_type; }
+    void set_initiator_type(Optional<Requesting::InitiatorType> initiator_type) { m_initiator_type = move(initiator_type); }
 
-    [[nodiscard]] ServiceWorkersMode service_workers_mode() const { return m_service_workers_mode; }
-    void set_service_workers_mode(ServiceWorkersMode service_workers_mode) { m_service_workers_mode = service_workers_mode; }
+    [[nodiscard]] Requesting::ServiceWorkersMode service_workers_mode() const { return m_service_workers_mode; }
+    void set_service_workers_mode(Requesting::ServiceWorkersMode service_workers_mode) { m_service_workers_mode = service_workers_mode; }
 
-    [[nodiscard]] Optional<Initiator> const& initiator() const { return m_initiator; }
-    void set_initiator(Optional<Initiator> initiator) { m_initiator = move(initiator); }
+    [[nodiscard]] Optional<Requesting::Initiator> const& initiator() const { return m_initiator; }
+    void set_initiator(Optional<Requesting::Initiator> initiator) { m_initiator = move(initiator); }
 
-    [[nodiscard]] Optional<Destination> const& destination() const { return m_destination; }
-    void set_destination(Optional<Destination> destination) { m_destination = move(destination); }
+    [[nodiscard]] Optional<Requesting::Destination> const& destination() const { return m_destination; }
+    void set_destination(Optional<Requesting::Destination> destination) { m_destination = move(destination); }
 
     [[nodiscard]] Optional<Priority> const& priority() const { return m_priority; }
     void set_priority(Optional<Priority> priority) { m_priority = move(priority); }
@@ -216,23 +97,23 @@ public:
     [[nodiscard]] PolicyContainerType const& policy_container() const { return m_policy_container; }
     void set_policy_container(PolicyContainerType policy_container) { m_policy_container = move(policy_container); }
 
-    [[nodiscard]] Mode mode() const { return m_mode; }
-    void set_mode(Mode mode) { m_mode = mode; }
+    [[nodiscard]] Requesting::Mode mode() const { return m_mode; }
+    void set_mode(Requesting::Mode mode) { m_mode = mode; }
 
     [[nodiscard]] bool use_cors_preflight() const { return m_use_cors_preflight; }
     void set_use_cors_preflight(bool use_cors_preflight) { m_use_cors_preflight = use_cors_preflight; }
 
-    [[nodiscard]] CredentialsMode credentials_mode() const { return m_credentials_mode; }
-    void set_credentials_mode(CredentialsMode credentials_mode) { m_credentials_mode = credentials_mode; }
+    [[nodiscard]] Requesting::CredentialsMode credentials_mode() const { return m_credentials_mode; }
+    void set_credentials_mode(Requesting::CredentialsMode credentials_mode) { m_credentials_mode = credentials_mode; }
 
     [[nodiscard]] bool use_url_credentials() const { return m_use_url_credentials; }
     void set_use_url_credentials(bool use_url_credentials) { m_use_url_credentials = use_url_credentials; }
 
-    [[nodiscard]] CacheMode cache_mode() const { return m_cache_mode; }
-    void set_cache_mode(CacheMode cache_mode) { m_cache_mode = cache_mode; }
+    [[nodiscard]] Requesting::CacheMode cache_mode() const { return m_cache_mode; }
+    void set_cache_mode(Requesting::CacheMode cache_mode) { m_cache_mode = cache_mode; }
 
-    [[nodiscard]] RedirectMode redirect_mode() const { return m_redirect_mode; }
-    void set_redirect_mode(RedirectMode redirect_mode) { m_redirect_mode = redirect_mode; }
+    [[nodiscard]] Requesting::RedirectMode redirect_mode() const { return m_redirect_mode; }
+    void set_redirect_mode(Requesting::RedirectMode redirect_mode) { m_redirect_mode = redirect_mode; }
 
     [[nodiscard]] String const& integrity_metadata() const { return m_integrity_metadata; }
     void set_integrity_metadata(String integrity_metadata) { m_integrity_metadata = move(integrity_metadata); }
@@ -240,8 +121,8 @@ public:
     [[nodiscard]] String const& cryptographic_nonce_metadata() const { return m_cryptographic_nonce_metadata; }
     void set_cryptographic_nonce_metadata(String cryptographic_nonce_metadata) { m_cryptographic_nonce_metadata = move(cryptographic_nonce_metadata); }
 
-    [[nodiscard]] Optional<ParserMetadata> const& parser_metadata() const { return m_parser_metadata; }
-    void set_parser_metadata(Optional<ParserMetadata> parser_metadata) { m_parser_metadata = move(parser_metadata); }
+    [[nodiscard]] Optional<Requesting::ParserMetadata> const& parser_metadata() const { return m_parser_metadata; }
+    void set_parser_metadata(Optional<Requesting::ParserMetadata> parser_metadata) { m_parser_metadata = move(parser_metadata); }
 
     [[nodiscard]] bool reload_navigation() const { return m_reload_navigation; }
     void set_reload_navigation(bool reload_navigation) { m_reload_navigation = reload_navigation; }
@@ -268,8 +149,8 @@ public:
     [[nodiscard]] Optional<ReferrerPolicy::ReferrerPolicy> const& referrer_policy() const { return m_referrer_policy; }
     void set_referrer_policy(Optional<ReferrerPolicy::ReferrerPolicy> referrer_policy) { m_referrer_policy = move(referrer_policy); }
 
-    [[nodiscard]] ResponseTainting response_tainting() const { return m_response_tainting; }
-    void set_response_tainting(ResponseTainting response_tainting) { m_response_tainting = response_tainting; }
+    [[nodiscard]] Requesting::ResponseTainting response_tainting() const { return m_response_tainting; }
+    void set_response_tainting(Requesting::ResponseTainting response_tainting) { m_response_tainting = response_tainting; }
 
     [[nodiscard]] bool prevent_no_cache_cache_control_header_modification() const { return m_prevent_no_cache_cache_control_header_modification; }
     void set_prevent_no_cache_cache_control_header_modification(bool prevent_no_cache_cache_control_header_modification) { m_prevent_no_cache_cache_control_header_modification = prevent_no_cache_cache_control_header_modification; }
@@ -357,7 +238,7 @@ private:
     // https://fetch.spec.whatwg.org/#concept-request-window
     // A request has an associated window ("no-window", "client", or an environment settings object whose global object
     // is a Window object). Unless stated otherwise it is "client".
-    WindowType m_window { Window::Client };
+    WindowType m_window { Requesting::Window::Client };
 
     // https://fetch.spec.whatwg.org/#request-keepalive-flag
     // A request has an associated boolean keepalive. Unless stated otherwise it is false.
@@ -367,16 +248,16 @@ private:
     // A request has an associated initiator type, which is null, "audio", "beacon", "body", "css", "early-hint",
     // "embed", "fetch", "font", "frame", "iframe", "image", "img", "input", "link", "object", "ping", "script",
     // "track", "video", "xmlhttprequest", or "other". Unless stated otherwise it is null. [RESOURCE-TIMING]
-    Optional<InitiatorType> m_initiator_type;
+    Optional<Requesting::InitiatorType> m_initiator_type;
 
     // https://fetch.spec.whatwg.org/#request-service-workers-mode
     // A request has an associated service-workers mode, that is "all" or "none". Unless stated otherwise it is "all".
-    ServiceWorkersMode m_service_workers_mode { ServiceWorkersMode::All };
+    Requesting::ServiceWorkersMode m_service_workers_mode { Requesting::ServiceWorkersMode::All };
 
     // https://fetch.spec.whatwg.org/#concept-request-initiator
     // A request has an associated initiator, which is the empty string, "download", "imageset", "manifest",
     // "prefetch", "prerender", or "xslt". Unless stated otherwise it is the empty string.
-    Optional<Initiator> m_initiator;
+    Optional<Requesting::Initiator> m_initiator;
 
     // https://fetch.spec.whatwg.org/#concept-request-destination
     // A request has an associated destination, which is the empty string, "audio", "audioworklet", "document",
@@ -385,7 +266,7 @@ private:
     // otherwise it is the empty string.
     // NOTE: These are reflected on RequestDestination except for "serviceworker" and "webidentity" as fetches with
     //       those destinations skip service workers.
-    Optional<Destination> m_destination;
+    Optional<Requesting::Destination> m_destination;
 
     // https://fetch.spec.whatwg.org/#concept-request-priority
     // A request has an associated priority (null or a user-agent-defined object). Unless otherwise stated it is null.
@@ -393,17 +274,17 @@ private:
 
     // https://fetch.spec.whatwg.org/#concept-request-origin
     // A request has an associated origin, which is "client" or an origin. Unless stated otherwise it is "client".
-    OriginType m_origin { Origin::Client };
+    OriginType m_origin { Requesting::Origin::Client };
 
     // https://fetch.spec.whatwg.org/#concept-request-policy-container
     // A request has an associated policy container, which is "client" or a policy container. Unless stated otherwise
     // it is "client".
-    PolicyContainerType m_policy_container { PolicyContainer::Client };
+    PolicyContainerType m_policy_container { Requesting::PolicyContainer::Client };
 
     // https://fetch.spec.whatwg.org/#concept-request-referrer
     // A request has an associated referrer, which is "no-referrer", "client", or a URL. Unless stated otherwise it is
     // "client".
-    ReferrerType m_referrer { Referrer::Client };
+    ReferrerType m_referrer { Requesting::Referrer::Client };
 
     // https://fetch.spec.whatwg.org/#concept-request-referrer-policy
     // A request has an associated referrer policy, which is a referrer policy. Unless stated otherwise it is the empty
@@ -413,7 +294,7 @@ private:
     // https://fetch.spec.whatwg.org/#concept-request-mode
     // A request has an associated mode, which is "same-origin", "cors", "no-cors", "navigate", or "websocket". Unless
     // stated otherwise, it is "no-cors".
-    Mode m_mode { Mode::NoCORS };
+    Requesting::Mode m_mode { Requesting::Mode::NoCORS };
 
     // https://fetch.spec.whatwg.org/#use-cors-preflight-flag
     // A request has an associated use-CORS-preflight flag. Unless stated otherwise, it is unset.
@@ -422,7 +303,7 @@ private:
     // https://fetch.spec.whatwg.org/#concept-request-credentials-mode
     // A request has an associated credentials mode, which is "omit", "same-origin", or "include". Unless stated
     // otherwise, it is "same-origin".
-    CredentialsMode m_credentials_mode { CredentialsMode::SameOrigin };
+    Requesting::CredentialsMode m_credentials_mode { Requesting::CredentialsMode::SameOrigin };
 
     // https://fetch.spec.whatwg.org/#concept-request-use-url-credentials-flag
     // A request has an associated use-URL-credentials flag. Unless stated otherwise, it is unset.
@@ -435,12 +316,12 @@ private:
     // https://fetch.spec.whatwg.org/#concept-request-cache-mode
     // A request has an associated cache mode, which is "default", "no-store", "reload", "no-cache", "force-cache", or
     // "only-if-cached". Unless stated otherwise, it is "default".
-    CacheMode m_cache_mode { CacheMode::Default };
+    Requesting::CacheMode m_cache_mode { Requesting::CacheMode::Default };
 
     // https://fetch.spec.whatwg.org/#concept-request-redirect-mode
     // A request has an associated redirect mode, which is "follow", "error", or "manual". Unless stated otherwise, it
     // is "follow".
-    RedirectMode m_redirect_mode { RedirectMode::Follow };
+    Requesting::RedirectMode m_redirect_mode { Requesting::RedirectMode::Follow };
 
     // https://fetch.spec.whatwg.org/#concept-request-integrity-metadata
     // A request has associated integrity metadata (a string). Unless stated otherwise, it is the empty string.
@@ -454,7 +335,7 @@ private:
     // https://fetch.spec.whatwg.org/#concept-request-parser-metadata
     // A request has associated parser metadata which is the empty string, "parser-inserted", or
     // "not-parser-inserted". Unless otherwise stated, it is the empty string.
-    Optional<ParserMetadata> m_parser_metadata;
+    Optional<Requesting::ParserMetadata> m_parser_metadata;
 
     // https://fetch.spec.whatwg.org/#concept-request-reload-navigation-flag
     // A request has an associated reload-navigation flag. Unless stated otherwise, it is unset.
@@ -485,7 +366,7 @@ private:
     // https://fetch.spec.whatwg.org/#concept-request-response-tainting
     // A request has an associated response tainting, which is "basic", "cors", or "opaque". Unless stated otherwise,
     // it is "basic".
-    ResponseTainting m_response_tainting { ResponseTainting::Basic };
+    Requesting::ResponseTainting m_response_tainting { Requesting::ResponseTainting::Basic };
 
     // https://fetch.spec.whatwg.org/#no-cache-prevent-cache-control
     // A request has an associated prevent no-cache cache-control header modification flag. Unless stated otherwise, it

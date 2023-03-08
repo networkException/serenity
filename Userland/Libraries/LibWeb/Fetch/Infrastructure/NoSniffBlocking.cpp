@@ -48,7 +48,7 @@ ErrorOr<RequestOrResponseBlocking> should_response_to_request_be_blocked_due_to_
         return RequestOrResponseBlocking::Blocked;
 
     // 5. If destination is "style" and mimeType is failure or its essence is not "text/css", then return blocked.
-    if (destination == Request::Destination::Style && (!mime_type.has_value() || mime_type->essence() != "text/css"sv))
+    if (destination == Requesting::Destination::Style && (!mime_type.has_value() || mime_type->essence() != "text/css"sv))
         return RequestOrResponseBlocking::Blocked;
 
     // 6. Return allowed.

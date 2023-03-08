@@ -75,12 +75,12 @@ bool Request::destination_is_script_like() const
 {
     // A request’s destination is script-like if it is "audioworklet", "paintworklet", "script", "serviceworker", "sharedworker", or "worker".
     static constexpr Array script_like_destinations = {
-        Destination::AudioWorklet,
-        Destination::PaintWorklet,
-        Destination::Script,
-        Destination::ServiceWorker,
-        Destination::SharedWorker,
-        Destination::Worker,
+        Requesting::Destination::AudioWorklet,
+        Requesting::Destination::PaintWorklet,
+        Requesting::Destination::Script,
+        Requesting::Destination::ServiceWorker,
+        Requesting::Destination::SharedWorker,
+        Requesting::Destination::Worker,
     };
     return any_of(script_like_destinations, [this](auto destination) {
         return m_destination == destination;
@@ -92,17 +92,17 @@ bool Request::is_subresource_request() const
 {
     // A subresource request is a request whose destination is "audio", "audioworklet", "font", "image", "manifest", "paintworklet", "script", "style", "track", "video", "xslt", or the empty string.
     static constexpr Array subresource_request_destinations = {
-        Destination::Audio,
-        Destination::AudioWorklet,
-        Destination::Font,
-        Destination::Image,
-        Destination::Manifest,
-        Destination::PaintWorklet,
-        Destination::Script,
-        Destination::Style,
-        Destination::Track,
-        Destination::Video,
-        Destination::XSLT,
+        Requesting::Destination::Audio,
+        Requesting::Destination::AudioWorklet,
+        Requesting::Destination::Font,
+        Requesting::Destination::Image,
+        Requesting::Destination::Manifest,
+        Requesting::Destination::PaintWorklet,
+        Requesting::Destination::Script,
+        Requesting::Destination::Style,
+        Requesting::Destination::Track,
+        Requesting::Destination::Video,
+        Requesting::Destination::XSLT,
     };
     return any_of(subresource_request_destinations, [this](auto destination) {
         return m_destination == destination;
@@ -114,15 +114,15 @@ bool Request::is_non_subresource_request() const
 {
     // A non-subresource request is a request whose destination is "document", "embed", "frame", "iframe", "object", "report", "serviceworker", "sharedworker", or "worker".
     static constexpr Array non_subresource_request_destinations = {
-        Destination::Document,
-        Destination::Embed,
-        Destination::Frame,
-        Destination::IFrame,
-        Destination::Object,
-        Destination::Report,
-        Destination::ServiceWorker,
-        Destination::SharedWorker,
-        Destination::Worker,
+        Requesting::Destination::Document,
+        Requesting::Destination::Embed,
+        Requesting::Destination::Frame,
+        Requesting::Destination::IFrame,
+        Requesting::Destination::Object,
+        Requesting::Destination::Report,
+        Requesting::Destination::ServiceWorker,
+        Requesting::Destination::SharedWorker,
+        Requesting::Destination::Worker,
     };
     return any_of(non_subresource_request_destinations, [this](auto destination) {
         return m_destination == destination;
@@ -134,11 +134,11 @@ bool Request::is_navigation_request() const
 {
     // A navigation request is a request whose destination is "document", "embed", "frame", "iframe", or "object".
     static constexpr Array navigation_request_destinations = {
-        Destination::Document,
-        Destination::Embed,
-        Destination::Frame,
-        Destination::IFrame,
-        Destination::Object,
+        Requesting::Destination::Document,
+        Requesting::Destination::Embed,
+        Requesting::Destination::Frame,
+        Requesting::Destination::IFrame,
+        Requesting::Destination::Object,
     };
     return any_of(navigation_request_destinations, [this](auto destination) {
         return m_destination == destination;
@@ -287,7 +287,7 @@ ErrorOr<void> Request::add_origin_header()
     auto serialized_origin = TRY(byte_serialize_origin());
 
     // 2. If request’s response tainting is "cors" or request’s mode is "websocket", then append (`Origin`, serializedOrigin) to request’s header list.
-    if (m_response_tainting == ResponseTainting::CORS || m_mode == Mode::WebSocket) {
+    if (m_response_tainting == Requesting::ResponseTainting::CORS || m_mode == Requesting::Mode::WebSocket) {
         auto header = Header {
             .name = MUST(ByteBuffer::copy("Origin"sv.bytes())),
             .value = move(serialized_origin),
@@ -297,7 +297,7 @@ ErrorOr<void> Request::add_origin_header()
     // 3. Otherwise, if request’s method is neither `GET` nor `HEAD`, then:
     else if (!StringView { m_method }.is_one_of("GET"sv, "HEAD"sv)) {
         // 1. If request’s mode is not "cors", then switch on request’s referrer policy:
-        if (m_mode != Mode::CORS && m_referrer_policy.has_value()) {
+        if (m_mode != Requesting::Mode::CORS && m_referrer_policy.has_value()) {
             switch (*m_referrer_policy) {
             // -> "no-referrer"
             case ReferrerPolicy::ReferrerPolicy::NoReferrer:
@@ -344,7 +344,7 @@ ErrorOr<void> Request::add_origin_header()
 bool Request::cross_origin_embedder_policy_allows_credentials() const
 {
     // 1. If request’s mode is not "no-cors", then return true.
-    if (m_mode != Mode::NoCORS)
+    if (m_mode != Requesting::Mode::NoCORS)
         return true;
 
     // 2. If request’s client is null, then return true.

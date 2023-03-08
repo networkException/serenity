@@ -23,7 +23,7 @@ ErrorOr<bool> cors_check(Infrastructure::Request const& request, Infrastructure:
         return false;
 
     // 3. If request’s credentials mode is not "include" and origin is `*`, then return success.
-    if (request.credentials_mode() != Infrastructure::Request::CredentialsMode::Include && origin->span() == "*"sv.bytes())
+    if (request.credentials_mode() != Infrastructure::Requesting::CredentialsMode::Include && origin->span() == "*"sv.bytes())
         return true;
 
     // 4. If the result of byte-serializing a request origin with request is not origin, then return failure.
@@ -31,7 +31,7 @@ ErrorOr<bool> cors_check(Infrastructure::Request const& request, Infrastructure:
         return false;
 
     // 5. If request’s credentials mode is not "include", then return success.
-    if (request.credentials_mode() != Infrastructure::Request::CredentialsMode::Include)
+    if (request.credentials_mode() != Infrastructure::Requesting::CredentialsMode::Include)
         return true;
 
     // 6. Let credentials be the result of getting `Access-Control-Allow-Credentials` from response’s header list.
@@ -68,14 +68,14 @@ ErrorOr<bool> tao_check(Infrastructure::Request const& request, Infrastructure::
     //       container document’s origin and the TAO check would return failure. Since navigation timing never
     //       validates the results of the TAO check, the nested document would still have access to the full timing
     //       information, but the container document would not.
-    if (request.mode() == Infrastructure::Request::Mode::Navigate
+    if (request.mode() == Infrastructure::Requesting::Mode::Navigate
         && request.origin().has<HTML::Origin>()
         && !URL::url_origin(request.current_url()).is_same_origin(request.origin().get<HTML::Origin>())) {
         return false;
     }
 
     // 6. If request’s response tainting is "basic", then return success.
-    if (request.response_tainting() == Infrastructure::Request::ResponseTainting::Basic)
+    if (request.response_tainting() == Infrastructure::Requesting::ResponseTainting::Basic)
         return true;
 
     // 7. Return failure.

@@ -61,7 +61,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<Infrastructure::FetchController>> fetch(JS:
     auto& vm = realm.vm();
 
     // 1. Assert: request’s mode is "navigate" or processEarlyHintsResponse is null.
-    VERIFY(request.mode() == Infrastructure::Request::Mode::Navigate || !algorithms.process_early_hints_response().has_value());
+    VERIFY(request.mode() == Infrastructure::Requesting::Mode::Navigate || !algorithms.process_early_hints_response().has_value());
 
     // 2. Let taskDestination be null.
     JS::GCPtr<JS::Object> task_destination;
@@ -108,24 +108,24 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<Infrastructure::FetchController>> fetch(JS:
 
     // 9. If request’s window is "client", then set request’s window to request’s client, if request’s client’s global
     //    object is a Window object; otherwise "no-window".
-    auto const* window = request.window().get_pointer<Infrastructure::Request::Window>();
-    if (window && *window == Infrastructure::Request::Window::Client) {
+    auto const* window = request.window().get_pointer<Infrastructure::Requesting::Window>();
+    if (window && *window == Infrastructure::Requesting::Window::Client) {
         if (is<HTML::Window>(request.client()->global_object())) {
             request.set_window(request.client());
         } else {
-            request.set_window(Infrastructure::Request::Window::NoWindow);
+            request.set_window(Infrastructure::Requesting::Window::NoWindow);
         }
     }
 
     // 10. If request’s origin is "client", then set request’s origin to request’s client’s origin.
-    auto const* origin = request.origin().get_pointer<Infrastructure::Request::Origin>();
-    if (origin && *origin == Infrastructure::Request::Origin::Client)
+    auto const* origin = request.origin().get_pointer<Infrastructure::Requesting::Origin>();
+    if (origin && *origin == Infrastructure::Requesting::Origin::Client)
         request.set_origin(request.client()->origin());
 
     // 12. If request’s policy container is "client", then:
-    auto const* policy_container = request.policy_container().get_pointer<Infrastructure::Request::PolicyContainer>();
+    auto const* policy_container = request.policy_container().get_pointer<Infrastructure::Requesting::PolicyContainer>();
     if (policy_container) {
-        VERIFY(*policy_container == Infrastructure::Request::PolicyContainer::Client);
+        VERIFY(*policy_container == Infrastructure::Requesting::PolicyContainer::Client);
         // 1. If request’s client is non-null, then set request’s policy container to a clone of request’s client’s
         //    policy container.
         if (request.client() != nullptr)
@@ -147,19 +147,19 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<Infrastructure::FetchController>> fetch(JS:
             // -> "document"
             // -> "frame"
             // -> "iframe"
-            case Infrastructure::Request::Destination::Document:
-            case Infrastructure::Request::Destination::Frame:
-            case Infrastructure::Request::Destination::IFrame:
+            case Infrastructure::Requesting::Destination::Document:
+            case Infrastructure::Requesting::Destination::Frame:
+            case Infrastructure::Requesting::Destination::IFrame:
                 // `text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8`
                 value = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"sv;
                 break;
             // -> "image"
-            case Infrastructure::Request::Destination::Image:
+            case Infrastructure::Requesting::Destination::Image:
                 // `image/png,image/svg+xml,image/*;q=0.8,*/*;q=0.5`
                 value = "image/png,image/svg+xml,image/*;q=0.8,*/*;q=0.5"sv;
                 break;
             // -> "style"
-            case Infrastructure::Request::Destination::Style:
+            case Infrastructure::Requesting::Destination::Style:
                 // `text/css,*/*;q=0.1`
                 value = "text/css,*/*;q=0.1"sv;
                 break;
@@ -239,13 +239,13 @@ WebIDL::ExceptionOr<Optional<JS::NonnullGCPtr<PendingResponse>>> main_fetch(JS::
     //    request’s referrer.
     // NOTE: As stated in Referrer Policy, user agents can provide the end user with options to override request’s
     //       referrer to "no-referrer" or have it expose less sensitive information.
-    auto const* referrer = request->referrer().get_pointer<Infrastructure::Request::Referrer>();
-    if (!referrer || *referrer != Infrastructure::Request::Referrer::NoReferrer) {
+    auto const* referrer = request->referrer().get_pointer<Infrastructure::Requesting::Referrer>();
+    if (!referrer || *referrer != Infrastructure::Requesting::Referrer::NoReferrer) {
         auto determined_referrer = ReferrerPolicy::determine_requests_referrer(request);
         if (determined_referrer.has_value())
             request->set_referrer(*determined_referrer);
         else
-            request->set_referrer(Infrastructure::Request::Referrer::NoReferrer);
+            request->set_referrer(Infrastructure::Requesting::Referrer::NoReferrer);
     }
 
     // 9. Set request’s current URL’s scheme to "https" if all of the following conditions are true:
@@ -285,11 +285,11 @@ WebIDL::ExceptionOr<Optional<JS::NonnullGCPtr<PendingResponse>>> main_fetch(JS::
         // -> request’s current URL’s scheme is "data"
         // -> request’s mode is "navigate" or "websocket"
         else if (
-            (request->origin().has<HTML::Origin>() && URL::url_origin(request->current_url()).is_same_origin(request->origin().get<HTML::Origin>()) && request->response_tainting() == Infrastructure::Request::ResponseTainting::Basic)
+            (request->origin().has<HTML::Origin>() && URL::url_origin(request->current_url()).is_same_origin(request->origin().get<HTML::Origin>()) && request->response_tainting() == Infrastructure::Requesting::ResponseTainting::Basic)
             || request->current_url().scheme() == "data"sv
-            || (request->mode() == Infrastructure::Request::Mode::Navigate || request->mode() == Infrastructure::Request::Mode::WebSocket)) {
+            || (request->mode() == Infrastructure::Requesting::Mode::Navigate || request->mode() == Infrastructure::Requesting::Mode::WebSocket)) {
             // 1. Set request’s response tainting to "basic".
-            request->set_response_tainting(Infrastructure::Request::ResponseTainting::Basic);
+            request->set_response_tainting(Infrastructure::Requesting::ResponseTainting::Basic);
 
             // 2. Return the result of running scheme fetch given fetchParams.
             return scheme_fetch(realm, fetch_params);
@@ -298,18 +298,18 @@ WebIDL::ExceptionOr<Optional<JS::NonnullGCPtr<PendingResponse>>> main_fetch(JS::
             //       opaque origin. Service workers can only be created from URLs whose scheme is an HTTP(S) scheme.
         }
         // -> request’s mode is "same-origin"
-        else if (request->mode() == Infrastructure::Request::Mode::SameOrigin) {
+        else if (request->mode() == Infrastructure::Requesting::Mode::SameOrigin) {
             // Return a network error.
             return PendingResponse::create(vm, request, Infrastructure::Response::network_error(vm, "Request with 'same-origin' mode must have same URL and request origin"sv));
         }
         // -> request’s mode is "no-cors"
-        else if (request->mode() == Infrastructure::Request::Mode::NoCORS) {
+        else if (request->mode() == Infrastructure::Requesting::Mode::NoCORS) {
             // 1. If request’s redirect mode is not "follow", then return a network error.
-            if (request->redirect_mode() != Infrastructure::Request::RedirectMode::Follow)
+            if (request->redirect_mode() != Infrastructure::Requesting::RedirectMode::Follow)
                 return PendingResponse::create(vm, request, Infrastructure::Response::network_error(vm, "Request with 'no-cors' mode must have redirect mode set to 'follow'"sv));
 
             // 2. Set request’s response tainting to "opaque".
-            request->set_response_tainting(Infrastructure::Request::ResponseTainting::Opaque);
+            request->set_response_tainting(Infrastructure::Requesting::ResponseTainting::Opaque);
 
             // 3. Return the result of running scheme fetch given fetchParams.
             return scheme_fetch(realm, fetch_params);
@@ -317,7 +317,7 @@ WebIDL::ExceptionOr<Optional<JS::NonnullGCPtr<PendingResponse>>> main_fetch(JS::
         // -> request’s current URL’s scheme is not an HTTP(S) scheme
         else if (!Infrastructure::is_http_or_https_scheme(request->current_url().scheme())) {
             // NOTE: At this point all other request modes have been handled. Ensure we're not lying in the error message :^)
-            VERIFY(request->mode() == Infrastructure::Request::Mode::CORS);
+            VERIFY(request->mode() == Infrastructure::Requesting::Mode::CORS);
 
             // Return a network error.
             return PendingResponse::create(vm, request, Infrastructure::Response::network_error(vm, "Request with 'cors' mode must have URL with HTTP or HTTPS scheme"sv));
@@ -331,7 +331,7 @@ WebIDL::ExceptionOr<Optional<JS::NonnullGCPtr<PendingResponse>>> main_fetch(JS::
                 && (!Infrastructure::is_cors_safelisted_method(request->method())
                     || !TRY_OR_THROW_OOM(vm, Infrastructure::get_cors_unsafe_header_names(request->header_list())).is_empty()))) {
             // 1. Set request’s response tainting to "cors".
-            request->set_response_tainting(Infrastructure::Request::ResponseTainting::CORS);
+            request->set_response_tainting(Infrastructure::Requesting::ResponseTainting::CORS);
 
             auto returned_pending_response = PendingResponse::create(vm, request);
 
@@ -353,7 +353,7 @@ WebIDL::ExceptionOr<Optional<JS::NonnullGCPtr<PendingResponse>>> main_fetch(JS::
         // -> Otherwise
         else {
             // 1. Set request’s response tainting to "cors".
-            request->set_response_tainting(Infrastructure::Request::ResponseTainting::CORS);
+            request->set_response_tainting(Infrastructure::Requesting::ResponseTainting::CORS);
 
             // 2. Return the result of running HTTP fetch given fetchParams.
             return http_fetch(realm, fetch_params);
@@ -389,7 +389,7 @@ WebIDL::ExceptionOr<Optional<JS::NonnullGCPtr<PendingResponse>>> main_fetch(JS::
             // 13. If response is not a network error and response is not a filtered response, then:
             if (!response->is_network_error() && !is<Infrastructure::FilteredResponse>(*response)) {
                 // 1. If request’s response tainting is "cors", then:
-                if (request->response_tainting() == Infrastructure::Request::ResponseTainting::CORS) {
+                if (request->response_tainting() == Infrastructure::Requesting::ResponseTainting::CORS) {
                     // FIXME: 1. Let headerNames be the result of extracting header list values given
                     //           `Access-Control-Expose-Headers` and response’s header list.
                     // FIXME: 2. If request’s credentials mode is not "include" and headerNames contains `*`, then set
@@ -404,15 +404,15 @@ WebIDL::ExceptionOr<Optional<JS::NonnullGCPtr<PendingResponse>>> main_fetch(JS::
                 response = TRY_OR_IGNORE([&]() -> WebIDL::ExceptionOr<JS::NonnullGCPtr<Infrastructure::Response>> {
                     switch (request->response_tainting()) {
                     // -> "basic"
-                    case Infrastructure::Request::ResponseTainting::Basic:
+                    case Infrastructure::Requesting::ResponseTainting::Basic:
                         // basic filtered response
                         return TRY_OR_THROW_OOM(vm, Infrastructure::BasicFilteredResponse::create(vm, *response));
                     // -> "cors"
-                    case Infrastructure::Request::ResponseTainting::CORS:
+                    case Infrastructure::Requesting::ResponseTainting::CORS:
                         // CORS filtered response
                         return TRY_OR_THROW_OOM(vm, Infrastructure::CORSFilteredResponse::create(vm, *response));
                     // -> "opaque"
-                    case Infrastructure::Request::ResponseTainting::Opaque:
+                    case Infrastructure::Requesting::ResponseTainting::Opaque:
                         // opaque filtered response
                         return Infrastructure::OpaqueFilteredResponse::create(vm, *response);
                     default:
@@ -533,7 +533,7 @@ WebIDL::ExceptionOr<void> fetch_response_handover(JS::Realm& realm, Infrastructu
 
         // 2. If fetchParams’s request’s destination is "document", then set fetchParams’s controller’s full timing
         //    info to fetchParams’s timing info.
-        if (fetch_params.request()->destination() == Infrastructure::Request::Destination::Document)
+        if (fetch_params.request()->destination() == Infrastructure::Requesting::Destination::Document)
             fetch_params.controller()->set_full_timing_info(fetch_params.timing_info());
 
         // 3. Set fetchParams’s controller’s report timing steps to the following steps given a global object global:
@@ -562,7 +562,7 @@ WebIDL::ExceptionOr<void> fetch_response_handover(JS::Realm& realm, Infrastructu
             }
 
             // 6. Let responseStatus be 0 if fetchParams’s request’s mode is "navigate" and response’s has-cross-origin-redirects is true; otherwise response’s status.
-            auto response_status = fetch_params.request()->mode() == Infrastructure::Request::Mode::Navigate && response.has_cross_origin_redirects()
+            auto response_status = fetch_params.request()->mode() == Infrastructure::Requesting::Mode::Navigate && response.has_cross_origin_redirects()
                 ? 0
                 : response.status();
 
@@ -756,7 +756,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> http_fetch(JS::Realm& rea
     JS::GCPtr<Infrastructure::Response> actual_response;
 
     // 4. If request’s service-workers mode is "all", then:
-    if (request->service_workers_mode() == Infrastructure::Request::ServiceWorkersMode::All) {
+    if (request->service_workers_mode() == Infrastructure::Requesting::ServiceWorkersMode::All) {
         // 1. Let requestForServiceWorker be a clone of request.
         auto request_for_service_worker = TRY(request->clone(realm));
 
@@ -797,13 +797,13 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> http_fetch(JS::Realm& rea
                 // - response’s type is "error"
                 response->type() == Infrastructure::Response::Type::Error
                 // - request’s mode is "same-origin" and response’s type is "cors"
-                || (request->mode() == Infrastructure::Request::Mode::SameOrigin && response->type() == Infrastructure::Response::Type::CORS)
+                || (request->mode() == Infrastructure::Requesting::Mode::SameOrigin && response->type() == Infrastructure::Response::Type::CORS)
                 // - request’s mode is not "no-cors" and response’s type is "opaque"
-                || (request->mode() != Infrastructure::Request::Mode::NoCORS && response->type() == Infrastructure::Response::Type::Opaque)
+                || (request->mode() != Infrastructure::Requesting::Mode::NoCORS && response->type() == Infrastructure::Response::Type::Opaque)
                 // - request’s redirect mode is not "manual" and response’s type is "opaqueredirect"
-                || (request->redirect_mode() != Infrastructure::Request::RedirectMode::Manual && response->type() == Infrastructure::Response::Type::OpaqueRedirect)
+                || (request->redirect_mode() != Infrastructure::Requesting::RedirectMode::Manual && response->type() == Infrastructure::Response::Type::OpaqueRedirect)
                 // - request’s redirect mode is not "follow" and response’s URL list has more than one item.
-                || (request->redirect_mode() != Infrastructure::Request::RedirectMode::Follow && response->url_list().size() > 1)) {
+                || (request->redirect_mode() != Infrastructure::Requesting::RedirectMode::Follow && response->url_list().size() > 1)) {
                 // then return a network error.
                 return PendingResponse::create(vm, request, Infrastructure::Response::network_error(vm, "Invalid request/response state combination"sv));
             }
@@ -841,8 +841,8 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> http_fetch(JS::Realm& rea
             // 2. If request’s redirect mode is "follow", then set request’s service-workers mode to "none".
             // NOTE: Redirects coming from the network (as opposed to from a service worker) are not to be exposed to a
             //       service worker.
-            if (request->redirect_mode() == Infrastructure::Request::RedirectMode::Follow)
-                request->set_service_workers_mode(Infrastructure::Request::ServiceWorkersMode::None);
+            if (request->redirect_mode() == Infrastructure::Requesting::RedirectMode::Follow)
+                request->set_service_workers_mode(Infrastructure::Requesting::ServiceWorkersMode::None);
 
             // 3. Set response and actualResponse to the result of running HTTP-network-or-cache fetch given fetchParams.
             return http_network_or_cache_fetch(*realm, *fetch_params);
@@ -880,7 +880,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> http_fetch(JS::Realm& rea
             //    then return a network error.
             // NOTE: As the CORS check is not to be applied to responses whose status is 304 or 407, or responses from
             //       a service worker for that matter, it is applied here.
-            if (request->response_tainting() == Infrastructure::Request::ResponseTainting::CORS
+            if (request->response_tainting() == Infrastructure::Requesting::ResponseTainting::CORS
                 && !TRY_OR_IGNORE(cors_check(request, *response))) {
                 returned_pending_response->resolve(Infrastructure::Response::network_error(vm, TRY_OR_IGNORE("Request with 'cors' response tainting failed CORS check"_string)));
                 return;
@@ -897,7 +897,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> http_fetch(JS::Realm& rea
         // NOTE: The cross-origin resource policy check runs for responses coming from the network and responses coming
         //       from the service worker. This is different from the CORS check, as request’s client and the service
         //       worker can have different embedder policies.
-        if ((request->response_tainting() == Infrastructure::Request::ResponseTainting::Opaque || response->type() == Infrastructure::Response::Type::Opaque)
+        if ((request->response_tainting() == Infrastructure::Requesting::ResponseTainting::Opaque || response->type() == Infrastructure::Response::Type::Opaque)
             && false // FIXME: "and the cross-origin resource policy check with request’s origin, request’s client, request’s destination, and actualResponse returns blocked"
         ) {
             returned_pending_response->resolve(Infrastructure::Response::network_error(vm, TRY_OR_IGNORE("Response was blocked by cross-origin resource policy check"_string)));
@@ -915,24 +915,24 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> http_fetch(JS::Realm& rea
             // 2. Switch on request’s redirect mode:
             switch (request->redirect_mode()) {
             // -> "error"
-            case Infrastructure::Request::RedirectMode::Error:
+            case Infrastructure::Requesting::RedirectMode::Error:
                 // Set response to a network error.
                 response = Infrastructure::Response::network_error(vm, TRY_OR_IGNORE("Request with 'error' redirect mode received redirect response"_string));
                 break;
             // -> "manual"
-            case Infrastructure::Request::RedirectMode::Manual:
+            case Infrastructure::Requesting::RedirectMode::Manual:
                 // Set response to an opaque-redirect filtered response whose internal response is actualResponse. If
                 // request’s mode is "navigate", then set fetchParams’s controller’s next manual redirect steps to run
                 // HTTP-redirect fetch given fetchParams and response.
                 response = Infrastructure::OpaqueRedirectFilteredResponse::create(vm, *actual_response);
-                if (request->mode() == Infrastructure::Request::Mode::Navigate) {
+                if (request->mode() == Infrastructure::Requesting::Mode::Navigate) {
                     fetch_params.controller()->set_next_manual_redirect_steps([&realm, &fetch_params, response] {
                         (void)http_redirect_fetch(realm, fetch_params, *response);
                     });
                 }
                 break;
             // -> "follow"
-            case Infrastructure::Request::RedirectMode::Follow:
+            case Infrastructure::Requesting::RedirectMode::Follow:
                 // Set response to the result of running HTTP-redirect fetch given fetchParams and response.
                 inner_pending_response = TRY_OR_IGNORE(http_redirect_fetch(realm, fetch_params, *response));
                 break;
@@ -1000,7 +1000,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> http_redirect_fetch(JS::R
 
     // 8. If request’s mode is "cors", locationURL includes credentials, and request’s origin is not same origin with
     //    locationURL’s origin, then return a network error.
-    if (request->mode() == Infrastructure::Request::Mode::CORS
+    if (request->mode() == Infrastructure::Requesting::Mode::CORS
         && location_url.includes_credentials()
         && request->origin().has<HTML::Origin>()
         && !request->origin().get<HTML::Origin>().is_same_origin(URL::url_origin(location_url))) {
@@ -1009,7 +1009,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> http_redirect_fetch(JS::R
 
     // 10. If request’s response tainting is "cors" and locationURL includes credentials, then return a network error.
     // NOTE: This catches a cross-origin resource redirecting to a same-origin URL.
-    if (request->response_tainting() == Infrastructure::Request::ResponseTainting::CORS && location_url.includes_credentials())
+    if (request->response_tainting() == Infrastructure::Requesting::ResponseTainting::CORS && location_url.includes_credentials())
         return PendingResponse::create(vm, request, Infrastructure::Response::network_error(vm, "Request with 'cors' response tainting must not include credentials in redirect URL"sv));
 
     // 11. If actualResponse’s status is not 303, request’s body is non-null, and request’s body’s source is null, then
@@ -1134,9 +1134,9 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> http_network_or_cache_fet
 
         // 1. If request’s window is "no-window" and request’s redirect mode is "error", then set httpFetchParams to
         //    fetchParams and httpRequest to request.
-        if (request->window().has<Infrastructure::Request::Window>()
-            && request->window().get<Infrastructure::Request::Window>() == Infrastructure::Request::Window::NoWindow
-            && request->redirect_mode() == Infrastructure::Request::RedirectMode::Error) {
+        if (request->window().has<Infrastructure::Requesting::Window>()
+            && request->window().get<Infrastructure::Requesting::Window>() == Infrastructure::Requesting::Window::NoWindow
+            && request->redirect_mode() == Infrastructure::Requesting::RedirectMode::Error) {
             http_fetch_params = fetch_params;
             http_request = request;
         }
@@ -1161,10 +1161,10 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> http_network_or_cache_fet
         // 3. Let includeCredentials be true if one of
         if (
             // - request’s credentials mode is "include"
-            request->credentials_mode() == Infrastructure::Request::CredentialsMode::Include
+            request->credentials_mode() == Infrastructure::Requesting::CredentialsMode::Include
             // - request’s credentials mode is "same-origin" and request’s response tainting is "basic"
-            || (request->credentials_mode() == Infrastructure::Request::CredentialsMode::SameOrigin
-                && request->response_tainting() == Infrastructure::Request::ResponseTainting::Basic)
+            || (request->credentials_mode() == Infrastructure::Requesting::CredentialsMode::SameOrigin
+                && request->response_tainting() == Infrastructure::Requesting::ResponseTainting::Basic)
             // is true; otherwise false.
         ) {
             include_credentials = IncludeCredentials::Yes;
@@ -1243,19 +1243,19 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> http_network_or_cache_fet
         // 15. If httpRequest’s cache mode is "default" and httpRequest’s header list contains `If-Modified-Since`,
         //     `If-None-Match`, `If-Unmodified-Since`, `If-Match`, or `If-Range`, then set httpRequest’s cache mode to
         //     "no-store".
-        if (http_request->cache_mode() == Infrastructure::Request::CacheMode::Default
+        if (http_request->cache_mode() == Infrastructure::Requesting::CacheMode::Default
             && (http_request->header_list()->contains("If-Modified-Since"sv.bytes())
                 || http_request->header_list()->contains("If-None-Match"sv.bytes())
                 || http_request->header_list()->contains("If-Unmodified-Since"sv.bytes())
                 || http_request->header_list()->contains("If-Match"sv.bytes())
                 || http_request->header_list()->contains("If-Range"sv.bytes()))) {
-            http_request->set_cache_mode(Infrastructure::Request::CacheMode::NoStore);
+            http_request->set_cache_mode(Infrastructure::Requesting::CacheMode::NoStore);
         }
 
         // 16. If httpRequest’s cache mode is "no-cache", httpRequest’s prevent no-cache cache-control header
         //     modification flag is unset, and httpRequest’s header list does not contain `Cache-Control`, then append
         //     (`Cache-Control`, `max-age=0`) to httpRequest’s header list.
-        if (http_request->cache_mode() == Infrastructure::Request::CacheMode::NoCache
+        if (http_request->cache_mode() == Infrastructure::Requesting::CacheMode::NoCache
             && !http_request->prevent_no_cache_cache_control_header_modification()
             && !http_request->header_list()->contains("Cache-Control"sv.bytes())) {
             auto header = MUST(Infrastructure::Header::from_string_pair("Cache-Control"sv, "max-age=0"sv));
@@ -1263,8 +1263,8 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> http_network_or_cache_fet
         }
 
         // 17. If httpRequest’s cache mode is "no-store" or "reload", then:
-        if (http_request->cache_mode() == Infrastructure::Request::CacheMode::NoStore
-            || http_request->cache_mode() == Infrastructure::Request::CacheMode::Reload) {
+        if (http_request->cache_mode() == Infrastructure::Requesting::CacheMode::NoStore
+            || http_request->cache_mode() == Infrastructure::Requesting::CacheMode::Reload) {
             // 1. If httpRequest’s header list does not contain `Pragma`, then append (`Pragma`, `no-cache`) to
             //    httpRequest’s header list.
             if (!http_request->header_list()->contains("Pragma"sv.bytes())) {
@@ -1359,11 +1359,11 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> http_network_or_cache_fet
 
         // 23. If httpCache is null, then set httpRequest’s cache mode to "no-store".
         if (!http_cache)
-            http_request->set_cache_mode(Infrastructure::Request::CacheMode::NoStore);
+            http_request->set_cache_mode(Infrastructure::Requesting::CacheMode::NoStore);
 
         // 24. If httpRequest’s cache mode is neither "no-store" nor "reload", then:
-        if (http_request->cache_mode() != Infrastructure::Request::CacheMode::NoStore
-            && http_request->cache_mode() != Infrastructure::Request::CacheMode::Reload) {
+        if (http_request->cache_mode() != Infrastructure::Requesting::CacheMode::NoStore
+            && http_request->cache_mode() != Infrastructure::Requesting::CacheMode::Reload) {
             // 1. Set storedResponse to the result of selecting a response from the httpCache, possibly needing
             //    validation, as per the "Constructing Responses from Caches" chapter of HTTP Caching [HTTP-CACHING],
             //    if any.
@@ -1387,7 +1387,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> http_network_or_cache_fet
     // 10. If response is null, then:
     if (!response) {
         // 1. If httpRequest’s cache mode is "only-if-cached", then return a network error.
-        if (http_request->cache_mode() == Infrastructure::Request::CacheMode::OnlyIfCached)
+        if (http_request->cache_mode() == Infrastructure::Requesting::CacheMode::OnlyIfCached)
             return PendingResponse::create(vm, request, Infrastructure::Response::network_error(vm, "Request with 'only-if-cached' cache mode doesn't have a cached response"sv));
 
         // 2. Let forwardResponse be the result of running HTTP-network fetch given httpFetchParams, includeCredentials,
@@ -1457,7 +1457,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> http_network_or_cache_fet
         // 14. If response’s status is 401, httpRequest’s response tainting is not "cors", includeCredentials is true,
         //     and request’s window is an environment settings object, then:
         if (response->status() == 401
-            && http_request->response_tainting() != Infrastructure::Request::ResponseTainting::CORS
+            && http_request->response_tainting() != Infrastructure::Requesting::ResponseTainting::CORS
             && include_credentials == IncludeCredentials::Yes
             && request->window().has<HTML::EnvironmentSettingsObject*>()) {
             // 1. Needs testing: multiple `WWW-Authenticate` headers, missing, parsing issues.
@@ -1511,8 +1511,8 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> http_network_or_cache_fet
             // 15. If response’s status is 407, then:
             if (response->status() == 407) {
                 // 1. If request’s window is "no-window", then return a network error.
-                if (request->window().has<Infrastructure::Request::Window>()
-                    && request->window().get<Infrastructure::Request::Window>() == Infrastructure::Request::Window::NoWindow) {
+                if (request->window().has<Infrastructure::Requesting::Window>()
+                    && request->window().get<Infrastructure::Requesting::Window>() == Infrastructure::Requesting::Window::NoWindow) {
                     returned_pending_response->resolve(Infrastructure::Response::network_error(vm, TRY_OR_IGNORE("Request requires proxy authentication but has 'no-window' set"_string)));
                     return;
                 }
@@ -1695,8 +1695,8 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> cors_preflight_fetch(JS::
     preflight->set_origin(request.origin());
     preflight->set_referrer(request.referrer());
     preflight->set_referrer_policy(request.referrer_policy());
-    preflight->set_mode(Infrastructure::Request::Mode::CORS);
-    preflight->set_response_tainting(Infrastructure::Request::ResponseTainting::CORS);
+    preflight->set_mode(Infrastructure::Requesting::Mode::CORS);
+    preflight->set_response_tainting(Infrastructure::Requesting::ResponseTainting::CORS);
 
     // 2. Append (`Accept`, `*/*`) to preflight’s header list.
     auto temp_header = TRY_OR_THROW_OOM(vm, Infrastructure::Header::from_string_pair("Accept"sv, "*/*"sv));
@@ -1811,7 +1811,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> cors_preflight_fetch(JS::
             // 5. If request’s method is not in methods, request’s method is not a CORS-safelisted method, and request’s credentials mode
             //    is "include" or methods does not contain `*`, then return a network error.
             if (!methods.contains_slow(request.method()) && !Infrastructure::is_cors_safelisted_method(request.method())) {
-                if (request.credentials_mode() == Infrastructure::Request::CredentialsMode::Include) {
+                if (request.credentials_mode() == Infrastructure::Requesting::CredentialsMode::Include) {
                     returned_pending_response->resolve(Infrastructure::Response::network_error(vm, TRY_OR_IGNORE(String::formatted("Non-CORS-safelisted method '{}' not found in the CORS-preflight response's Access-Control-Allow-Methods header (the header may be missing). '*' is not allowed as the main request includes credentials."sv, StringView { request.method() }))));
                     return;
                 }
@@ -1857,7 +1857,7 @@ WebIDL::ExceptionOr<JS::NonnullGCPtr<PendingResponse>> cors_preflight_fetch(JS::
                 }
 
                 if (!is_in_header_names) {
-                    if (request.credentials_mode() == Infrastructure::Request::CredentialsMode::Include) {
+                    if (request.credentials_mode() == Infrastructure::Requesting::CredentialsMode::Include) {
                         returned_pending_response->resolve(Infrastructure::Response::network_error(vm, TRY_OR_IGNORE(String::formatted("CORS-unsafe request-header '{}' not found in the CORS-preflight response's Access-Control-Allow-Headers header (the header may be missing). '*' is not allowed as the main request includes credentials."sv, StringView { unsafe_name }))));
                         return;
                     }

@@ -28,9 +28,9 @@ Optional<AK::URL> determine_requests_referrer(Fetch::Infrastructure::Request con
     // 3. Switch on request’s referrer:
     auto referrer_source = request.referrer().visit(
         // "client"
-        [&](Fetch::Infrastructure::Request::Referrer referrer) -> Optional<AK::URL> {
+        [&](Fetch::Infrastructure::Requesting::Referrer referrer) -> Optional<AK::URL> {
             // Note: If request’s referrer is "no-referrer", Fetch will not call into this algorithm.
-            VERIFY(referrer == Fetch::Infrastructure::Request::Referrer::Client);
+            VERIFY(referrer == Fetch::Infrastructure::Requesting::Referrer::Client);
 
             // FIXME: Add a const global_object() getter to ESO
             auto& global_object = const_cast<HTML::EnvironmentSettingsObject*>(environment)->global_object();

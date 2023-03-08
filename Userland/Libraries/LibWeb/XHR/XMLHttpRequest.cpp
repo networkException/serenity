@@ -570,7 +570,7 @@ WebIDL::ExceptionOr<void> XMLHttpRequest::send(Optional<DocumentOrXMLHttpRequest
 
     // mode
     //    "cors".
-    request->set_mode(Fetch::Infrastructure::Request::Mode::CORS);
+    request->set_mode(Fetch::Infrastructure::Requesting::Mode::CORS);
 
     // use-CORS-preflight flag
     //    Set if this’s upload listener flag is set.
@@ -578,7 +578,7 @@ WebIDL::ExceptionOr<void> XMLHttpRequest::send(Optional<DocumentOrXMLHttpRequest
 
     // credentials mode
     //    If this’s cross-origin credentials is true, then "include"; otherwise "same-origin".
-    request->set_credentials_mode(m_cross_origin_credentials ? Fetch::Infrastructure::Request::CredentialsMode::Include : Fetch::Infrastructure::Request::CredentialsMode::SameOrigin);
+    request->set_credentials_mode(m_cross_origin_credentials ? Fetch::Infrastructure::Requesting::CredentialsMode::Include : Fetch::Infrastructure::Requesting::CredentialsMode::SameOrigin);
 
     // use-URL-credentials flag
     //    Set if this’s request URL includes credentials.
@@ -586,7 +586,7 @@ WebIDL::ExceptionOr<void> XMLHttpRequest::send(Optional<DocumentOrXMLHttpRequest
 
     // initiator type
     //    "xmlhttprequest".
-    request->set_initiator_type(Fetch::Infrastructure::Request::InitiatorType::XMLHttpRequest);
+    request->set_initiator_type(Fetch::Infrastructure::Requesting::InitiatorType::XMLHttpRequest);
 
     // 7. Unset this’s upload complete flag.
     m_upload_complete = false;

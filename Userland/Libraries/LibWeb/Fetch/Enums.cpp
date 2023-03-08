@@ -49,65 +49,65 @@ Optional<ReferrerPolicy::ReferrerPolicy> from_bindings_enum(Bindings::ReferrerPo
     }
 }
 
-Infrastructure::Request::Mode from_bindings_enum(Bindings::RequestMode mode)
+Infrastructure::Requesting::Mode from_bindings_enum(Bindings::RequestMode mode)
 {
     switch (mode) {
     case Bindings::RequestMode::SameOrigin:
-        return Infrastructure::Request::Mode::SameOrigin;
+        return Infrastructure::Requesting::Mode::SameOrigin;
     case Bindings::RequestMode::Cors:
-        return Infrastructure::Request::Mode::CORS;
+        return Infrastructure::Requesting::Mode::CORS;
     case Bindings::RequestMode::NoCors:
-        return Infrastructure::Request::Mode::NoCORS;
+        return Infrastructure::Requesting::Mode::NoCORS;
     case Bindings::RequestMode::Navigate:
-        return Infrastructure::Request::Mode::Navigate;
+        return Infrastructure::Requesting::Mode::Navigate;
     default:
         VERIFY_NOT_REACHED();
     }
 }
 
-Infrastructure::Request::CredentialsMode from_bindings_enum(Bindings::RequestCredentials request_credentials)
+Infrastructure::Requesting::CredentialsMode from_bindings_enum(Bindings::RequestCredentials request_credentials)
 {
     switch (request_credentials) {
     case Bindings::RequestCredentials::Omit:
-        return Infrastructure::Request::CredentialsMode::Omit;
+        return Infrastructure::Requesting::CredentialsMode::Omit;
     case Bindings::RequestCredentials::SameOrigin:
-        return Infrastructure::Request::CredentialsMode::SameOrigin;
+        return Infrastructure::Requesting::CredentialsMode::SameOrigin;
     case Bindings::RequestCredentials::Include:
-        return Infrastructure::Request::CredentialsMode::Include;
+        return Infrastructure::Requesting::CredentialsMode::Include;
     default:
         VERIFY_NOT_REACHED();
     }
 }
 
-Infrastructure::Request::CacheMode from_bindings_enum(Bindings::RequestCache request_cache)
+Infrastructure::Requesting::CacheMode from_bindings_enum(Bindings::RequestCache request_cache)
 {
     switch (request_cache) {
     case Bindings::RequestCache::Default:
-        return Infrastructure::Request::CacheMode::Default;
+        return Infrastructure::Requesting::CacheMode::Default;
     case Bindings::RequestCache::NoStore:
-        return Infrastructure::Request::CacheMode::NoStore;
+        return Infrastructure::Requesting::CacheMode::NoStore;
     case Bindings::RequestCache::Reload:
-        return Infrastructure::Request::CacheMode::Reload;
+        return Infrastructure::Requesting::CacheMode::Reload;
     case Bindings::RequestCache::NoCache:
-        return Infrastructure::Request::CacheMode::NoCache;
+        return Infrastructure::Requesting::CacheMode::NoCache;
     case Bindings::RequestCache::ForceCache:
-        return Infrastructure::Request::CacheMode::ForceCache;
+        return Infrastructure::Requesting::CacheMode::ForceCache;
     case Bindings::RequestCache::OnlyIfCached:
-        return Infrastructure::Request::CacheMode::OnlyIfCached;
+        return Infrastructure::Requesting::CacheMode::OnlyIfCached;
     default:
         VERIFY_NOT_REACHED();
     }
 }
 
-Infrastructure::Request::RedirectMode from_bindings_enum(Bindings::RequestRedirect request_redirect)
+Infrastructure::Requesting::RedirectMode from_bindings_enum(Bindings::RequestRedirect request_redirect)
 {
     switch (request_redirect) {
     case Bindings::RequestRedirect::Follow:
-        return Infrastructure::Request::RedirectMode::Follow;
+        return Infrastructure::Requesting::RedirectMode::Follow;
     case Bindings::RequestRedirect::Error:
-        return Infrastructure::Request::RedirectMode::Error;
+        return Infrastructure::Requesting::RedirectMode::Error;
     case Bindings::RequestRedirect::Manual:
-        return Infrastructure::Request::RedirectMode::Manual;
+        return Infrastructure::Requesting::RedirectMode::Manual;
     default:
         VERIFY_NOT_REACHED();
     }
@@ -139,70 +139,70 @@ Bindings::ReferrerPolicy to_bindings_enum(Optional<ReferrerPolicy::ReferrerPolic
     }
 }
 
-Bindings::RequestDestination to_bindings_enum(Optional<Infrastructure::Request::Destination> const& destination)
+Bindings::RequestDestination to_bindings_enum(Optional<Infrastructure::Requesting::Destination> const& destination)
 {
     if (!destination.has_value())
         return Bindings::RequestDestination::Empty;
     switch (*destination) {
-    case Infrastructure::Request::Destination::Audio:
+    case Infrastructure::Requesting::Destination::Audio:
         return Bindings::RequestDestination::Audio;
-    case Infrastructure::Request::Destination::AudioWorklet:
+    case Infrastructure::Requesting::Destination::AudioWorklet:
         return Bindings::RequestDestination::Audioworklet;
-    case Infrastructure::Request::Destination::Document:
+    case Infrastructure::Requesting::Destination::Document:
         return Bindings::RequestDestination::Document;
-    case Infrastructure::Request::Destination::Embed:
+    case Infrastructure::Requesting::Destination::Embed:
         return Bindings::RequestDestination::Embed;
-    case Infrastructure::Request::Destination::Font:
+    case Infrastructure::Requesting::Destination::Font:
         return Bindings::RequestDestination::Font;
-    case Infrastructure::Request::Destination::Frame:
+    case Infrastructure::Requesting::Destination::Frame:
         return Bindings::RequestDestination::Frame;
-    case Infrastructure::Request::Destination::IFrame:
+    case Infrastructure::Requesting::Destination::IFrame:
         return Bindings::RequestDestination::Iframe;
-    case Infrastructure::Request::Destination::Image:
+    case Infrastructure::Requesting::Destination::Image:
         return Bindings::RequestDestination::Image;
-    case Infrastructure::Request::Destination::Manifest:
+    case Infrastructure::Requesting::Destination::Manifest:
         return Bindings::RequestDestination::Manifest;
-    case Infrastructure::Request::Destination::Object:
+    case Infrastructure::Requesting::Destination::Object:
         return Bindings::RequestDestination::Object;
-    case Infrastructure::Request::Destination::PaintWorklet:
+    case Infrastructure::Requesting::Destination::PaintWorklet:
         return Bindings::RequestDestination::Paintworklet;
-    case Infrastructure::Request::Destination::Report:
+    case Infrastructure::Requesting::Destination::Report:
         return Bindings::RequestDestination::Report;
-    case Infrastructure::Request::Destination::Script:
+    case Infrastructure::Requesting::Destination::Script:
         return Bindings::RequestDestination::Script;
-    case Infrastructure::Request::Destination::ServiceWorker:
+    case Infrastructure::Requesting::Destination::ServiceWorker:
         // NOTE: "serviceworker" is omitted from RequestDestination as it cannot be observed from JavaScript.
         //       Implementations will still need to support it as a destination.
         VERIFY_NOT_REACHED();
-    case Infrastructure::Request::Destination::SharedWorker:
+    case Infrastructure::Requesting::Destination::SharedWorker:
         return Bindings::RequestDestination::Sharedworker;
-    case Infrastructure::Request::Destination::Style:
+    case Infrastructure::Requesting::Destination::Style:
         return Bindings::RequestDestination::Style;
-    case Infrastructure::Request::Destination::Track:
+    case Infrastructure::Requesting::Destination::Track:
         return Bindings::RequestDestination::Track;
-    case Infrastructure::Request::Destination::Video:
+    case Infrastructure::Requesting::Destination::Video:
         return Bindings::RequestDestination::Video;
-    case Infrastructure::Request::Destination::Worker:
+    case Infrastructure::Requesting::Destination::Worker:
         return Bindings::RequestDestination::Worker;
-    case Infrastructure::Request::Destination::XSLT:
+    case Infrastructure::Requesting::Destination::XSLT:
         return Bindings::RequestDestination::Xslt;
     default:
         VERIFY_NOT_REACHED();
     }
 }
 
-Bindings::RequestMode to_bindings_enum(Infrastructure::Request::Mode mode)
+Bindings::RequestMode to_bindings_enum(Infrastructure::Requesting::Mode mode)
 {
     switch (mode) {
-    case Infrastructure::Request::Mode::SameOrigin:
+    case Infrastructure::Requesting::Mode::SameOrigin:
         return Bindings::RequestMode::SameOrigin;
-    case Infrastructure::Request::Mode::CORS:
+    case Infrastructure::Requesting::Mode::CORS:
         return Bindings::RequestMode::Cors;
-    case Infrastructure::Request::Mode::NoCORS:
+    case Infrastructure::Requesting::Mode::NoCORS:
         return Bindings::RequestMode::NoCors;
-    case Infrastructure::Request::Mode::Navigate:
+    case Infrastructure::Requesting::Mode::Navigate:
         return Bindings::RequestMode::Navigate;
-    case Infrastructure::Request::Mode::WebSocket:
+    case Infrastructure::Requesting::Mode::WebSocket:
         // NOTE: "websocket" is omitted from RequestMode as it cannot be used nor observed from JavaScript.
         VERIFY_NOT_REACHED();
     default:
@@ -210,48 +210,48 @@ Bindings::RequestMode to_bindings_enum(Infrastructure::Request::Mode mode)
     }
 }
 
-Bindings::RequestCredentials to_bindings_enum(Infrastructure::Request::CredentialsMode credentials_mode)
+Bindings::RequestCredentials to_bindings_enum(Infrastructure::Requesting::CredentialsMode credentials_mode)
 {
     switch (credentials_mode) {
-    case Infrastructure::Request::CredentialsMode::Omit:
+    case Infrastructure::Requesting::CredentialsMode::Omit:
         return Bindings::RequestCredentials::Omit;
-    case Infrastructure::Request::CredentialsMode::SameOrigin:
+    case Infrastructure::Requesting::CredentialsMode::SameOrigin:
         return Bindings::RequestCredentials::SameOrigin;
-    case Infrastructure::Request::CredentialsMode::Include:
+    case Infrastructure::Requesting::CredentialsMode::Include:
         return Bindings::RequestCredentials::Include;
     default:
         VERIFY_NOT_REACHED();
     }
 }
 
-Bindings::RequestCache to_bindings_enum(Infrastructure::Request::CacheMode cache_mode)
+Bindings::RequestCache to_bindings_enum(Infrastructure::Requesting::CacheMode cache_mode)
 {
     switch (cache_mode) {
-    case Infrastructure::Request::CacheMode::Default:
+    case Infrastructure::Requesting::CacheMode::Default:
         return Bindings::RequestCache::Default;
-    case Infrastructure::Request::CacheMode::NoStore:
+    case Infrastructure::Requesting::CacheMode::NoStore:
         return Bindings::RequestCache::NoStore;
-    case Infrastructure::Request::CacheMode::Reload:
+    case Infrastructure::Requesting::CacheMode::Reload:
         return Bindings::RequestCache::Reload;
-    case Infrastructure::Request::CacheMode::NoCache:
+    case Infrastructure::Requesting::CacheMode::NoCache:
         return Bindings::RequestCache::NoCache;
-    case Infrastructure::Request::CacheMode::ForceCache:
+    case Infrastructure::Requesting::CacheMode::ForceCache:
         return Bindings::RequestCache::ForceCache;
-    case Infrastructure::Request::CacheMode::OnlyIfCached:
+    case Infrastructure::Requesting::CacheMode::OnlyIfCached:
         return Bindings::RequestCache::OnlyIfCached;
     default:
         VERIFY_NOT_REACHED();
     }
 }
 
-Bindings::RequestRedirect to_bindings_enum(Infrastructure::Request::RedirectMode redirect_mode)
+Bindings::RequestRedirect to_bindings_enum(Infrastructure::Requesting::RedirectMode redirect_mode)
 {
     switch (redirect_mode) {
-    case Infrastructure::Request::RedirectMode::Follow:
+    case Infrastructure::Requesting::RedirectMode::Follow:
         return Bindings::RequestRedirect::Follow;
-    case Infrastructure::Request::RedirectMode::Error:
+    case Infrastructure::Requesting::RedirectMode::Error:
         return Bindings::RequestRedirect::Error;
-    case Infrastructure::Request::RedirectMode::Manual:
+    case Infrastructure::Requesting::RedirectMode::Manual:
         return Bindings::RequestRedirect::Manual;
     default:
         VERIFY_NOT_REACHED();
