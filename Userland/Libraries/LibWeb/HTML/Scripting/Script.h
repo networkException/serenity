@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, Andreas Kling <kling@serenityos.org>
+ * Copyright (c) 2023, networkException <networkexception@serenityos.org>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
@@ -26,6 +27,9 @@ public:
     DeprecatedString const& filename() const { return m_filename; }
 
     EnvironmentSettingsObject& settings_object() { return m_settings_object; }
+
+    // https://html.spec.whatwg.org/multipage/webappapis.html#active-script
+    static JS::GCPtr<Script> active_script(JS::VM&);
 
 protected:
     Script(AK::URL base_url, DeprecatedString filename, EnvironmentSettingsObject& environment_settings_object);
