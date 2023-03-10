@@ -77,9 +77,9 @@ VM::VM(OwnPtr<CustomData> custom_data)
         return make_job_callback(function_object);
     };
 
-    host_resolve_imported_module = [&](ScriptOrModule referencing_script_or_module, ModuleRequest const& specifier) {
-        return resolve_imported_module(move(referencing_script_or_module), specifier);
-    };
+    /* host_load_imported_module = [&](CyclicModule* referrer, DeprecatedString const& specifier, GraphLoadingState::HostDefined const& host_defined, GraphLoadingState payload) {
+        load_imported_module(referrer, specifier, host_defined, move(payload));
+    }; */
 
     host_import_module_dynamically = [&](ScriptOrModule, ModuleRequest const&, PromiseCapability const& promise_capability) -> ThrowCompletionOr<void> {
         // By default, we throw on dynamic imports this is to prevent arbitrary file access by scripts.
@@ -842,6 +842,7 @@ ThrowCompletionOr<void> VM::link_and_eval_module(Module& module)
     return {};
 }
 
+/*
 static DeprecatedString resolve_module_filename(StringView filename, StringView module_type)
 {
     auto extensions = Vector<StringView, 2> { "js"sv, "mjs"sv };
@@ -864,29 +865,30 @@ static DeprecatedString resolve_module_filename(StringView filename, StringView 
     }
     return filename;
 }
+ */
 
-// 16.2.1.7 HostResolveImportedModule ( referencingScriptOrModule, specifier ), https://tc39.es/ecma262/#sec-hostresolveimportedmodule
-ThrowCompletionOr<NonnullGCPtr<Module>> VM::resolve_imported_module(ScriptOrModule referencing_script_or_module, ModuleRequest const& module_request)
+/*
+// 16.2.1.8 HostLoadImportedModule ( referrer, specifier, hostDefined, payload ), https://tc39.es/ecma262/#sec-HostLoadImportedModule
+ThrowCompletionOr<NonnullGCPtr<Module>> VM::load_imported_module(CyclicModule* referrer, DeprecatedString const& specifier, GraphLoadingState::HostDefined const& host_defined, GraphLoadingState payload)
 {
-    // An implementation of HostResolveImportedModule must conform to the following requirements:
-    //  - If it completes normally, the [[Value]] slot of the completion must contain an instance of a concrete subclass of Module Record.
-    //  - If a Module Record corresponding to the pair referencingScriptOrModule, moduleRequest does not exist or cannot be created, an exception must be thrown.
-    //  - Each time this operation is called with a specific referencingScriptOrModule, moduleRequest.[[Specifier]], moduleRequest.[[Assertions]] triple
-    //    as arguments it must return the same Module Record instance if it completes normally.
-    //    * It is recommended but not required that implementations additionally conform to the following stronger constraint:
-    //      each time this operation is called with a specific referencingScriptOrModule, moduleRequest.[[Specifier]] pair as arguments it must return the same Module Record instance if it completes normally.
-    //   - moduleRequest.[[Assertions]] must not influence the interpretation of the module or the module specifier;
-    //     instead, it may be used to determine whether the algorithm completes normally or with an abrupt completion.
+    // An implementation of HostLoadImportedModule must conform to the following requirements:
+    //  - The host environment must perform FinishLoadingImportedModule(referrer, specifier, payload, result),
+    //    where result is either a normal completion containing the loaded Module Record or a throw completion, either synchronously or asynchronously.
+    //  - If this operation is called multiple times with the same (referrer, specifier) pair and it performs
+    //    FinishLoadingImportedModule(referrer, specifier, payload, result) where result is a normal completion,
+    //    then it must perform FinishLoadingImportedModule(referrer, specifier, payload, result) with the same result each time.
+    //  - The operation must treat payload as an opaque value to be passed through to FinishLoadingImportedModule.
 
-    // Multiple different referencingScriptOrModule, moduleRequest.[[Specifier]] pairs may map to the same Module Record instance.
-    // The actual mapping semantic is host-defined but typically a normalization process is applied to specifier as part of the mapping process.
-    // A typical normalization process would include actions such as alphabetic case folding and expansion of relative and abbreviated path specifiers.
+    // The actual process performed is host-defined, but typically consists of performing whatever I/O operations are necessary to load the appropriate Module Record.
+    // Multiple different (referrer, specifier) pairs may map to the same Module Record instance. The actual mapping semantics is host-defined but typically a
+    // normalization process is applied to specifier as part of the mapping process. A typical normalization process would include actions such as expansion of
+    // relative and abbreviated path specifiers.
 
     // We only allow "type" as a supported assertion so it is the only valid key that should ever arrive here.
     VERIFY(module_request.assertions.is_empty() || (module_request.assertions.size() == 1 && module_request.assertions.first().key == "type"));
     auto module_type = module_request.assertions.is_empty() ? DeprecatedString {} : module_request.assertions.first().value;
 
-    dbgln_if(JS_MODULE_DEBUG, "[JS MODULE] module at {} has type {} [is_null={}]", module_request.module_specifier, module_type, module_type.is_null());
+    dbgln_if(JS_MODULE_DEBUG, "[JS MODULE] module at {} has type {} [is_null={}]", specifier, module_type, module_type.is_null());
 
     StringView base_filename = referencing_script_or_module.visit(
         [&](Empty) {
@@ -897,7 +899,7 @@ ThrowCompletionOr<NonnullGCPtr<Module>> VM::resolve_imported_module(ScriptOrModu
         });
 
     LexicalPath base_path { base_filename };
-    auto filename = LexicalPath::absolute_path(base_path.dirname(), module_request.module_specifier);
+    auto filename = LexicalPath::absolute_path(base_path.dirname(), specifier);
 
     dbgln_if(JS_MODULE_DEBUG, "[JS MODULE] base path: '{}'", base_path);
     dbgln_if(JS_MODULE_DEBUG, "[JS MODULE] initial filename: '{}'", filename);
@@ -933,7 +935,7 @@ ThrowCompletionOr<NonnullGCPtr<Module>> VM::resolve_imported_module(ScriptOrModu
     auto file_or_error = Core::DeprecatedFile::open(filename, Core::OpenMode::ReadOnly);
 
     if (file_or_error.is_error()) {
-        return throw_completion<SyntaxError>(ErrorType::ModuleNotFound, module_request.module_specifier);
+        return throw_completion<SyntaxError>(ErrorType::ModuleNotFound, specifier);
     }
 
     // FIXME: Don't read the file in one go.
@@ -971,6 +973,7 @@ ThrowCompletionOr<NonnullGCPtr<Module>> VM::resolve_imported_module(ScriptOrModu
 
     return module;
 }
+*/
 
 // 16.2.1.8 HostImportModuleDynamically ( referencingScriptOrModule, specifier, promiseCapability ), https://tc39.es/ecma262/#sec-hostimportmoduledynamically
 ThrowCompletionOr<void> VM::import_module_dynamically(ScriptOrModule referencing_script_or_module, ModuleRequest module_request, PromiseCapability const& promise_capability)
@@ -1007,6 +1010,7 @@ ThrowCompletionOr<void> VM::import_module_dynamically(ScriptOrModule referencing
             return {};
         }
     }
+/*
 
     // Note: If host_resolve_imported_module returns a module it has been loaded successfully and the next call in finish_dynamic_import will retrieve it again.
     auto module_or_error = host_resolve_imported_module(referencing_script_or_module, module_request);
@@ -1028,12 +1032,19 @@ ThrowCompletionOr<void> VM::import_module_dynamically(ScriptOrModule referencing
 
     // It must return unused.
     // Note: Just return void always since the resulting value cannot be accessed by user code.
+    */
     return {};
 }
 
 // 16.2.1.9 FinishDynamicImport ( referencingScriptOrModule, specifier, promiseCapability, innerPromise ), https://tc39.es/ecma262/#sec-finishdynamicimport
 void VM::finish_dynamic_import(ScriptOrModule referencing_script_or_module, ModuleRequest module_request, PromiseCapability const& promise_capability, Promise* inner_promise)
 {
+    (void)referencing_script_or_module;
+    (void)module_request;
+    (void)promise_capability;
+    (void)inner_promise;
+
+    /*
     dbgln_if(JS_MODULE_DEBUG, "[JS MODULE] finish_dynamic_import on {}", module_request.module_specifier);
 
     auto& realm = *current_realm();
@@ -1088,6 +1099,7 @@ void VM::finish_dynamic_import(ScriptOrModule referencing_script_or_module, Modu
     inner_promise->perform_then(on_fulfilled, on_rejected, {});
 
     // 6. Return unused.
+     */
 }
 
 }

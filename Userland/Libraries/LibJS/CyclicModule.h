@@ -12,12 +12,35 @@
 namespace JS {
 
 enum class ModuleStatus {
+    New,
     Unlinked,
     Linking,
     Linked,
     Evaluating,
     EvaluatingAsync,
     Evaluated
+};
+
+class CyclicModule;
+
+// https://tc39.es/ecma262/#graphloadingstate-record
+struct GraphLoadingState {
+    struct HostDefined {
+        virtual ~HostDefined() = default;
+
+        virtual void visit_edges(Cell::Visitor&) { }
+    };
+
+    GCPtr<PromiseCapability> promise_capability; // [[PromiseCapability]]
+    bool is_loading { false };                   // [[IsLoading]]
+    size_t pending_module_count { 0 };           // [[PendingModulesCount]]
+    HashTable<CyclicModule*> visited;            // [[Visited]]
+    Optional<HostDefined> host_defined;          // [[HostDefined]]
+};
+
+struct ModuleWithSpecifier {
+    DeprecatedString specifier;  // [[Specifier]]
+    NonnullGCPtr<Module> module; // [[Module]]
 };
 
 // 16.2.1.5 Cyclic Module Records, https://tc39.es/ecma262/#sec-cyclic-module-records
@@ -29,16 +52,22 @@ public:
     //       Badges cannot be used because other hosts must be able to call this (and it is called recursively)
     virtual ThrowCompletionOr<void> link(VM& vm) override;
     virtual ThrowCompletionOr<Promise*> evaluate(VM& vm) override;
+    virtual PromiseCapability& load_requested_modules(Realm&, Optional<GraphLoadingState::HostDefined>);
 
     Vector<ModuleRequest> const& requested_modules() const { return m_requested_modules; }
+
+    ModuleStatus const& status() { return m_status; }
 
 protected:
     CyclicModule(Realm& realm, StringView filename, bool has_top_level_await, Vector<ModuleRequest> requested_modules, Script::HostDefined* host_defined);
 
     virtual void visit_edges(Cell::Visitor&) override;
 
+    NonnullGCPtr<Module> get_imported_module(DeprecatedString const& specifier);
+
     virtual ThrowCompletionOr<u32> inner_module_linking(VM& vm, Vector<Module*>& stack, u32 index) override;
     virtual ThrowCompletionOr<u32> inner_module_evaluation(VM& vm, Vector<Module*>& stack, u32 index) override;
+    void inner_module_loading(GraphLoadingState);
 
     virtual ThrowCompletionOr<void> initialize_environment(VM& vm);
     virtual ThrowCompletionOr<void> execute_module(VM& vm, GCPtr<PromiseCapability> capability = {});
@@ -53,6 +82,7 @@ protected:
     Optional<u32> m_dfs_index;                        // [[DFSIndex]]
     Optional<u32> m_dfs_ancestor_index;               // [[DFSAncestorIndex]]
     Vector<ModuleRequest> m_requested_modules;        // [[RequestedModules]]
+    Vector<ModuleWithSpecifier> m_loaded_modules;     // [[LoadedModules]]
     CyclicModule* m_cycle_root { nullptr };           // [[CycleRoot]]
     bool m_has_top_level_await { false };             // [[HasTLA]]
     bool m_async_evaluation { false };                // [[AsyncEvaluation]]

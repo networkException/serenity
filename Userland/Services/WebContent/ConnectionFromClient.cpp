@@ -438,9 +438,8 @@ void ConnectionFromClient::run_javascript(DeprecatedString const& js_source)
     auto base_url = settings.api_base_url();
 
     // Let script be the result of creating a classic script given scriptSource, settings, baseURL, and the default classic script fetch options.
-    // FIXME: This doesn't pass in "default classic script fetch options"
     // FIXME: What should the filename be here?
-    auto script = Web::HTML::ClassicScript::create("(client connection run_javascript)", js_source, settings, move(base_url));
+    auto script = Web::HTML::ClassicScript::create("(client connection run_javascript)", js_source, settings, move(base_url), Web::HTML::ScriptFetchOptions::default_classic_script());
 
     // Let evaluationStatus be the result of running the classic script script.
     auto evaluation_status = script->run();

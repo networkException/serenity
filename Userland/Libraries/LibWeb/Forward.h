@@ -217,6 +217,24 @@ class Request;
 class Response;
 }
 
+namespace Web::Fetch::Infrastructure::Requesting {
+enum class CacheMode;
+enum class CredentialsMode;
+enum class Destination;
+enum class Initiator;
+enum class InitiatorType;
+enum class Mode;
+enum class Origin;
+enum class ParserMetadata;
+enum class PolicyContainer;
+enum class Priority;
+enum class RedirectMode;
+enum class Referrer;
+enum class ResponseTainting;
+enum class ServiceWorkersMode;
+enum class Window;
+}
+
 namespace Web::FileAPI {
 class Blob;
 class File;

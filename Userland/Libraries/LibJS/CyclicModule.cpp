@@ -27,9 +27,105 @@ void CyclicModule::visit_edges(Cell::Visitor& visitor)
     visitor.visit(m_cycle_root);
     for (auto* module : m_async_parent_modules)
         visitor.visit(module);
+    for (auto const& module : m_loaded_modules)
+        visitor.visit(module.module);
 }
 
-// 16.2.1.5.1 Link ( ), https://tc39.es/ecma262/#sec-moduledeclarationlinking
+// 16.2.1.5.1 LoadRequestedModules ( [ hostDefined ] ), https://tc39.es/ecma262/#sec-LoadRequestedModules
+PromiseCapability& CyclicModule::load_requested_modules(Realm& ream, Optional<GraphLoadingState::HostDefined> host_defined)
+{
+    // 1. If hostDefined is not present, let hostDefined be empty.
+    // NOTE: The empty state is handled by [[HostDefined]] being an optional without value.
+
+    // 2. Let pc be ! NewPromiseCapability(%Promise%).
+    auto promise_capability = MUST(new_promise_capability(ream.vm(), ream.intrinsics().promise_constructor()));
+
+    // 3. Let state be the GraphLoadingState Record { [[IsLoading]]: true, [[PendingModulesCount]]: 1, [[Visited]]: « », [[PromiseCapability]]: pc, [[HostDefined]]: hostDefined }.
+    auto state = GraphLoadingState { .promise_capability = promise_capability, .is_loading = true, .pending_module_count = 1, .visited = {}, .host_defined = move(host_defined) };
+
+    // 4. Perform InnerModuleLoading(state, module).
+    inner_module_loading(state);
+
+    // NOTE: This is likely a spec bug, see https://matrixlogs.bakkot.com/WHATWG/2023-02-13#L1
+    // FIXME: 5. Return pc.[[Promise]].
+    return promise_capability;
+}
+
+// 16.2.1.5.1.1 InnerModuleLoading ( state, module ), https://tc39.es/ecma262/#sec-InnerModuleLoading
+void CyclicModule::inner_module_loading(GraphLoadingState state)
+{
+    // 1. Assert: state.[[IsLoading]] is true.
+    VERIFY(state.is_loading);
+
+    // 2. If module is a Cyclic Module Record, module.[[Status]] is new, and state.[[Visited]] does not contain module, then
+    if (m_status == ModuleStatus::New && !state.visited.contains(this)) {
+        // a. Append module to state.[[Visited]].
+        state.visited.set(this);
+
+        // b. Let requestedModulesCount be the number of elements in module.[[RequestedModules]].
+        auto requested_module_count = requested_modules().size();
+
+        // c. Set state.[[PendingModulesCount]] to state.[[PendingModulesCount]] + requestedModulesCount.
+        state.pending_module_count += requested_module_count;
+
+        // d. For each String required of module.[[RequestedModules]], do
+        for (auto const& required : requested_modules()) {
+            bool found = false;
+
+            // i. If module.[[LoadedModules]] contains a Record whose [[Specifier]] is required, then
+            for (auto const& record : m_loaded_modules) {
+                if (record.specifier == required.module_specifier) {
+                    // 1. Let record be that Record.
+
+                    // 2. Perform InnerModuleLoading(state, record.[[Module]]).
+                    static_cast<CyclicModule&>(*record.module).inner_module_loading(state);
+
+                    found = true;
+                    break;
+                }
+            }
+
+            // ii. Else,
+            if (!found) {
+                // 1. Perform HostLoadImportedModule(module, required, state.[[HostDefined]], state).
+                vm().host_load_imported_module(NonnullGCPtr<Module>(*this), required, state.host_defined, state);
+
+                // 2. NOTE: HostLoadImportedModule will call FinishLoadingImportedModule, which re-enters the graph loading process through ContinueModuleLoading.
+            }
+
+            // iii. If state.[[IsLoading]] is false, return unused.
+            if (!state.is_loading)
+                return;
+        }
+    }
+
+    // 3. Assert: state.[[PendingModulesCount]] ≥ 1.
+    VERIFY(state.pending_module_count >= 1);
+
+    // 4. Set state.[[PendingModulesCount]] to state.[[PendingModulesCount]] - 1.
+    state.pending_module_count -= 1;
+
+    // 5. If state.[[PendingModulesCount]] = 0, then
+    if (state.pending_module_count == 0) {
+        // a. Set state.[[IsLoading]] to false.
+        state.is_loading = false;
+
+        // b. For each Cyclic Module Record loaded of state.[[Visited]], do
+        for (auto const& loaded : state.visited) {
+            // i. If loaded.[[Status]] is new, set loaded.[[Status]] to unlinked.
+            if (loaded->m_status == ModuleStatus::New)
+                loaded->m_status = ModuleStatus::Unlinked;
+        }
+
+        // c. Perform ! Call(state.[[PromiseCapability]].[[Resolve]], undefined, « undefined »).
+        MUST(call(vm(), state.promise_capability->resolve(), js_undefined(), js_undefined()));
+    }
+
+    // 6. Return unused.
+    return;
+}
+
+// 16.2.1.5.2 Link ( ), https://tc39.es/ecma262/#sec-moduledeclarationlinking
 ThrowCompletionOr<void> CyclicModule::link(VM& vm)
 {
     dbgln_if(JS_MODULE_DEBUG, "[JS MODULE] link[{}]()", this);
@@ -70,7 +166,7 @@ ThrowCompletionOr<void> CyclicModule::link(VM& vm)
     return {};
 }
 
-// 16.2.1.5.1.1 InnerModuleLinking ( module, stack, index ), https://tc39.es/ecma262/#sec-InnerModuleLinking
+// 16.2.1.5.2.1 InnerModuleLinking ( module, stack, index ), https://tc39.es/ecma262/#sec-InnerModuleLinking
 ThrowCompletionOr<u32> CyclicModule::inner_module_linking(VM& vm, Vector<Module*>& stack, u32 index)
 {
     // 1. If module is not a Cyclic Module Record, then
@@ -117,8 +213,8 @@ ThrowCompletionOr<u32> CyclicModule::inner_module_linking(VM& vm, Vector<Module*
     for (auto& required_string : m_requested_modules) {
         ModuleRequest required { required_string };
 
-        // a. Let requiredModule be ? HostResolveImportedModule(module, required).
-        auto required_module = TRY(vm.host_resolve_imported_module(NonnullGCPtr<Module>(*this), required));
+        // a. Let requiredModule be GetImportedModule(module, required).
+        auto required_module = get_imported_module(required.module_specifier);
 
         // b. Set index to ? InnerModuleLinking(requiredModule, stack, index).
         index = TRY(required_module->inner_module_linking(vm, stack, index));
@@ -181,7 +277,26 @@ ThrowCompletionOr<u32> CyclicModule::inner_module_linking(VM& vm, Vector<Module*
     return index;
 }
 
-// 16.2.1.5.2 Evaluate ( ), https://tc39.es/ecma262/#sec-moduleevaluation
+// 16.2.1.7 GetImportedModule ( referrer, specifier ), https://tc39.es/ecma262/#sec-GetImportedModule
+NonnullGCPtr<Module> CyclicModule::get_imported_module(DeprecatedString const& specifier)
+{
+    // 1. Assert: Exactly one element of referrer.[[LoadedModules]] is a Record whose [[Specifier]] is specifier,
+    //    since LoadRequestedModules has completed successfully on referrer prior to invoking this abstract operation.
+    Vector<ModuleWithSpecifier, 1> modules;
+    for (auto const& module : m_loaded_modules) {
+        if (module.specifier == specifier)
+            modules.append(module);
+    }
+    VERIFY(modules.size() == 1);
+
+    // 2. Let record be the Record in referrer.[[LoadedModules]] whose [[Specifier]] is specifier.
+    auto record = modules[0];
+
+    // 3. Return record.[[Module]].
+    return record.module;
+}
+
+// 16.2.1.5.3 Evaluate ( ), https://tc39.es/ecma262/#sec-moduleevaluation
 ThrowCompletionOr<Promise*> CyclicModule::evaluate(VM& vm)
 {
     dbgln_if(JS_MODULE_DEBUG, "[JS MODULE] evaluate[{}](vm)", this);
@@ -279,7 +394,7 @@ ThrowCompletionOr<Promise*> CyclicModule::evaluate(VM& vm)
     return verify_cast<Promise>(m_top_level_capability->promise().ptr());
 }
 
-// 16.2.1.5.2.1 InnerModuleEvaluation ( module, stack, index ), https://tc39.es/ecma262/#sec-innermoduleevaluation
+// 16.2.1.5.3.1 InnerModuleEvaluation ( module, stack, index ), https://tc39.es/ecma262/#sec-innermoduleevaluation
 ThrowCompletionOr<u32> CyclicModule::inner_module_evaluation(VM& vm, Vector<Module*>& stack, u32 index)
 {
     dbgln_if(JS_MODULE_DEBUG, "[JS MODULE] inner_module_evaluation[{}](vm, {}, {})", this, DeprecatedString::join(", "sv, stack), index);
@@ -323,8 +438,8 @@ ThrowCompletionOr<u32> CyclicModule::inner_module_evaluation(VM& vm, Vector<Modu
     // 11. For each String required of module.[[RequestedModules]], do
     for (auto& required : m_requested_modules) {
 
-        // a. Let requiredModule be ! HostResolveImportedModule(module, required).
-        auto* required_module = MUST(vm.host_resolve_imported_module(NonnullGCPtr<Module>(*this), required)).ptr();
+        // a. Let requiredModule be GetImportedModule(module, required).
+        auto required_module = get_imported_module(required.module_specifier);
         // b. NOTE: Link must be completed successfully prior to invoking this method, so every requested module is guaranteed to resolve successfully.
 
         // c. Set index to ? InnerModuleEvaluation(requiredModule, stack, index).
@@ -334,7 +449,7 @@ ThrowCompletionOr<u32> CyclicModule::inner_module_evaluation(VM& vm, Vector<Modu
         if (!is<CyclicModule>(*required_module))
             continue;
 
-        auto* cyclic_module = static_cast<CyclicModule*>(required_module);
+        auto* cyclic_module = &static_cast<CyclicModule&>(*required_module);
         // i. Assert: requiredModule.[[Status]] is either evaluating, evaluating-async, or evaluated.
         VERIFY(cyclic_module->m_status == ModuleStatus::Evaluating || cyclic_module->m_status == ModuleStatus::EvaluatingAsync || cyclic_module->m_status == ModuleStatus::Evaluated);
 
@@ -449,7 +564,7 @@ ThrowCompletionOr<void> CyclicModule::execute_module(VM&, GCPtr<PromiseCapabilit
     VERIFY_NOT_REACHED();
 }
 
-// 16.2.1.5.2.2 ExecuteAsyncModule ( module ), https://tc39.es/ecma262/#sec-execute-async-module
+// 16.2.1.5.3.2 ExecuteAsyncModule ( module ), https://tc39.es/ecma262/#sec-execute-async-module
 void CyclicModule::execute_async_module(VM& vm)
 {
     auto& realm = *vm.current_realm();
@@ -498,7 +613,7 @@ void CyclicModule::execute_async_module(VM& vm)
     // 10. Return unused.
 }
 
-// 16.2.1.5.2.3 GatherAvailableAncestors ( module, execList ), https://tc39.es/ecma262/#sec-gather-available-ancestors
+// 16.2.1.5.3.3 GatherAvailableAncestors ( module, execList ), https://tc39.es/ecma262/#sec-gather-available-ancestors
 void CyclicModule::gather_available_ancestors(Vector<CyclicModule*>& exec_list)
 {
     // 1. For each Cyclic Module Record m of module.[[AsyncParentModules]], do
@@ -535,7 +650,7 @@ void CyclicModule::gather_available_ancestors(Vector<CyclicModule*>& exec_list)
     // 2. Return unused.
 }
 
-// 16.2.1.5.2.4 AsyncModuleExecutionFulfilled ( module ), https://tc39.es/ecma262/#sec-async-module-execution-fulfilled
+// 16.2.1.5.3.4 AsyncModuleExecutionFulfilled ( module ), https://tc39.es/ecma262/#sec-async-module-execution-fulfilled
 void CyclicModule::async_module_execution_fulfilled(VM& vm)
 {
     // 1. If module.[[Status]] is evaluated, then
@@ -625,7 +740,7 @@ void CyclicModule::async_module_execution_fulfilled(VM& vm)
     // 13. Return unused.
 }
 
-// 16.2.1.5.2.5 AsyncModuleExecutionRejected ( module, error ), https://tc39.es/ecma262/#sec-async-module-execution-rejected
+// 16.2.1.5.3.5 AsyncModuleExecutionRejected ( module, error ), https://tc39.es/ecma262/#sec-async-module-execution-rejected
 void CyclicModule::async_module_execution_rejected(VM& vm, Value error)
 {
     // 1. If module.[[Status]] is evaluated, then

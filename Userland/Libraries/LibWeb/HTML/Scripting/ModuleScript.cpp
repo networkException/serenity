@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, networkException <networkexception@serenityos.org>
+ * Copyright (c) 2022-2023, networkException <networkexception@serenityos.org>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
@@ -16,20 +16,20 @@ namespace Web::HTML {
 
 ModuleScript::~ModuleScript() = default;
 
-ModuleScript::ModuleScript(AK::URL base_url, DeprecatedString filename, EnvironmentSettingsObject& environment_settings_object)
-    : Script(move(base_url), move(filename), environment_settings_object)
+ModuleScript::ModuleScript(AK::URL base_url, DeprecatedString filename, EnvironmentSettingsObject& environment_settings_object, ScriptFetchOptions fetch_options)
+    : Script(move(base_url), move(filename), environment_settings_object, move(fetch_options))
 {
 }
 
 JavaScriptModuleScript::~JavaScriptModuleScript() = default;
 
-JavaScriptModuleScript::JavaScriptModuleScript(AK::URL base_url, DeprecatedString filename, EnvironmentSettingsObject& environment_settings_object)
-    : ModuleScript(move(base_url), move(filename), environment_settings_object)
+JavaScriptModuleScript::JavaScriptModuleScript(AK::URL base_url, DeprecatedString filename, EnvironmentSettingsObject& environment_settings_object, ScriptFetchOptions fetch_options)
+    : ModuleScript(move(base_url), move(filename), environment_settings_object, move(fetch_options))
 {
 }
 
 // https://html.spec.whatwg.org/multipage/webappapis.html#creating-a-javascript-module-script
-WebIDL::ExceptionOr<JS::GCPtr<JavaScriptModuleScript>> JavaScriptModuleScript::create(DeprecatedString const& filename, StringView source, EnvironmentSettingsObject& settings_object, AK::URL base_url)
+WebIDL::ExceptionOr<JS::GCPtr<JavaScriptModuleScript>> JavaScriptModuleScript::create(DeprecatedString const& filename, StringView source, EnvironmentSettingsObject& settings_object, AK::URL base_url, ScriptFetchOptions options)
 {
     // 1. If scripting is disabled for settings, then set source to the empty string.
     if (settings_object.is_scripting_disabled())
@@ -38,15 +38,11 @@ WebIDL::ExceptionOr<JS::GCPtr<JavaScriptModuleScript>> JavaScriptModuleScript::c
     auto& realm = settings_object.realm();
 
     // 2. Let script be a new module script that this algorithm will subsequently initialize.
-    auto script = MUST_OR_THROW_OOM(realm.heap().allocate<JavaScriptModuleScript>(realm, move(base_url), filename, settings_object));
+    auto script = MUST_OR_THROW_OOM(realm.heap().allocate<JavaScriptModuleScript>(realm, move(base_url), filename, settings_object, move(options)));
 
-    // 3. Set script's settings object to settings.
-    // NOTE: This was already done when constructing.
-
-    // 4. Set script's base URL to baseURL.
-    // NOTE: This was already done when constructing.
-
-    // FIXME: 5. Set script's fetch options to options.
+    // 3. Set script's settings object to settings. (NOTE: This was already done when constructing.)
+    // 4. Set script's base URL to baseURL. (NOTE: This was already done when constructing.)
+    // 5. Set script's fetch options to options. (NOTE: This was already done when constructing.)
 
     // 6. Set script's parse error and error to rethrow to null.
     // NOTE: Parse error and error to rethrow were set to null in the construction of Script.

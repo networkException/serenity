@@ -10,10 +10,11 @@
 
 namespace Web::HTML {
 
-Script::Script(AK::URL base_url, DeprecatedString filename, EnvironmentSettingsObject& environment_settings_object)
+Script::Script(AK::URL base_url, DeprecatedString filename, EnvironmentSettingsObject& environment_settings_object, ScriptFetchOptions fetch_options)
     : m_base_url(move(base_url))
     , m_filename(move(filename))
     , m_settings_object(environment_settings_object)
+    , m_fetch_options(move(fetch_options))
 {
 }
 

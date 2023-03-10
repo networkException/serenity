@@ -19,7 +19,7 @@ public:
     virtual ~ModuleScript() override;
 
 protected:
-    ModuleScript(AK::URL base_url, DeprecatedString filename, EnvironmentSettingsObject& environment_settings_object);
+    ModuleScript(AK::URL base_url, DeprecatedString filename, EnvironmentSettingsObject& environment_settings_object, ScriptFetchOptions);
 };
 
 class JavaScriptModuleScript final : public ModuleScript {
@@ -28,7 +28,7 @@ class JavaScriptModuleScript final : public ModuleScript {
 public:
     virtual ~JavaScriptModuleScript() override;
 
-    static WebIDL::ExceptionOr<JS::GCPtr<JavaScriptModuleScript>> create(DeprecatedString const& filename, StringView source, EnvironmentSettingsObject&, AK::URL base_url);
+    static WebIDL::ExceptionOr<JS::GCPtr<JavaScriptModuleScript>> create(DeprecatedString const& filename, StringView source, EnvironmentSettingsObject&, AK::URL base_url, ScriptFetchOptions);
 
     enum class PreventErrorReporting {
         Yes,
@@ -41,7 +41,7 @@ public:
     JS::SourceTextModule* record() { return m_record.ptr(); };
 
 protected:
-    JavaScriptModuleScript(AK::URL base_url, DeprecatedString filename, EnvironmentSettingsObject& environment_settings_object);
+    JavaScriptModuleScript(AK::URL base_url, DeprecatedString filename, EnvironmentSettingsObject& environment_settings_object, ScriptFetchOptions);
 
 private:
     virtual void visit_edges(JS::Cell::Visitor&) override;

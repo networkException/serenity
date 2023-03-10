@@ -16,7 +16,7 @@
 namespace Web::HTML {
 
 // https://html.spec.whatwg.org/multipage/webappapis.html#creating-a-classic-script
-JS::NonnullGCPtr<ClassicScript> ClassicScript::create(DeprecatedString filename, StringView source, EnvironmentSettingsObject& environment_settings_object, AK::URL base_url, size_t source_line_number, MutedErrors muted_errors)
+JS::NonnullGCPtr<ClassicScript> ClassicScript::create(DeprecatedString filename, StringView source, EnvironmentSettingsObject& environment_settings_object, AK::URL base_url, ScriptFetchOptions options, size_t source_line_number, MutedErrors muted_errors)
 {
     auto& vm = environment_settings_object.realm().vm();
 
@@ -31,13 +31,11 @@ JS::NonnullGCPtr<ClassicScript> ClassicScript::create(DeprecatedString filename,
         source = ""sv;
 
     // 4. Let script be a new classic script that this algorithm will subsequently initialize.
-    auto script = vm.heap().allocate_without_realm<ClassicScript>(move(base_url), move(filename), environment_settings_object);
+    auto script = vm.heap().allocate_without_realm<ClassicScript>(move(base_url), move(filename), environment_settings_object, move(options));
 
     // 5. Set script's settings object to settings. (NOTE: This was already done when constructing.)
-
     // 6. Set script's base URL to baseURL. (NOTE: This was already done when constructing.)
-
-    // FIXME: 7. Set script's fetch options to options.
+    // 7. Set script's fetch options to options. (NOTE: This was already done when constructing.)
 
     // 8. Set script's muted errors to muted errors.
     script->m_muted_errors = muted_errors;
@@ -148,8 +146,8 @@ JS::Completion ClassicScript::run(RethrowErrors rethrow_errors, JS::GCPtr<JS::En
     //            Return Completion { [[Type]]: throw, [[Value]]: a new "QuotaExceededError" DOMException, [[Target]]: empty }.
 }
 
-ClassicScript::ClassicScript(AK::URL base_url, DeprecatedString filename, EnvironmentSettingsObject& environment_settings_object)
-    : Script(move(base_url), move(filename), environment_settings_object)
+ClassicScript::ClassicScript(AK::URL base_url, DeprecatedString filename, EnvironmentSettingsObject& environment_settings_object, ScriptFetchOptions fetch_options)
+    : Script(move(base_url), move(filename), environment_settings_object, move(fetch_options))
 {
 }
 

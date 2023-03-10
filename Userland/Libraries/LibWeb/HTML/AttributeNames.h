@@ -51,6 +51,7 @@ namespace AttributeNames {
     __ENUMERATE_HTML_ATTRIBUTE(contenteditable)            \
     __ENUMERATE_HTML_ATTRIBUTE(controls)                   \
     __ENUMERATE_HTML_ATTRIBUTE(coords)                     \
+    __ENUMERATE_HTML_ATTRIBUTE(crossorigin)                \
     __ENUMERATE_HTML_ATTRIBUTE(data)                       \
     __ENUMERATE_HTML_ATTRIBUTE(datetime)                   \
     __ENUMERATE_HTML_ATTRIBUTE(declare)                    \
@@ -193,6 +194,7 @@ namespace AttributeNames {
     __ENUMERATE_HTML_ATTRIBUTE(poster)                     \
     __ENUMERATE_HTML_ATTRIBUTE(preload)                    \
     __ENUMERATE_HTML_ATTRIBUTE(readonly)                   \
+    __ENUMERATE_HTML_ATTRIBUTE(referrerpolicy)             \
     __ENUMERATE_HTML_ATTRIBUTE(rel)                        \
     __ENUMERATE_HTML_ATTRIBUTE(required)                   \
     __ENUMERATE_HTML_ATTRIBUTE(rev)                        \

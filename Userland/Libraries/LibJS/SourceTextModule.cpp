@@ -301,8 +301,8 @@ ThrowCompletionOr<Vector<DeprecatedFlyString>> SourceTextModule::get_exported_na
 
     // 7. For each ExportEntry Record e of module.[[StarExportEntries]], do
     for (auto& entry : m_star_export_entries) {
-        // a. Let requestedModule be ? HostResolveImportedModule(module, e.[[ModuleRequest]]).
-        auto requested_module = TRY(vm.host_resolve_imported_module(NonnullGCPtr<Module>(*this), entry.module_request()));
+        // a. a. Let requestedModule be GetImportedModule(module, e.[[ModuleRequest]]).
+        auto requested_module = get_imported_module(entry.module_request().module_specifier);
 
         // b. Let starNames be ? requestedModule.GetExportedNames(exportStarSet).
         auto star_names = TRY(requested_module->get_exported_names(vm, export_star_set));
@@ -355,8 +355,8 @@ ThrowCompletionOr<void> SourceTextModule::initialize_environment(VM& vm)
 
     // 7. For each ImportEntry Record in of module.[[ImportEntries]], do
     for (auto& import_entry : m_import_entries) {
-        // a. Let importedModule be ! HostResolveImportedModule(module, in.[[ModuleRequest]]).
-        auto imported_module = MUST(vm.host_resolve_imported_module(NonnullGCPtr<Module>(*this), import_entry.module_request()));
+        // a. Let importedModule be GetImportedModule(module, in.[[ModuleRequest]]).
+        auto imported_module = get_imported_module(import_entry.module_request().module_specifier);
         // b. NOTE: The above call cannot fail because imported module requests are a subset of module.[[RequestedModules]], and these have been resolved earlier in this algorithm.
 
         // c. If in.[[ImportName]] is namespace-object, then
@@ -565,8 +565,8 @@ ThrowCompletionOr<ResolvedBinding> SourceTextModule::resolve_export(VM& vm, Depr
         if (export_name != entry.export_name)
             continue;
 
-        // i. Let importedModule be ? HostResolveImportedModule(module, e.[[ModuleRequest]]).
-        auto imported_module = TRY(vm.host_resolve_imported_module(NonnullGCPtr<Module>(*this), entry.module_request()));
+        // i. i. Let importedModule be GetImportedModule(module, e.[[ModuleRequest]]).
+        auto imported_module = get_imported_module(entry.module_request().module_specifier);
 
         // ii. If e.[[ImportName]] is all, then
         if (entry.kind == ExportEntry::Kind::ModuleRequestAll) {
@@ -605,8 +605,8 @@ ThrowCompletionOr<ResolvedBinding> SourceTextModule::resolve_export(VM& vm, Depr
 
     // 8. For each ExportEntry Record e of module.[[StarExportEntries]], do
     for (auto& entry : m_star_export_entries) {
-        // a. Let importedModule be ? HostResolveImportedModule(module, e.[[ModuleRequest]]).
-        auto imported_module = TRY(vm.host_resolve_imported_module(NonnullGCPtr<Module>(*this), entry.module_request()));
+        // a. Let importedModule be GetImportedModule(module, e.[[ModuleRequest]]).
+        auto imported_module = get_imported_module(entry.module_request().module_specifier);
 
         // b. Let resolution be ? importedModule.ResolveExport(exportName, resolveSet).
         auto resolution = TRY(imported_module->resolve_export(vm, export_name, resolve_set));

@@ -464,10 +464,13 @@ i32 Window::run_timer_initialization_steps(TimerHandler handler, i32 timeout, JS
     // FIXME: Implement this when step 9.2 is implemented.
 
     // 7. Let initiating script be the active script.
+    auto initiating_script = Script::active_script(vm());
+
     // 8. Assert: initiating script is not null, since this algorithm is always called from some script.
+    VERIFY(initiating_script);
 
     // 9. Let task be a task that runs the following substeps:
-    JS::SafeFunction<void()> task = [this, handler = move(handler), timeout, arguments = move(arguments), repeat, id] {
+    JS::SafeFunction<void()> task = [this, handler = move(handler), timeout, arguments = move(arguments), repeat, id, initiating_script] {
         // 1. If id does not exist in global's map of active timers, then abort these steps.
         if (!m_timers.contains(id))
             return;
@@ -491,9 +494,21 @@ i32 Window::run_timer_initialization_steps(TimerHandler handler, i32 timeout, JS
 
                 // 5. Assert: base URL is not null, as initiating script is a classic script or a JavaScript module script.
 
-                // 6. Let fetch options be a script fetch options whose cryptographic nonce is initiating script's fetch options's cryptographic nonce, integrity metadata is the empty string, parser metadata is "not-parser-inserted", credentials mode is initiating script's fetch options's credentials mode, and referrer policy is initiating script's fetch options's referrer policy.
+                // 6. Let fetch options be a script fetch options whose cryptographic nonce is initiating script's fetch options's cryptographic nonce,
+                //    integrity metadata is the empty string, parser metadata is "not-parser-inserted",
+                //    credentials mode is initiating script's fetch options's credentials mode,
+                //    and referrer policy is initiating script's fetch options's referrer policy.
+                auto initiating_script_fetch_options = initiating_script->fetch_options();
+                auto fetch_options = ScriptFetchOptions {
+                    .cryptographic_nonce = initiating_script_fetch_options.cryptographic_nonce,
+                    .integrity_metadata = String(),
+                    .parser_metadata = Fetch::Infrastructure::Requesting::ParserMetadata::NotParserInserted,
+                    .credentials_mode = initiating_script_fetch_options.credentials_mode,
+                    .referrer_policy = initiating_script_fetch_options.referrer_policy,
+                };
+
                 // 7. Let script be the result of creating a classic script given handler, settings object, base URL, and fetch options.
-                auto script = HTML::ClassicScript::create(url.basename(), source, settings_object, url);
+                auto script = HTML::ClassicScript::create(url.basename(), source, settings_object, url, fetch_options);
 
                 // 8. Run the classic script script.
                 (void)script->run();

@@ -271,24 +271,41 @@ void HTMLScriptElement::prepare_script()
     // FIXME: 22. Let classic script CORS setting be the current state of el's crossorigin content attribute.
 
     // FIXME: 23. Let module script credentials mode be the CORS settings attribute credentials mode for el's crossorigin content attribute.
+    auto module_script_credentials_mode = Fetch::Infrastructure::Requesting::CredentialsMode::SameOrigin;
 
     // FIXME: 24. Let cryptographic nonce be el's [[CryptographicNonce]] internal slot's value.
+    auto cryptographic_nonce = String();
 
-    // FIXME: 25. If el has an integrity attribute, then let integrity metadata be that attribute's value.
-    //            Otherwise, let integrity metadata be the empty string.
+    // 25. If el has an integrity attribute, then let integrity metadata be that attribute's value.
+    //     Otherwise, let integrity metadata be the empty string.
+    auto integrity_metadata = has_attribute(HTML::AttributeNames::integrity) ? String::from_deprecated_string(attribute(HTML::AttributeNames::integrity)).release_value_but_fixme_should_propagate_errors() : String();
 
     // FIXME: 26. Let referrer policy be the current state of el's referrerpolicy content attribute.
+    auto referrer_policy = ReferrerPolicy::ReferrerPolicy::EmptyString;
 
-    // FIXME: 27. Let parser metadata be "parser-inserted" if el is parser-inserted, and "not-parser-inserted" otherwise.
+    // FIXME: 27. Let fetch priority be the current state of el's fetchpriority content attribute.
+    auto fetch_priority = Fetch::Infrastructure::Requesting::Priority::Auto;
 
-    // FIXME: 28. Let options be a script fetch options whose cryptographic nonce is cryptographic nonce,
-    //            integrity metadata is integrity metadata, parser metadata is parser metadata,
-    //            credentials mode is module script credentials mode, and referrer policy is referrer policy.
+    // 28. Let parser metadata be "parser-inserted" if el is parser-inserted, and "not-parser-inserted" otherwise.
+    auto parser_metadata = is_parser_inserted() ? Fetch::Infrastructure::Requesting::ParserMetadata::ParserInserted : Fetch::Infrastructure::Requesting::ParserMetadata::NotParserInserted;
 
-    // 29. Let settings object be el's node document's relevant settings object.
+    // 28. Let options be a script fetch options whose cryptographic nonce is cryptographic nonce,
+    //     integrity metadata is integrity metadata, parser metadata is parser metadata,
+    //     credentials mode is module script credentials mode, referrer policy is referrer policy,
+    //     and fetch priority is fetch priority.
+    auto options = ScriptFetchOptions {
+        .cryptographic_nonce = cryptographic_nonce,
+        .integrity_metadata = integrity_metadata,
+        .parser_metadata = parser_metadata,
+        .credentials_mode = module_script_credentials_mode,
+        .referrer_policy = referrer_policy,
+        .fetch_priority = fetch_priority,
+    };
+
+    // 30. Let settings object be el's node document's relevant settings object.
     auto& settings_object = document().relevant_settings_object();
 
-    // 30. If el has a src content attribute, then:
+    // 31. If el has a src content attribute, then:
     if (has_attribute(HTML::AttributeNames::src)) {
         // 1. If el's type is "importmap",
         if (m_script_type == ScriptType::ImportMap) {
@@ -349,8 +366,7 @@ void HTMLScriptElement::prepare_script()
         // -> "module"
         else if (m_script_type == ScriptType::Module) {
             // Fetch an external module script graph given url, settings object, options, and onComplete.
-            // FIXME: Pass options.
-            fetch_external_module_script_graph(url, settings_object, [this](auto* result) {
+            fetch_external_module_script_graph(url, settings_object, options, [this](auto* result) {
                 // 1. Mark as ready el given result.
                 if (!result)
                     mark_as_ready(ResultState::Null {});
@@ -369,8 +385,7 @@ void HTMLScriptElement::prepare_script()
         // -> "classic"
         if (m_script_type == ScriptType::Classic) {
             // 1. Let script be the result of creating a classic script using source text, settings object, base URL, and options.
-            // FIXME: Pass options.
-            auto script = ClassicScript::create(m_document->url().to_deprecated_string(), source_text, settings_object, base_url, m_source_line_number);
+            auto script = ClassicScript::create(m_document->url().to_deprecated_string(), source_text, settings_object, base_url, options, m_source_line_number);
 
             // 2. Mark as ready el given script.
             mark_as_ready(Result(move(script)));
@@ -381,8 +396,7 @@ void HTMLScriptElement::prepare_script()
             begin_delaying_document_load_event(*m_preparation_time_document);
 
             // 2. Fetch an inline module script graph, given source text, base URL, settings object, options, and with the following steps given result:
-            // FIXME: Pass options
-            fetch_inline_module_script_graph(m_document->url().to_deprecated_string(), source_text, base_url, document().relevant_settings_object(), [this](auto* result) {
+            fetch_inline_module_script_graph(m_document->url().to_deprecated_string(), source_text, base_url, document().relevant_settings_object(), options, [this](auto* result) {
                 // 1. Mark as ready el given result.
                 if (!result)
                     mark_as_ready(ResultState::Null {});
@@ -519,7 +533,7 @@ void HTMLScriptElement::resource_did_load()
         }
     }
 
-    auto script = ClassicScript::create(resource()->url().to_deprecated_string(), data, document().relevant_settings_object(), AK::URL());
+    auto script = ClassicScript::create(resource()->url().to_deprecated_string(), data, document().relevant_settings_object(), AK::URL(), ScriptFetchOptions::default_classic_script());
 
     // When the chosen algorithm asynchronously completes, set the script's script to the result. At that time, the script is ready.
     mark_as_ready(Result(script));

@@ -14,6 +14,7 @@
 #include <AK/RefCounted.h>
 #include <AK/StackInfo.h>
 #include <AK/Variant.h>
+#include <LibJS/CyclicModule.h>
 #include <LibJS/Heap/Heap.h>
 #include <LibJS/Heap/MarkedVector.h>
 #include <LibJS/Runtime/CommonPropertyNames.h>
@@ -249,9 +250,12 @@ public:
 
     ScriptOrModule get_active_script_or_module() const;
 
+    using SomeRandomName = Variant<NonnullGCPtr<Script>, NonnullGCPtr<Module>, NonnullGCPtr<Realm>>;
+
     Function<ThrowCompletionOr<NonnullGCPtr<Module>>(ScriptOrModule, ModuleRequest const&)> host_resolve_imported_module;
     Function<ThrowCompletionOr<void>(ScriptOrModule, ModuleRequest, PromiseCapability const&)> host_import_module_dynamically;
     Function<void(ScriptOrModule, ModuleRequest const&, PromiseCapability const&, Promise*)> host_finish_dynamic_import;
+    Function<void(SomeRandomName, ModuleRequest const&, Optional<GraphLoadingState::HostDefined>, GraphLoadingState)> host_load_imported_module;
 
     Function<HashMap<PropertyKey, Value>(SourceTextModule const&)> host_get_import_meta_properties;
     Function<void(Object*, SourceTextModule const&)> host_finalize_import_meta;
@@ -274,7 +278,7 @@ private:
     ThrowCompletionOr<void> property_binding_initialization(BindingPattern const& binding, Value value, Environment* environment);
     ThrowCompletionOr<void> iterator_binding_initialization(BindingPattern const& binding, Iterator& iterator_record, Environment* environment);
 
-    ThrowCompletionOr<NonnullGCPtr<Module>> resolve_imported_module(ScriptOrModule referencing_script_or_module, ModuleRequest const& module_request);
+    // ThrowCompletionOr<NonnullGCPtr<Module>> load_imported_module(CyclicModule* referrer, DeprecatedString const& specifier, GraphLoadingState::HostDefined const&, GraphLoadingState payload);
     ThrowCompletionOr<void> link_and_eval_module(Module& module);
 
     ThrowCompletionOr<void> import_module_dynamically(ScriptOrModule referencing_script_or_module, ModuleRequest module_request, PromiseCapability const& promise_capability);

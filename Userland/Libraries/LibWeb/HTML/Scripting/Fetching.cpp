@@ -1,11 +1,17 @@
 /*
- * Copyright (c) 2022, networkException <networkexception@serenityos.org>
+ * Copyright (c) 2022-2023, networkException <networkexception@serenityos.org>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
+#include <AK/String.h>
 #include <AK/URLParser.h>
 #include <LibJS/Runtime/ModuleRequest.h>
+#include <LibWeb/Fetch/Fetching/Fetching.h>
+#include <LibWeb/Fetch/Infrastructure/FetchAlgorithms.h>
+#include <LibWeb/Fetch/Infrastructure/HTTP/Requests.h>
+#include <LibWeb/Fetch/Infrastructure/HTTP/Responses.h>
+#include <LibWeb/Fetch/Infrastructure/HTTP/Statuses.h>
 #include <LibWeb/HTML/Scripting/Environments.h>
 #include <LibWeb/HTML/Scripting/Fetching.h>
 #include <LibWeb/HTML/Scripting/ModuleScript.h>
@@ -14,6 +20,7 @@
 #include <LibWeb/Loader/LoadRequest.h>
 #include <LibWeb/Loader/ResourceLoader.h>
 #include <LibWeb/MimeSniff/MimeType.h>
+#include <LibWeb/WebIDL/Promise.h>
 
 namespace Web::HTML {
 
@@ -210,133 +217,8 @@ Optional<AK::URL> resolve_url_like_module_specifier(DeprecatedString const& spec
     return url;
 }
 
-// https://html.spec.whatwg.org/multipage/webappapis.html#internal-module-script-graph-fetching-procedure
-void fetch_internal_module_script_graph(JS::ModuleRequest const& module_request, EnvironmentSettingsObject& fetch_client_settings_object, StringView destination, Script& referring_script, HashTable<ModuleLocationTuple> const& visited_set, ModuleCallback on_complete)
-{
-    // 1. Let url be the result of resolving a module specifier given referringScript and moduleRequest.[[Specifier]].
-    auto url = MUST(resolve_module_specifier(referring_script, module_request.module_specifier));
-
-    // 2. Assert: the previous step never throws an exception, because resolving a module specifier must have been previously successful with these same two arguments.
-    // NOTE: Handled by MUST above.
-
-    // 3. Let moduleType be the result of running the module type from module request steps given moduleRequest.
-    auto module_type = module_type_from_module_request(module_request);
-
-    // 4. Assert: visited set contains (url, moduleType).
-    VERIFY(visited_set.contains({ url, module_type }));
-
-    // 5. Fetch a single module script given url, fetch client settings object, destination, options, referringScript's settings object,
-    //    referringScript's base URL, moduleRequest, false, and onSingleFetchComplete as defined below. If performFetch was given, pass it along as well.
-    // FIXME: Pass options and performFetch if given.
-    fetch_single_module_script(url, fetch_client_settings_object, destination, referring_script.settings_object(), referring_script.base_url(), module_request, TopLevelModule::No, [on_complete = move(on_complete), &fetch_client_settings_object, destination, visited_set](auto* result) mutable {
-        // onSingleFetchComplete given result is the following algorithm:
-        // 1. If result is null, run onComplete with null, and abort these steps.
-        if (!result) {
-            on_complete(nullptr);
-            return;
-        }
-
-        // 2. Fetch the descendants of result given fetch client settings object, destination, visited set, and with onComplete. If performFetch was given, pass it along as well.
-        // FIXME: Pass performFetch if given.
-        fetch_descendants_of_a_module_script(*result, fetch_client_settings_object, destination, visited_set, move(on_complete));
-    });
-}
-
-// https://html.spec.whatwg.org/multipage/webappapis.html#fetch-the-descendants-of-a-module-script
-void fetch_descendants_of_a_module_script(JavaScriptModuleScript& module_script, EnvironmentSettingsObject& fetch_client_settings_object, StringView destination, HashTable<ModuleLocationTuple> visited_set, ModuleCallback on_complete)
-{
-    // 1. If module script's record is null, run onComplete with module script and return.
-    if (!module_script.record()) {
-        on_complete(&module_script);
-        return;
-    }
-
-    // 2. Let record be module script's record.
-    auto const& record = module_script.record();
-
-    // 3. If record is not a Cyclic Module Record, or if record.[[RequestedModules]] is empty, run onComplete with module script and return.
-    // FIXME: Currently record is always a cyclic module.
-    if (record->requested_modules().is_empty()) {
-        on_complete(&module_script);
-        return;
-    }
-
-    // 4. Let moduleRequests be a new empty list.
-    Vector<JS::ModuleRequest> module_requests;
-
-    // 5. For each ModuleRequest Record requested of record.[[RequestedModules]],
-    for (auto const& requested : record->requested_modules()) {
-        // 1. Let url be the result of resolving a module specifier given module script and requested.[[Specifier]].
-        auto url = MUST(resolve_module_specifier(module_script, requested.module_specifier));
-
-        // 2. Assert: the previous step never throws an exception, because resolving a module specifier must have been previously successful with these same two arguments.
-        // NOTE: Handled by MUST above.
-
-        // 3. Let moduleType be the result of running the module type from module request steps given requested.
-        auto module_type = module_type_from_module_request(requested);
-
-        // 4. If visited set does not contain (url, moduleType), then:
-        if (!visited_set.contains({ url, module_type })) {
-            // 1. Append requested to moduleRequests.
-            module_requests.append(requested);
-
-            // 2. Append (url, moduleType) to visited set.
-            visited_set.set({ url, module_type });
-        }
-    }
-
-    // FIXME: 6. Let options be the descendant script fetch options for module script's fetch options.
-
-    // FIXME: 7. Assert: options is not null, as module script is a JavaScript module script.
-
-    // 8. Let pendingCount be the length of moduleRequests.
-    auto pending_count = module_requests.size();
-
-    // 9. If pendingCount is zero, run onComplete with module script.
-    if (pending_count == 0) {
-        on_complete(&module_script);
-        return;
-    }
-
-    // 10. Let failed be false.
-    auto context = DescendantFetchingContext::create();
-    context->set_pending_count(pending_count);
-    context->set_failed(false);
-    context->set_on_complete(move(on_complete));
-
-    // 11. For each moduleRequest in moduleRequests, perform the internal module script graph fetching procedure given moduleRequest,
-    //     fetch client settings object, destination, options, module script, visited set, and onInternalFetchingComplete as defined below.
-    //     If performFetch was given, pass it along as well.
-    for (auto const& module_request : module_requests) {
-        // FIXME: Pass options and performFetch if given.
-        fetch_internal_module_script_graph(module_request, fetch_client_settings_object, destination, module_script, visited_set, [context, &module_script](auto const* result) mutable {
-            // onInternalFetchingComplete given result is the following algorithm:
-            // 1. If failed is true, then abort these steps.
-            if (context->failed())
-                return;
-
-            // 2. If result is null, then set failed to true, run onComplete with null, and abort these steps.
-            if (!result) {
-                context->set_failed(true);
-                context->on_complete(nullptr);
-                return;
-            }
-
-            // 3. Assert: pendingCount is greater than zero.
-            VERIFY(context->pending_count() > 0);
-
-            // 4. Decrement pendingCount by one.
-            context->decrement_pending_count();
-
-            // 5. If pendingCount is zero, run onComplete with module script.
-            if (context->pending_count() == 0)
-                context->on_complete(&module_script);
-        });
-    }
-}
-
 // https://html.spec.whatwg.org/multipage/webappapis.html#fetch-a-single-module-script
-void fetch_single_module_script(AK::URL const& url, EnvironmentSettingsObject&, StringView, EnvironmentSettingsObject& module_map_settings_object, AK::URL const&, Optional<JS::ModuleRequest> const& module_request, TopLevelModule, ModuleCallback on_complete)
+void fetch_single_module_script(AK::URL const& url, EnvironmentSettingsObject& fetch_client_settings_object, Fetch::Infrastructure::Requesting::Destination destination, ScriptFetchOptions const& options, EnvironmentSettingsObject& module_map_settings_object, Fetch::Infrastructure::Request::ReferrerType const& referrer, Optional<JS::ModuleRequest> const& module_request, TopLevelModule top_level_module, ModuleCallback on_complete)
 {
     // 1. Let moduleType be "javascript".
     DeprecatedString module_type = "javascript"sv;
@@ -378,77 +260,146 @@ void fetch_single_module_script(AK::URL const& url, EnvironmentSettingsObject&, 
     // 7. Set moduleMap[(url, moduleType)] to "fetching".
     module_map.set(url, module_type, { ModuleMap::EntryType::Fetching, nullptr });
 
-    // FIXME: Implement non ad-hoc version of steps 8 to 20.
+    // 8. Let request be a new request whose URL is url, destination is destination,
+    //    mode is "cors", referrer is referrer, and client is fetch client settings object.
+    auto request = Fetch::Infrastructure::Request::create(module_map_settings_object.vm());
+    request->set_url(url);
+    request->set_destination(destination);
+    request->set_mode(Fetch::Infrastructure::Requesting::Mode::CORS);
+    request->set_referrer(referrer);
+    request->set_client(&fetch_client_settings_object);
 
-    auto request = LoadRequest::create_for_url_on_page(url, nullptr);
+    // 9. If destination is "worker", "sharedworker", or "serviceworker",
+    //    and the top-level module fetch flag is set, then set request's mode to "same-origin".
+    if (
+        (destination == Fetch::Infrastructure::Requesting::Destination::Worker || destination == Fetch::Infrastructure::Requesting::Destination::ServiceWorker)
+        && top_level_module == TopLevelModule::Yes) {
+        request->set_mode(Fetch::Infrastructure::Requesting::Mode::SameOrigin);
+    }
 
-    ResourceLoader::the().load(
-        request,
-        [url, module_type, &module_map_settings_object, on_complete = move(on_complete), &module_map](StringView data, auto& response_headers, auto) {
-            if (data.is_null()) {
-                dbgln("Failed to load module {}", url);
-                module_map.set(url, module_type, { ModuleMap::EntryType::Failed, nullptr });
-                on_complete(nullptr);
-                return;
-            }
+    // 10. Set request's initiator type to script".
+    request->set_initiator_type(Fetch::Infrastructure::Requesting::InitiatorType::Script);
 
-            auto content_type_header = response_headers.get("Content-Type");
-            if (!content_type_header.has_value()) {
-                dbgln("Module has no content type! {}", url);
-                module_map.set(url, module_type, { ModuleMap::EntryType::Failed, nullptr });
-                on_complete(nullptr);
-                return;
-            }
+    // 11. Set up the module script request given request and options.
+    ScriptFetchOptions::setup_module_script_request(request, options);
 
-            if (MimeSniff::is_javascript_mime_type_essence_match(*content_type_header) && module_type == "javascript"sv) {
-                auto module_script = JavaScriptModuleScript::create(url.basename(), data, module_map_settings_object, url).release_value_but_fixme_should_propagate_errors();
-                module_map.set(url, module_type, { ModuleMap::EntryType::ModuleScript, module_script });
-                on_complete(module_script);
-                return;
-            }
+    // FIXME: 12. If performFetch was given, run performFetch with request, isTopLevel, and with processResponseConsumeBody as defined below.
 
-            dbgln("Module has no JS content type! {} of type {}, with content {}", url, module_type, *content_type_header);
+    auto process_response_consume_body = [&module_map, &url, &module_type, &module_map_settings_object, &options, on_complete = move(on_complete)](JS::NonnullGCPtr<Fetch::Infrastructure::Response> response, Variant<Empty, Fetch::Infrastructure::FetchAlgorithms::ConsumeBodyFailureTag, ByteBuffer> bodyBytes) {
+        // 1. If either of the following conditions are met:
+        if (
+            // bodyBytes is null or failure; or
+            (bodyBytes.has<Empty>() || bodyBytes.has<Fetch::Infrastructure::FetchAlgorithms::ConsumeBodyFailureTag>()) ||
+            // response's status is not an ok status,
+            !Fetch::Infrastructure::is_ok_status(response->status())) {
+            // then set moduleMap[(url, moduleType)] to null, run onComplete given null, and abort these steps.
+            // FIXME: Clarify if the Failed type is meant by null.
             module_map.set(url, module_type, { ModuleMap::EntryType::Failed, nullptr });
             on_complete(nullptr);
-        },
-        [module_type, url](auto&, auto) {
-            dbgln("Failed to load module script");
-            TODO();
-        });
+            return;
+        }
+
+        // 2. Let source text be the result of UTF-8 decoding bodyBytes.
+        auto source_text = MUST(String::from_utf8(bodyBytes.get<ByteBuffer>()));
+
+        // 3. Let MIME type be the result of extracting a MIME type from response's header list.
+        auto mime_type = response->header_list()->extract_mime_type().release_value_but_fixme_should_propagate_errors();
+
+        // 4. Let module script be null.
+        JS::GCPtr<JavaScriptModuleScript> module_script;
+
+        // 5. If MIME type is a JavaScript MIME type and moduleType is "javascript",
+        //    then set module script to the result of creating a JavaScript module script given source text, module map settings object, response's URL, and options.
+        if (mime_type.has_value() && mime_type->is_javascript() && module_type == "javascript"sv)
+            module_script = JavaScriptModuleScript::create(url.basename(), source_text.to_deprecated_string(), module_map_settings_object, *response->url(), options).release_value_but_fixme_should_propagate_errors();
+
+        // 6. If the MIME type essence of MIME type is "text/css" and moduleType is "css",
+        //    then set module script to the result of creating a CSS module script given source text and module map settings object.
+        if (mime_type.has_value() && mime_type->essence() == "text/css"sv && module_type == "css"sv) {
+            // FIXME: Implement CSS module script handling.
+            dbgln("Handling of css module scripts not implemented for script fetching");
+            on_complete(nullptr);
+            return;
+        }
+
+        // 7. If MIME type essence is a JSON MIME type and moduleType is "json",
+        //    then set module script to the result of creating a JSON module script given source text and module map settings object.
+        if (mime_type.has_value() && mime_type->is_json() && module_type == "json"sv) {
+            // FIXME: Implement JSON module script handling.
+            dbgln("Handling of json module scripts not implemented for script fetching");
+            on_complete(nullptr);
+            return;
+        }
+
+        // 8. Set moduleMap[(url, moduleType)] to module script, and run onComplete given module script.
+        module_map.set(url, module_type, { ModuleMap::EntryType::ModuleScript, module_script });
+        on_complete(module_script);
+    };
+
+    // Otherwise, fetch request with processResponseConsumeBody set to processResponseConsumeBody as defined below.
+    // FIXME: Handle exception
+    (void)Fetch::Fetching::fetch(
+        fetch_client_settings_object.realm(),
+        request,
+        Fetch::Infrastructure::FetchAlgorithms::create(fetch_client_settings_object.realm().vm(), {
+                                                                                                      .process_request_body_chunk_length = {},
+                                                                                                      .process_request_end_of_body = {},
+                                                                                                      .process_early_hints_response = {},
+                                                                                                      .process_response = {},
+                                                                                                      .process_response_end_of_body = {},
+                                                                                                      .process_response_consume_body = move(process_response_consume_body),
+                                                                                                  }));
+}
+
+// https://html.spec.whatwg.org/multipage/webappapis.html#fetch-a-single-imported-module-script
+void fetch_single_imported_module_script(AK::URL const& url, EnvironmentSettingsObject& settings_object, Fetch::Infrastructure::Requesting::Destination destination, ScriptFetchOptions const& options, Fetch::Infrastructure::Request::ReferrerType const& referrer, JS::ModuleRequest module_request, ModuleCallback on_complete)
+{
+    // 1. Assert: moduleRequest.[[Assertions]] does not contain any Record entry such that entry.[[Key]] is not "type",
+    //    because we only asked for "type" assertions in HostGetSupportedImportAssertions.
+    VERIFY(all_of(module_request.assertions, [](auto const& assertion) { return assertion.key == "type"sv; }));
+
+    // 2. Let moduleType be the result of running the module type from module request steps given moduleRequest.
+    auto module_type = module_type_from_module_request(module_request);
+
+    // 3. If the result of running the module type allowed steps given moduleType and settings object is false, then run onComplete given null, and return.
+    if (!settings_object.module_type_allowed(module_type)) {
+        on_complete(nullptr);
+        return;
+    }
+
+    // 4. Fetch a single module script given url, settings object, destination, options, settings object, referrer, moduleRequest,
+    //    false, and onComplete. If performFetch was given, pass it along as well.
+    // FIXME: Pass performFetch if given.
+    fetch_single_module_script(url, settings_object, destination, options, settings_object, referrer, module_request, TopLevelModule::No, move(on_complete));
 }
 
 // https://html.spec.whatwg.org/multipage/webappapis.html#fetch-a-module-script-tree
-void fetch_external_module_script_graph(AK::URL const& url, EnvironmentSettingsObject& settings_object, ModuleCallback on_complete)
+void fetch_external_module_script_graph(AK::URL const& url, EnvironmentSettingsObject& settings_object, ScriptFetchOptions const& options, ModuleCallback on_complete)
 {
     // 1. Disallow further import maps given settings object.
     settings_object.disallow_further_import_maps();
 
     // 2. Fetch a single module script given url, settings object, "script", options, settings object, "client", true, and with the following steps given result:
-    // FIXME: Pass options.
-    fetch_single_module_script(url, settings_object, "script"sv, settings_object, "client"sv, {}, TopLevelModule::Yes, [&settings_object, on_complete = move(on_complete), url](auto* result) mutable {
+    fetch_single_module_script(url, settings_object, Fetch::Infrastructure::Requesting::Destination::Script, options, settings_object, Fetch::Infrastructure::Requesting::Referrer::Client, {}, TopLevelModule::Yes, [&settings_object, on_complete = move(on_complete), url](auto* result) mutable {
         // 1. If result is null, run onComplete given null, and abort these steps.
         if (!result) {
             on_complete(nullptr);
             return;
         }
 
-        // 2. Let visited set be « (url, "javascript") ».
-        HashTable<ModuleLocationTuple> visited_set;
-        visited_set.set({ url, "javascript"sv });
-
-        // 3. Fetch the descendants of and link result given settings object, "script", visited set, and onComplete.
-        fetch_descendants_of_and_link_a_module_script(*result, settings_object, "script"sv, move(visited_set), move(on_complete));
+        // 2. Fetch the descendants of and link result given settings object, "script", and onComplete.
+        fetch_descendants_of_and_link_a_module_script(*result, settings_object, Fetch::Infrastructure::Requesting::Destination::Script, move(on_complete));
     });
 }
 
 // https://html.spec.whatwg.org/multipage/webappapis.html#fetch-an-inline-module-script-graph
-void fetch_inline_module_script_graph(DeprecatedString const& filename, DeprecatedString const& source_text, AK::URL const& base_url, EnvironmentSettingsObject& settings_object, ModuleCallback on_complete)
+void fetch_inline_module_script_graph(DeprecatedString const& filename, DeprecatedString const& source_text, AK::URL const& base_url, EnvironmentSettingsObject& settings_object, ScriptFetchOptions const& options, ModuleCallback on_complete)
 {
     // 1. Disallow further import maps given settings object.
     settings_object.disallow_further_import_maps();
 
     // 2. Let script be the result of creating a JavaScript module script using source text, settings object, base URL, and options.
-    auto script = JavaScriptModuleScript::create(filename, source_text.view(), settings_object, base_url).release_value_but_fixme_should_propagate_errors();
+    auto script = JavaScriptModuleScript::create(filename, source_text.view(), settings_object, base_url, options).release_value_but_fixme_should_propagate_errors();
 
     // 3. If script is null, run onComplete given null, and return.
     if (!script) {
@@ -456,47 +407,72 @@ void fetch_inline_module_script_graph(DeprecatedString const& filename, Deprecat
         return;
     }
 
-    // 4. Let visited set be an empty set.
-    HashTable<ModuleLocationTuple> visited_set;
-
-    // 5. Fetch the descendants of and link script, given settings object, the destination "script", visited set, and onComplete.
-    fetch_descendants_of_and_link_a_module_script(*script, settings_object, "script"sv, visited_set, move(on_complete));
+    // 4. Fetch the descendants of and link script, given settings object, "script", and onComplete.
+    fetch_descendants_of_and_link_a_module_script(*script, settings_object, Fetch::Infrastructure::Requesting::Destination::Script, move(on_complete));
 }
 
 // https://html.spec.whatwg.org/multipage/webappapis.html#fetch-the-descendants-of-and-link-a-module-script
-void fetch_descendants_of_and_link_a_module_script(JavaScriptModuleScript& module_script, EnvironmentSettingsObject& fetch_client_settings_object, StringView destination, HashTable<ModuleLocationTuple> const& visited_set, ModuleCallback on_complete)
+void fetch_descendants_of_and_link_a_module_script(JavaScriptModuleScript& module_script, EnvironmentSettingsObject& fetch_client_settings_object, Fetch::Infrastructure::Requesting::Destination destination, ModuleCallback on_complete)
 {
-    // 1. Fetch the descendants of module script, given fetch client settings object, destination, visited set, and onFetchDescendantsComplete as defined below.
-    //    If performFetch was given, pass it along as well.
-    // FIXME: Pass performFetch if given.
-    fetch_descendants_of_a_module_script(module_script, fetch_client_settings_object, destination, visited_set, [on_complete = move(on_complete)](JavaScriptModuleScript* result) {
-        // onFetchDescendantsComplete given result is the following algorithm:
-        // 1. If result is null, then run onComplete given result, and abort these steps.
-        if (!result) {
-            on_complete(nullptr);
-            return;
+    // 1. Let record be module script's record.
+    auto* record = module_script.record();
+
+    // 2. If record is null, then:
+    if (!record) {
+        // FIXME: 1. Set module script's error to rethrow to module script's parse error.
+
+        // 2. Run onComplete given module script.
+        on_complete(&module_script);
+
+        // 3. Return.
+        return;
+    }
+
+    // 3. Let state be Record { [[ParseError]]: null, [[Destination]]: destination, [[PerformFetch]]: null }.
+    auto state = FetchContext { destination, nullptr };
+
+    // FIXME: 4. If performFetch was given, set state.[[PerformFetch]] to performFetch.
+
+    // FIXME: Our implementation requires a current_realm() when calling this function, as we allocated
+    //        a native function in the realm's heap() in new_promise_capability, NativeFunction::create
+    fetch_client_settings_object.realm().vm().push_execution_context(fetch_client_settings_object.realm_execution_context());
+
+    // 5. Let loadingPromise be record.LoadRequestedModules(state).
+    auto const& loading_promise = record->load_requested_modules(fetch_client_settings_object.realm(), state);
+
+    // 6. Upon fulfillment of loadingPromise, run the following steps:
+    WebIDL::upon_fulfillment(loading_promise, [&record, &fetch_client_settings_object, &module_script, on_complete = move(on_complete)](auto) {
+        // 1. Perform record.Link().
+        auto linking_result = record->link(fetch_client_settings_object.realm().vm());
+
+        // FIXME: If this throws an exception, set result's error to rethrow to that exception.
+        if (linking_result.is_error()) {
+            dbgln("Linking module script record caused an exception");
+            return JS::js_undefined();
         }
 
-        // FIXME: 2. Let parse error be the result of finding the first parse error given result.
+        // 2. Run onComplete given module script.
+        on_complete(&module_script);
 
-        // 3. If parse error is null, then:
-        if (result->record()) {
-            // 1. Let record be result's record.
-            auto const& record = *result->record();
+        // FIXME: See fixme about current_realm() above. The call to WebIDL::upon_fulfillment ends up allocating
+        //        a native function as well.
+        fetch_client_settings_object.realm().vm().pop_execution_context();
 
-            // 2. Perform record.Link().
-            auto linking_result = const_cast<JS::SourceTextModule&>(record).link(result->vm());
+        return JS::js_undefined();
+    });
 
-            // TODO: If this throws an exception, set result's error to rethrow to that exception.
-            if (linking_result.is_error())
-                TODO();
-        } else {
-            // FIXME: 4. Otherwise, set result's error to rethrow to parse error.
-            TODO();
-        }
+    // 7. Upon rejection of loadingPromise, run the following steps:
+    WebIDL::upon_rejection(loading_promise, [state, &fetch_client_settings_object, on_complete = move(on_complete)](auto) {
+        // FIXME: 1. If state.[[ParseError]] is not null, set module script's error to rethrow to state.[[ParseError]] and run onComplete given module script.
 
-        // 5. Run onComplete given result.
-        on_complete(result);
+        // 2. Otherwise, run onComplete given null.
+        on_complete(nullptr);
+
+        // FIXME: See fixme about current_realm() above. The call to WebIDL::upon_rejection ends up allocating
+        //        a native function as well.
+        fetch_client_settings_object.realm().vm().pop_execution_context();
+
+        return JS::js_undefined();
     });
 }
 
