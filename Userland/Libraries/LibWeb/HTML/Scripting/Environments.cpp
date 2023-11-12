@@ -45,10 +45,14 @@ void EnvironmentSettingsObject::visit_edges(Cell::Visitor& visitor)
     visitor.visit(target_browsing_context);
     visitor.visit(m_module_map);
     visitor.ignore(m_outstanding_rejected_promises_weak_set);
+
+    m_realm_execution_context->visit_edges(visitor);
 }
 
 JS::ExecutionContext& EnvironmentSettingsObject::realm_execution_context()
 {
+    dbgln("EnvironmentSettingsObject::realm_execution_context: m_realm_execution_context: {}", m_realm_execution_context.ptr());
+
     // NOTE: All environment settings objects are created with a realm execution context, so it's stored and returned here in the base class.
     return *m_realm_execution_context;
 }

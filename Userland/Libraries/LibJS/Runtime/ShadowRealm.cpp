@@ -231,17 +231,22 @@ ThrowCompletionOr<Value> shadow_realm_import_value(VM& vm, DeprecatedString spec
     // 5. Push evalContext onto the execution context stack; evalContext is now the running execution context.
     TRY(vm.push_execution_context(eval_context, {}));
 
-    // 6. Perform HostImportModuleDynamically(null, specifierString, innerCapability).
-    MUST_OR_THROW_OOM(vm.host_import_module_dynamically(Empty {}, ModuleRequest { move(specifier_string) }, inner_capability));
+    // 6. Let referrer be the Realm component of evalContext.
+    auto referrer = eval_context.realm;
 
-    // 7. Suspend evalContext and remove it from the execution context stack.
+    ImportedModulePayload payload = inner_capability;
+
+    // 7. Perform HostLoadImportedModule(referrer, specifierString, EMPTY, innerCapability).
+    vm.host_load_imported_module(realm, NonnullGCPtr(*referrer), ModuleRequest { specifier_string }, {}, payload);
+
+    // 8. Suspend evalContext and remove it from the execution context stack.
     // NOTE: We don't support this concept yet.
     vm.pop_execution_context();
 
-    // 8. Resume the context that is now on the top of the execution context stack as the running execution context.
+    // 9. Resume the context that is now on the top of the execution context stack as the running execution context.
     // NOTE: We don't support this concept yet.
 
-    // 9. Let steps be the steps of an ExportGetter function as described below.
+    // 10. Let steps be the steps of an ExportGetter function as described below.
     auto steps = [string = move(export_name_string)](auto& vm) -> ThrowCompletionOr<Value> {
         // 1. Assert: exports is a module namespace exotic object.
         VERIFY(vm.argument(0).is_object());
@@ -272,11 +277,11 @@ ThrowCompletionOr<Value> shadow_realm_import_value(VM& vm, DeprecatedString spec
         return get_wrapped_value(vm, *realm, value);
     };
 
-    // 10. Let onFulfilled be CreateBuiltinFunction(steps, 1, "", « [[ExportNameString]] », callerRealm).
-    // 11. Set onFulfilled.[[ExportNameString]] to exportNameString.
+    // 11. Let onFulfilled be CreateBuiltinFunction(steps, 1, "", « [[ExportNameString]] », callerRealm).
+    // 12. Set onFulfilled.[[ExportNameString]] to exportNameString.
     auto on_fulfilled = NativeFunction::create(realm, move(steps), 1, "", &caller_realm);
 
-    // 12. Let promiseCapability be ! NewPromiseCapability(%Promise%).
+    // 13. Let promiseCapability be ! NewPromiseCapability(%Promise%).
     auto promise_capability = MUST(new_promise_capability(vm, realm.intrinsics().promise_constructor()));
 
     // NOTE: Even though the spec tells us to use %ThrowTypeError%, it's not observable if we actually do.
@@ -285,7 +290,7 @@ ThrowCompletionOr<Value> shadow_realm_import_value(VM& vm, DeprecatedString spec
         return vm.template throw_completion<TypeError>(vm.argument(0).as_object().get_without_side_effects(vm.names.message).as_string().utf8_string());
     });
 
-    // 13. Return PerformPromiseThen(innerCapability.[[Promise]], onFulfilled, callerRealm.[[Intrinsics]].[[%ThrowTypeError%]], promiseCapability).
+    // 14. Return PerformPromiseThen(innerCapability.[[Promise]], onFulfilled, callerRealm.[[Intrinsics]].[[%ThrowTypeError%]], promiseCapability).
     return verify_cast<Promise>(inner_capability->promise().ptr())->perform_then(on_fulfilled, throw_type_error, promise_capability);
 }
 

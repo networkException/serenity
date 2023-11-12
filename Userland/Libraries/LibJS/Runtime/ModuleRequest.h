@@ -9,7 +9,8 @@
 
 #include <AK/DeprecatedFlyString.h>
 #include <AK/Vector.h>
-#include <LibJS/Module.h>
+#include <LibJS/Forward.h>
+#include <LibJS/Heap/GCPtr.h>
 
 namespace JS {
 

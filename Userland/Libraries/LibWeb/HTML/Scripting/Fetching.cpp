@@ -25,6 +25,7 @@
 #include <LibWeb/Infra/Strings.h>
 #include <LibWeb/MimeSniff/MimeType.h>
 #include <LibWeb/URL/URL.h>
+#include <LibJS/Heap/Cell.h>
 
 namespace Web::HTML {
 
@@ -51,6 +52,13 @@ ScriptFetchOptions default_classic_script_fetch_options()
         .referrer_policy = {},
         .fetch_priority = Fetch::Infrastructure::Request::Priority::Auto
     };
+}
+
+void FetchContext::visit_edges(JS::Cell::Visitor& visitor)
+{
+    visitor.visit(m_parse_error);
+    visitor.visit(m_perform_fetch);
+    visitor.visit(m_fetch_client);
 }
 
 // https://html.spec.whatwg.org/multipage/webappapis.html#module-type-from-module-request
@@ -561,6 +569,10 @@ void fetch_single_module_script(JS::Realm& realm,
     TopLevelModule is_top_level,
     OnFetchScriptComplete on_complete)
 {
+    dbgln("fetch_single_module_script");
+    dbgln("calling fetch_client.realm_execution_context()");
+    fetch_client.realm_execution_context();
+
     // 1. Let moduleType be "javascript".
     DeprecatedString module_type = "javascript"sv;
 
@@ -662,6 +674,8 @@ void fetch_single_module_script(JS::Realm& realm,
         on_complete->function()(module_script);
     };
 
+    dbgln("calling Fetch::Fetching::fetch in fetch_single_module_script");
+
     Fetch::Fetching::fetch(realm, request, Fetch::Infrastructure::FetchAlgorithms::create(realm.vm(), move(fetch_algorithms_input))).release_value_but_fixme_should_propagate_errors();
 }
 
@@ -732,6 +746,8 @@ void fetch_single_imported_module_script(JS::Realm& realm,
         return;
     }
 
+    dbgln("calling fetch_single_module_script from fetch_single_imported_module_script");
+
     // 4. Fetch a single module script given url, fetchClient, destination, options, settingsObject, referrer, moduleRequest, false,
     //    and onComplete. If performFetch was given, pass it along as well.
     fetch_single_module_script(realm, url, fetch_client, destination, options, settings_object, referrer, module_request, TopLevelModule::No, on_complete);
@@ -744,6 +760,8 @@ void fetch_descendants_of_and_link_a_module_script(JS::Realm& realm,
     Fetch::Infrastructure::Request::Destination destination,
     OnFetchScriptComplete on_complete)
 {
+    dbgln("fetch_descendants_of_and_link_a_module_script");
+
     // 1. Let record be moduleScript's record.
     auto* record = module_script.record();
 
@@ -758,6 +776,8 @@ void fetch_descendants_of_and_link_a_module_script(JS::Realm& realm,
         // 3. Return.
         return;
     }
+
+    dbgln("Creating a new FetchContext with fetch_client set to {}", &fetch_client);
 
     // 3. Let state be Record { [[ParseError]]: null, [[Destination]]: destination, [[PerformFetch]]: null, [[FetchClient]]: fetchClient }.
     auto state = FetchContext { {}, destination, {}, fetch_client };
@@ -780,6 +800,8 @@ void fetch_descendants_of_and_link_a_module_script(JS::Realm& realm,
     // 6. Upon fulfillment of loadingPromise, run the following steps:
     WebIDL::upon_fulfillment(loading_promise, [&realm, record, &module_script, on_complete](auto const&) -> WebIDL::ExceptionOr<JS::Value> {
         // 1. Perform record.Link().
+        dbgln("WebIDL::upon_fulfillment");
+
         auto linking_result = record->link(realm.vm());
 
         // If this throws an exception, set result's error to rethrow to that exception.
@@ -796,8 +818,8 @@ void fetch_descendants_of_and_link_a_module_script(JS::Realm& realm,
     WebIDL::upon_rejection(loading_promise, [&state, &module_script, on_complete](auto const&) -> WebIDL::ExceptionOr<JS::Value> {
         // 1. If state.[[ParseError]] is not null, set moduleScript's error to rethrow to state.[[ParseError]] and run
         //    onComplete given moduleScript.
-        if (state.parse_error != nullptr) {
-            module_script.set_error_to_rethrow(*state.parse_error);
+        if (state.has_parse_error()) {
+            module_script.set_error_to_rethrow(state.parse_error());
 
             on_complete->function()(module_script);
         }

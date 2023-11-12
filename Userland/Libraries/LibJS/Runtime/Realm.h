@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2021-2022, Linus Groh <linusg@serenityos.org>
  * Copyright (c) 2022, Andreas Kling <kling@serenityos.org>
+ * Copyright (c) 2023, networkException <networkexception@serenityos.org>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
@@ -13,6 +14,7 @@
 #include <AK/Weakable.h>
 #include <LibJS/Heap/Cell.h>
 #include <LibJS/Runtime/Intrinsics.h>
+#include <LibJS/Runtime/ModuleRequest.h>
 
 namespace JS {
 
@@ -36,6 +38,7 @@ public:
 
     [[nodiscard]] Object& global_object() const { return *m_global_object; }
     [[nodiscard]] GlobalEnvironment& global_environment() const { return *m_global_environment; }
+    [[nodiscard]] Vector<ModuleWithSpecifier> const& loaded_modules() const { return m_loaded_modules; };
 
     [[nodiscard]] Intrinsics const& intrinsics() const { return *m_intrinsics; }
     [[nodiscard]] Intrinsics& intrinsics() { return *m_intrinsics; }
@@ -58,6 +61,7 @@ private:
     GCPtr<Intrinsics> m_intrinsics;                // [[Intrinsics]]
     GCPtr<Object> m_global_object;                 // [[GlobalObject]]
     GCPtr<GlobalEnvironment> m_global_environment; // [[GlobalEnv]]
+    Vector<ModuleWithSpecifier> m_loaded_modules;  // [[LoadedModules]]
     OwnPtr<HostDefined> m_host_defined;            // [[HostDefined]]
 };
 

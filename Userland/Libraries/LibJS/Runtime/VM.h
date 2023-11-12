@@ -18,6 +18,7 @@
 #include <LibJS/CyclicModule.h>
 #include <LibJS/Heap/Heap.h>
 #include <LibJS/Heap/MarkedVector.h>
+#include <LibJS/ModuleLoading.h>
 #include <LibJS/Runtime/CommonPropertyNames.h>
 #include <LibJS/Runtime/Completion.h>
 #include <LibJS/Runtime/Error.h>
@@ -229,18 +230,14 @@ public:
     //       Our implementation of this proposal is outdated however, as such we try to adapt the proposal and living standard
     //       to match our implementation for now.
     // 16.2.1.8 HostLoadImportedModule ( referrer, moduleRequest, hostDefined, payload ), https://tc39.es/proposal-import-attributes/#sec-HostLoadImportedModule
-    Function<void(Realm&, Variant<NonnullGCPtr<Script>, NonnullGCPtr<CyclicModule>>, ModuleRequest const&, Optional<GraphLoadingState::HostDefined>, GraphLoadingState&)> host_load_imported_module;
-
-    Function<ThrowCompletionOr<NonnullGCPtr<Module>>(ScriptOrModule, ModuleRequest const&)> host_resolve_imported_module;
-    Function<ThrowCompletionOr<void>(ScriptOrModule, ModuleRequest, PromiseCapability const&)> host_import_module_dynamically;
-    Function<void(ScriptOrModule, ModuleRequest const&, PromiseCapability const&, Promise*)> host_finish_dynamic_import;
+    Function<void(Realm&, ImportedModuleReferrer const&, ModuleRequest const&, GCPtr<GraphLoadingState::HostDefined>, ImportedModulePayload)> host_load_imported_module;
 
     Function<HashMap<PropertyKey, Value>(SourceTextModule&)> host_get_import_meta_properties;
     Function<void(Object*, SourceTextModule const&)> host_finalize_import_meta;
 
     Function<Vector<DeprecatedString>()> host_get_supported_import_assertions;
 
-    void enable_default_host_import_module_dynamically_hook();
+    void allow_dynamic_imports() { m_allows_dynamic_imports = true; }
 
     Function<void(Promise&, Promise::RejectionOperation)> host_promise_rejection_tracker;
     Function<ThrowCompletionOr<Value>(JobCallback&, Value, MarkedVector<Value>)> host_call_job_callback;
@@ -271,11 +268,9 @@ private:
     ThrowCompletionOr<void> property_binding_initialization(BindingPattern const& binding, Value value, Environment* environment);
     ThrowCompletionOr<void> iterator_binding_initialization(BindingPattern const& binding, IteratorRecord& iterator_record, Environment* environment);
 
-    ThrowCompletionOr<NonnullGCPtr<Module>> resolve_imported_module(ScriptOrModule referencing_script_or_module, ModuleRequest const& module_request);
     ThrowCompletionOr<void> link_and_eval_module(Module& module);
 
-    ThrowCompletionOr<void> import_module_dynamically(ScriptOrModule referencing_script_or_module, ModuleRequest module_request, PromiseCapability const& promise_capability);
-    void finish_dynamic_import(ScriptOrModule referencing_script_or_module, ModuleRequest module_request, PromiseCapability const& promise_capability, Promise* inner_promise);
+    void load_imported_module(Realm&, ImportedModuleReferrer const&, ModuleRequest const&, GCPtr<GraphLoadingState::HostDefined>, ImportedModulePayload);
 
     void set_well_known_symbols(WellKnownSymbols well_known_symbols) { m_well_known_symbols = move(well_known_symbols); }
 
@@ -311,7 +306,7 @@ private:
         bool has_once_started_linking { false };
     };
 
-    StoredModule* get_stored_module(ScriptOrModule const& script_or_module, DeprecatedString const& filename, DeprecatedString const& type);
+    StoredModule* get_stored_module(ImportedModuleReferrer const&, DeprecatedString const& filename, DeprecatedString const& type);
 
     Vector<StoredModule> m_loaded_modules;
 
@@ -322,6 +317,8 @@ private:
     OwnPtr<CustomData> m_custom_data;
 
     OwnPtr<Bytecode::Interpreter> m_bytecode_interpreter;
+
+    bool m_allows_dynamic_imports { false };
 };
 
 template<typename GlobalObjectType, typename... Args>

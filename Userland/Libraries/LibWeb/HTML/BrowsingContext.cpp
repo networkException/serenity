@@ -165,6 +165,8 @@ WebIDL::ExceptionOr<BrowsingContext::BrowsingContextAndDocument> BrowsingContext
             return browsing_context->window_proxy();
         });
 
+    dbgln("Bindings::create_a_new_javascript_realm returned {}", realm_execution_context.ptr());
+
     // 10. Let topLevelCreationURL be about:blank if embedder is null; otherwise embedder's relevant settings object's top-level creation URL.
     auto top_level_creation_url = !embedder ? AK::URL("about:blank") : relevant_settings_object(*embedder).top_level_creation_url;
 

@@ -1470,6 +1470,8 @@ ThrowCompletionOr<Value> perform_import_call(VM& vm, Value specifier, Value opti
     auto& realm = *vm.current_realm();
 
     // 2.1.1.1 EvaluateImportCall ( specifierExpression [ , optionsExpression ] ), https://tc39.es/proposal-import-assertions/#sec-evaluate-import-call
+    // FIXME: The steps below don't match the spec anymore.
+
     //  1. Let referencingScriptOrModule be GetActiveScriptOrModule().
     auto referencing_script_or_module = vm.get_active_script_or_module();
 
@@ -1550,8 +1552,17 @@ ThrowCompletionOr<Value> perform_import_call(VM& vm, Value specifier, Value opti
     // 11. Let moduleRequest be a new ModuleRequest Record { [[Specifier]]: specifierString, [[Assertions]]: assertions }.
     ModuleRequest request { specifier_string, assertions };
 
-    // 12. Perform HostImportModuleDynamically(referencingScriptOrModule, moduleRequest, promiseCapability).
-    MUST_OR_THROW_OOM(vm.host_import_module_dynamically(referencing_script_or_module, move(request), promise_capability));
+    // NOTE: This is an ad-hoc adaption of https://tc39.es/proposal-import-attributes/#sec-evaluate-import-call's step 2 and 13.
+    // Perform HostLoadImportedModule(referrer, moduleRequest, empty, promiseCapability).
+    auto referrer = referencing_script_or_module.visit(
+        // If referrer is null, set referrer to the current Realm Record.
+        [&vm](Empty) -> ImportedModuleReferrer { return NonnullGCPtr(*vm.current_realm()); },
+        [](NonnullGCPtr<Script> script) -> ImportedModuleReferrer { return script; },
+        [](NonnullGCPtr<Module> module) -> ImportedModuleReferrer { return NonnullGCPtr(verify_cast<CyclicModule>(*module)); });
+
+    ImportedModulePayload payload = promise_capability;
+
+    vm.host_load_imported_module(realm, referrer, request, {}, payload);
 
     // 13. Return promiseCapability.[[Promise]].
     return Value { promise_capability->promise() };

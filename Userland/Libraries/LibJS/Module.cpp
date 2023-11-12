@@ -37,6 +37,8 @@ void Module::visit_edges(Cell::Visitor& visitor)
 // 16.2.1.5.1.1 InnerModuleLinking ( module, stack, index ), https://tc39.es/ecma262/#sec-InnerModuleLinking
 ThrowCompletionOr<u32> Module::inner_module_linking(VM& vm, Vector<Module*>&, u32 index)
 {
+    dbgln("Module::inner_module_linking");
+
     // 1. If module is not a Cyclic Module Record, then
     // a. Perform ? module.Link().
     TRY(link(vm));
@@ -68,17 +70,21 @@ ThrowCompletionOr<u32> Module::inner_module_evaluation(VM& vm, Vector<Module*>&,
 // FIXME: We currently implement an outdated version of https://tc39.es/proposal-import-attributes, as such it is not possible to
 //        use the exact steps from https://tc39.es/proposal-import-attributes/#sec-HostLoadImportedModule here.
 // FIXME: Support Realm for referrer.
-void finish_loading_imported_module(Realm& realm, Variant<JS::NonnullGCPtr<JS::Script>, JS::NonnullGCPtr<JS::CyclicModule>> referrer, ModuleRequest const& module_request, GraphLoadingState& payload, ThrowCompletionOr<Module*> const& result)
+void finish_loading_imported_module(Realm& realm, ImportedModuleReferrer const& referrer, ModuleRequest const& module_request, ImportedModulePayload& payload, ThrowCompletionOr<NonnullGCPtr<Module>> const& result)
 {
+    dbgln("finish_loading_imported_module");
+
     // 1. If result is a normal completion, then
     if (!result.is_error()) {
-        auto loaded_modules = referrer.visit(
-            [](JS::NonnullGCPtr<JS::Script> script) -> Vector<ModuleWithSpecifier> { return script->loaded_modules(); },
-            [](JS::NonnullGCPtr<JS::CyclicModule> module) -> Vector<ModuleWithSpecifier> { return module->loaded_modules(); });
+        auto loaded_modules = referrer.visit([](auto const& script_or_module_or_realm) -> Vector<ModuleWithSpecifier> {
+            return script_or_module_or_realm->loaded_modules();
+        });
+
+        dbgln("got loaded_modules");
 
         bool found_record = false;
 
-        // a.a. If referrer.[[LoadedModules]] contains a Record whose [[Specifier]] is specifier, then
+        // a. If referrer.[[LoadedModules]] contains a Record whose [[Specifier]] is specifier, then
         for (auto const& record : loaded_modules) {
             if (record.specifier == module_request.module_specifier) {
                 // i. Assert: That Record's [[Module]] is result.[[Value]].
@@ -90,21 +96,43 @@ void finish_loading_imported_module(Realm& realm, Variant<JS::NonnullGCPtr<JS::S
 
         // b. Else,
         if (!found_record) {
-            auto* module = const_cast<Module*>(result.value());
+            dbgln("Appending the record {}", module_request.module_specifier);
 
             // i. Append the Record { [[Specifier]]: specifier, [[Module]]: result.[[Value]] } to referrer.[[LoadedModules]].
             loaded_modules.append(ModuleWithSpecifier {
                 .specifier = module_request.module_specifier,
-                .module = NonnullGCPtr<Module>(*module) });
+                .module = result.value() });
+
+            dbgln("All loaded modules:");
+            {
+                auto loaded_modules2 = referrer.visit([](auto const& script_or_module_or_realm) -> Vector<ModuleWithSpecifier> {
+                    return script_or_module_or_realm->loaded_modules();
+                });
+
+                for (auto const& m : loaded_modules2) {
+                    dbgln("loaded module: {}", m.specifier);
+                }
+            }
+
+            dbgln("------");
         }
     }
 
-    // FIXME: 2. If payload is a GraphLoadingState Record, then
-    // a. Perform ContinueModuleLoading(payload, result)
-    continue_module_loading(realm, payload, result);
-
-    // FIXME: Else,
-    // FIXME: a. Perform ContinueDynamicImport(payload, result).
+    // 2. If payload is a GraphLoadingState Record, then
+    if (payload.has<NonnullGCPtr<GraphLoadingState>>()) {
+        dbgln("2. If payload is a GraphLoadingState Record, then");
+        // a. Perform ContinueModuleLoading(payload, result)
+        continue_module_loading(realm, payload.get<NonnullGCPtr<GraphLoadingState>>(), result);
+    }
+    // 3. Else,
+    else {
+        dbgln("3. Else,");
+        dbgln("payload: {}", &payload);
+        dbgln("payload as NonnullGCPtr<PromiseCapability>: {}", payload.get_pointer<NonnullGCPtr<PromiseCapability>>());
+        dbgln("payload as GraphLoadingState: {}", payload.get_pointer<NonnullGCPtr<GraphLoadingState>>());
+        // a. Perform ContinueDynamicImport(payload, result).
+        continue_dynamic_import(realm, payload.get<NonnullGCPtr<PromiseCapability>>(), result);
+    }
 
     // 4. Return unused.
 }

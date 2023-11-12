@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2021, Andreas Kling <kling@serenityos.org>
  * Copyright (c) 2022, David Tuin <davidot@serenityos.org>
+ * Copyright (c) 2023, networkException <networkexception@serenityos.org>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
@@ -9,6 +10,7 @@
 
 #include <AK/DeprecatedFlyString.h>
 #include <LibJS/Heap/GCPtr.h>
+#include <LibJS/ModuleLoading.h>
 #include <LibJS/Runtime/Environment.h>
 #include <LibJS/Runtime/Realm.h>
 #include <LibJS/Script.h>
@@ -110,8 +112,7 @@ private:
 };
 
 class CyclicModule;
-struct GraphLoadingState;
 
-void finish_loading_imported_module(Realm&, Variant<NonnullGCPtr<Script>, NonnullGCPtr<CyclicModule>>, ModuleRequest const&, GraphLoadingState&, ThrowCompletionOr<Module*> const&);
+void finish_loading_imported_module(Realm&, ImportedModuleReferrer const&, ModuleRequest const&, ImportedModulePayload&, ThrowCompletionOr<NonnullGCPtr<Module>> const&);
 
 }
