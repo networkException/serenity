@@ -54,9 +54,7 @@ struct ScriptFetchOptions {
 // https://html.spec.whatwg.org/multipage/webappapis.html#default-classic-script-fetch-options
 ScriptFetchOptions default_classic_script_fetch_options();
 
-class FetchContext final
-    : public JS::GraphLoadingState::HostDefined
-    , public JS::Cell {
+class FetchContext final : public JS::GraphLoadingState::HostDefined {
     JS_CELL(FetchContext, JS::GraphLoadingState::HostDefined);
 
 public:

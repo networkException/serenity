@@ -50,6 +50,7 @@
 #include <LibWeb/WebIDL/AbstractOperations.h>
 #include <LibWeb/XHR/EventNames.h>
 #include <LibWeb/XLink/AttributeNames.h>
+#include "LibWeb/HTML/Scripting/TemporaryExecutionContext.h"
 
 namespace Web::Bindings {
 
@@ -407,9 +408,6 @@ ErrorOr<void> initialize_main_thread_vm()
     s_main_thread_vm->host_load_imported_module = [](JS::Realm& realm, JS::ImportedModuleReferrer const& referrer, JS::ModuleRequest const& module_request, JS::GCPtr<JS::GraphLoadingState::HostDefined> load_state, JS::ImportedModulePayload payload) -> void {
         dbgln("host_load_imported_module in MainThreadVM");
 
-        dbgln("calling HTML::current_settings_object().realm_execution_context();");
-        HTML::current_settings_object().realm_execution_context();
-
         // 1. Let settingsObject be the current settings object.
         Optional<HTML::EnvironmentSettingsObject&> settings_object = HTML::current_settings_object();
 
@@ -455,6 +453,8 @@ ErrorOr<void> initialize_main_thread_vm()
             // 1. Let completion be Completion Record { [[Type]]: throw, [[Value]]: resolutionError, [[Target]]: empty }.
             auto completion = dom_exception_to_throw_completion(main_thread_vm(), url.exception());
 
+            HTML::TemporaryExecutionContext execution_context { host_defined_environment_settings_object(realm) };
+
             // 2. Perform FinishLoadingImportedModule(referrer, moduleRequest, payload, completion).
             JS::finish_loading_imported_module(realm, referrer, module_request, payload, completion);
 
@@ -491,7 +491,7 @@ ErrorOr<void> initialize_main_thread_vm()
             fetch_client->realm_execution_context();
         }
 
-        auto on_single_fetch_complete = HTML::create_on_fetch_script_complete(realm.heap(), [&referrer, &realm, &load_state, &module_request, &payload](JS::GCPtr<HTML::Script> const& module_script) -> void {
+        auto on_single_fetch_complete = HTML::create_on_fetch_script_complete(realm.heap(), [referrer, &realm, load_state, &module_request, payload](JS::GCPtr<HTML::Script> const& module_script) -> void {
             // onSingleFetchComplete given moduleScript is the following algorithm:
             // 1. Let completion be null.
             // NOTE: Our JS::Completion does not support non JS::Value types for its [[Value]], a such we
@@ -503,7 +503,7 @@ ErrorOr<void> initialize_main_thread_vm()
                 completion = JS::throw_completion(JS::TypeError::create(realm, DeprecatedString::formatted("Loading imported module '{}' failed.", module_request.module_specifier)));
             }
             // 3. Otherwise, if moduleScript's parse error is not null, then:
-            else if (!module_script->parse_error().is_empty()) {
+            else if (!module_script->parse_error().is_null()) {
                 // 1. Let parseError be moduleScript's parse error.
                 auto parse_error = module_script->parse_error();
 
@@ -525,6 +525,8 @@ ErrorOr<void> initialize_main_thread_vm()
 
                 completion = JS::ThrowCompletionOr<JS::NonnullGCPtr<JS::Module>>(record);
             }
+
+            HTML::TemporaryExecutionContext execution_context { host_defined_environment_settings_object(realm) };
 
             // 5. Perform FinishLoadingImportedModule(referrer, moduleRequest, payload, completion).
             JS::finish_loading_imported_module(realm, referrer, module_request, payload, *completion);

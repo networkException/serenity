@@ -671,6 +671,9 @@ void fetch_single_module_script(JS::Realm& realm,
 
         // 10. Set moduleMap[(url, moduleType)] to moduleScript, and run onComplete given moduleScript.
         module_map.set(url, module_type, { ModuleMap::EntryType::ModuleScript, module_script });
+
+        dbgln("calling onComplete");
+
         on_complete->function()(module_script);
     };
 
@@ -780,7 +783,7 @@ void fetch_descendants_of_and_link_a_module_script(JS::Realm& realm,
     dbgln("Creating a new FetchContext with fetch_client set to {}", &fetch_client);
 
     // 3. Let state be Record { [[ParseError]]: null, [[Destination]]: destination, [[PerformFetch]]: null, [[FetchClient]]: fetchClient }.
-    auto state = FetchContext { {}, destination, {}, fetch_client };
+    auto state = realm.heap().allocate_without_realm<FetchContext>(JS::Value {}, destination, nullptr, fetch_client);
 
     // FIXME: 4. If performFetch was given, set state.[[PerformFetch]] to performFetch.
 
@@ -818,8 +821,8 @@ void fetch_descendants_of_and_link_a_module_script(JS::Realm& realm,
     WebIDL::upon_rejection(loading_promise, [&state, &module_script, on_complete](auto const&) -> WebIDL::ExceptionOr<JS::Value> {
         // 1. If state.[[ParseError]] is not null, set moduleScript's error to rethrow to state.[[ParseError]] and run
         //    onComplete given moduleScript.
-        if (state.has_parse_error()) {
-            module_script.set_error_to_rethrow(state.parse_error());
+        if (state->has_parse_error()) {
+            module_script.set_error_to_rethrow(state->parse_error());
 
             on_complete->function()(module_script);
         }
@@ -831,8 +834,8 @@ void fetch_descendants_of_and_link_a_module_script(JS::Realm& realm,
         return JS::js_undefined();
     });
 
-    fetch_client.clean_up_after_running_callback();
     realm.vm().pop_execution_context();
+    fetch_client.clean_up_after_running_callback();
 }
 
 }

@@ -38,7 +38,7 @@ public:
 
     [[nodiscard]] Object& global_object() const { return *m_global_object; }
     [[nodiscard]] GlobalEnvironment& global_environment() const { return *m_global_environment; }
-    [[nodiscard]] Vector<ModuleWithSpecifier> const& loaded_modules() const { return m_loaded_modules; };
+    [[nodiscard]] Vector<ModuleWithSpecifier>& loaded_modules() { return m_loaded_modules; };
 
     [[nodiscard]] Intrinsics const& intrinsics() const { return *m_intrinsics; }
     [[nodiscard]] Intrinsics& intrinsics() { return *m_intrinsics; }

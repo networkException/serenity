@@ -30,10 +30,10 @@ class GraphLoadingState : public Cell {
     JS_CELL(GraphLoadingState, Cell);
 
 public:
-    struct HostDefined {
+    class HostDefined : public Cell {
+        JS_CELL(HostDefined, Cell);
+    public:
         virtual ~HostDefined() = default;
-
-        virtual void visit_edges(Cell::Visitor&) { }
     };
 
     GCPtr<PromiseCapability> promise_capability() { return m_promise_capability; }
@@ -75,7 +75,7 @@ public:
     virtual void inner_module_loading(GraphLoadingState& state);
 
     Vector<ModuleRequest> const& requested_modules() const { return m_requested_modules; }
-    Vector<ModuleWithSpecifier> const& loaded_modules() const { return m_loaded_modules; }
+    Vector<ModuleWithSpecifier>& loaded_modules() { return m_loaded_modules; }
 
 protected:
     CyclicModule(Realm& realm, StringView filename, bool has_top_level_await, Vector<ModuleRequest> requested_modules, Script::HostDefined* host_defined);

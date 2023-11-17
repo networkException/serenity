@@ -113,6 +113,6 @@ private:
 
 class CyclicModule;
 
-void finish_loading_imported_module(Realm&, ImportedModuleReferrer const&, ModuleRequest const&, ImportedModulePayload&, ThrowCompletionOr<NonnullGCPtr<Module>> const&);
+void finish_loading_imported_module(Realm&, ImportedModuleReferrer const&, ModuleRequest const&, ImportedModulePayload, ThrowCompletionOr<NonnullGCPtr<Module>> const&);
 
 }

@@ -17,11 +17,11 @@ namespace JS {
 
 void GraphLoadingState::visit_edges(Cell::Visitor& visitor)
 {
+    Base::visit_edges(visitor);
     visitor.visit(m_promise_capability);
     for (auto const& visited_module : m_visited)
         visitor.visit(visited_module);
-    if (m_host_defined)
-        m_host_defined->visit_edges(visitor);
+    visitor.visit(m_host_defined);
 }
 
 CyclicModule::CyclicModule(Realm& realm, StringView filename, bool has_top_level_await, Vector<ModuleRequest> requested_modules, Script::HostDefined* host_defined)
@@ -52,11 +52,11 @@ PromiseCapability& CyclicModule::load_requested_modules(JS::Realm& realm, GCPtr<
     auto promise_capability = MUST(new_promise_capability(realm.vm(), realm.intrinsics().promise_constructor()));
 
     // 3. Let state be the GraphLoadingState Record { [[IsLoading]]: true, [[PendingModulesCount]]: 1, [[Visited]]: « », [[PromiseCapability]]: pc, [[HostDefined]]: hostDefined }.
-    auto state = GraphLoadingState();
-    state.set_is_loading(true);
-    state.set_pending_module_count(1);
-    state.set_promise_capability(promise_capability);
-    state.set_host_defined(host_defined);
+    auto state = heap().allocate_without_realm<GraphLoadingState>();
+    state->set_is_loading(true);
+    state->set_pending_module_count(1);
+    state->set_promise_capability(promise_capability);
+    state->set_host_defined(host_defined);
 
     // 4. Perform InnerModuleLoading(state, module).
     inner_module_loading(state);
@@ -177,7 +177,7 @@ void CyclicModule::inner_module_loading(GraphLoadingState& state)
 void continue_module_loading(Realm& realm, GraphLoadingState& state, ThrowCompletionOr<NonnullGCPtr<Module>> const& module_completion)
 {
     // 1. If state.[[IsLoading]] is false, return UNUSED.
-    if (state.is_loading())
+    if (!state.is_loading())
         return;
 
     // 2. If moduleCompletion is a normal completion, then
@@ -189,6 +189,8 @@ void continue_module_loading(Realm& realm, GraphLoadingState& state, ThrowComple
     }
     // 3. Else,
     else {
+        dbgln("continue_module_loading throw completion");
+
         // a. Set state.[[IsLoading]] to false.
         state.set_is_loading(false);
 

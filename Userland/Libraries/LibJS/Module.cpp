@@ -70,17 +70,21 @@ ThrowCompletionOr<u32> Module::inner_module_evaluation(VM& vm, Vector<Module*>&,
 // FIXME: We currently implement an outdated version of https://tc39.es/proposal-import-attributes, as such it is not possible to
 //        use the exact steps from https://tc39.es/proposal-import-attributes/#sec-HostLoadImportedModule here.
 // FIXME: Support Realm for referrer.
-void finish_loading_imported_module(Realm& realm, ImportedModuleReferrer const& referrer, ModuleRequest const& module_request, ImportedModulePayload& payload, ThrowCompletionOr<NonnullGCPtr<Module>> const& result)
+void finish_loading_imported_module(Realm& realm, ImportedModuleReferrer const& referrer, ModuleRequest const& module_request, ImportedModulePayload payload, ThrowCompletionOr<NonnullGCPtr<Module>> const& result)
 {
     dbgln("finish_loading_imported_module");
 
     // 1. If result is a normal completion, then
     if (!result.is_error()) {
-        auto loaded_modules = referrer.visit([](auto const& script_or_module_or_realm) -> Vector<ModuleWithSpecifier> {
+        dbgln("a");
+
+        dbgln("referrer: {}", &referrer);
+
+        auto& loaded_modules = referrer.visit([](auto const& script_or_module_or_realm) -> Vector<ModuleWithSpecifier>& {
             return script_or_module_or_realm->loaded_modules();
         });
 
-        dbgln("got loaded_modules");
+        dbgln("b");
 
         bool found_record = false;
 
@@ -96,25 +100,10 @@ void finish_loading_imported_module(Realm& realm, ImportedModuleReferrer const& 
 
         // b. Else,
         if (!found_record) {
-            dbgln("Appending the record {}", module_request.module_specifier);
-
             // i. Append the Record { [[Specifier]]: specifier, [[Module]]: result.[[Value]] } to referrer.[[LoadedModules]].
             loaded_modules.append(ModuleWithSpecifier {
                 .specifier = module_request.module_specifier,
                 .module = result.value() });
-
-            dbgln("All loaded modules:");
-            {
-                auto loaded_modules2 = referrer.visit([](auto const& script_or_module_or_realm) -> Vector<ModuleWithSpecifier> {
-                    return script_or_module_or_realm->loaded_modules();
-                });
-
-                for (auto const& m : loaded_modules2) {
-                    dbgln("loaded module: {}", m.specifier);
-                }
-            }
-
-            dbgln("------");
         }
     }
 
