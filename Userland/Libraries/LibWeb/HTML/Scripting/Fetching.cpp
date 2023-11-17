@@ -569,7 +569,7 @@ void fetch_single_module_script(JS::Realm& realm,
     TopLevelModule is_top_level,
     OnFetchScriptComplete on_complete)
 {
-    dbgln("fetch_single_module_script");
+    dbgln("fetch_single_module_script {}", url);
     dbgln("calling fetch_client.realm_execution_context()");
     fetch_client.realm_execution_context();
 
@@ -591,8 +591,12 @@ void fetch_single_module_script(JS::Realm& realm,
     // 5. If moduleMap[(url, moduleType)] is "fetching", wait in parallel until that entry's value changes,
     //    then queue a task on the networking task source to proceed with running the following steps.
     if (module_map.is_fetching(url, module_type)) {
-        module_map.wait_for_change(realm.heap(), url, module_type, [on_complete](auto entry) -> void {
+        dbgln("{} is fetching, waiting for it to be done", url);
+
+        module_map.wait_for_change(realm.heap(), url, module_type, [url, on_complete](auto entry) -> void {
             // FIXME: This should queue a task.
+
+            dbgln("{} is done fetching", url);
 
             // FIXME: This should run other steps, for now we just assume the script loaded.
             VERIFY(entry.type == ModuleMap::EntryType::ModuleScript);
